@@ -25,6 +25,8 @@ try {
 
 const client = new Client({
   authStrategy: new LocalAuth()
+  // authStrategy: new LocalAuth(),puppeteer: { headless: true, executablePath: './node_modules/puppeteer/.local-chromium/linux-1022525/chrome-linux/chrome'} 
+  // Use this if you are using puppeteer on a linux machine
 }); 
 
 client.on('qr', qr => {
