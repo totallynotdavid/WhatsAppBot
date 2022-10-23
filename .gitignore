@@ -1,2 +1,6 @@
 node_modules/
 .wwebjs_auth/
+config.js
+audio/
+*.mp3
+*.png
