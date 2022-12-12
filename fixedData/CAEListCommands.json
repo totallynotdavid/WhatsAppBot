@@ -1,0 +1,22 @@
+[
+  {
+    "command": "bib",
+    "message": "https://bit.ly/3gbArg2"
+  },
+  {
+    "command": "cal",
+    "message": "1: https://bit.ly/3TMwIo1\n  2: https://bit.ly/3gj7nmY\n  3: https://bit.ly/3z2Ch9Q"
+  },
+  {
+    "command": "fg",
+    "message": "1: https://bit.ly/3eT3a9m\n  2: https://bit.ly/3N7njW1"
+  },
+  {
+    "command": "ayuda",
+    "message": "```!cae bib```: Retorna el enlace a la Biblioteca\n```!cae cal```: Retorna enlaces a los cursos de Cálculo\n```!cae fg```: Retorna enlaces a los cursos de Física General"
+  },
+  {
+    "command": "cae",
+    "message": "obtiene URLs del CAE-Física"
+  }
+]

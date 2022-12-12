@@ -1,23 +1,26 @@
 {
-  "name": "whatsapp",
-  "version": "0.1",
+  "name": "whatsapp-bot",
+  "version": "1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "clean": "shx rm -rf package-lock.json node_modules"
+    "start:clean": "npm run clean && npm start",
+    "clean:mundane": "shx rm -rf music logs.txt",
+    "clean:packages": "shx rm -rf package-lock.json node_modules",
+    "clean:session": "shw rm -rf .wwebjs_auth"
   },
-  "author": "David",
+  "author": "totallynotdavid",
   "license": "MIT",
   "devDependencies": {
     "axios": "^0.27.2",
+    "dotenv": "^16.0.3",
+    "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
-    "path": "^0.12.7",
     "qrcode-terminal": "^0.12.0",
-    "sharp": "^0.30.7",
     "shx": "^0.3.4",
     "spotify-web-api-node": "^5.0.2",
-    "whatsapp-web.js": "^1.17.1",
-    "ytsr": "^3.8.0"
+    "whatsapp-web.js": "^1.18.0",
+    "ytdl-core": "^4.11.2"
   }
 }

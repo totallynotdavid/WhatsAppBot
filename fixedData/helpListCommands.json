@@ -1,0 +1,22 @@
+[
+  {
+    "command": "spot",
+    "message": "Este comando busca en Spotify y obten una canción"
+  },
+  {
+    "command": "sticker",
+    "message": "Este comando transforma una imagen, video o gif en un sticker"
+  },
+  {
+    "command": "yt",
+    "message": "Este comando busca videos en YouTube y obten el primer resultado (imagen, título y URL)"
+  },
+  {
+    "command": "w",
+    "message": "Este comando busca en Wikipedia y obten una breve descripción"
+  },
+  {
+    "command": "cae",
+    "message": "Este comando obtiene URLs del CAE-Física"
+  }
+]
