@@ -62,7 +62,7 @@ client.on('message_create', async message => {
 
   if (message.body.startsWith(prefix)) {
 
-    const helpCommand = 'ayuda';
+    const helpCommand = 'help';
     const stickerCommand = 'sticker';
     const stickerUrlCommand = 'url';
     const spotifyCommand = 'spot';
