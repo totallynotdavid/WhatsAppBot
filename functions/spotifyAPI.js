@@ -71,7 +71,7 @@ async function downloadSpotifyAudio(song) {
 async function sendSpotifyAudio(MessageMedia, client, message, song) {
   try {
     const media = MessageMedia.fromFilePath(`./audio/${song.id}.mp3`);
-    await client.sendMessage(message.from, media, { sendAudioAsVoice: true });
+    await client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
   } catch (error) {
     console.error('Error sending audio file:', error);
     return null;

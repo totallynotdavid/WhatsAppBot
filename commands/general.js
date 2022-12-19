@@ -1,9 +1,7 @@
 /* Packages */
 const fetch = require('node-fetch');
 const path = require('path');
-const fs = require('fs');
 const { exec } = require('child_process');
-const ytdl = require('ytdl-core');
 const moment = require('moment');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const youtubeKey = process.env.youtubeKey;
@@ -32,7 +30,8 @@ function capitalizeText(s) {
 function getHelpMessage(prefix, stringifyMessage, helpCommand, message) {
   try {
 
-    switch (true) {
+    switch (true) 
+    {
       // If the message is just "${prefix}ayuda", print all the commands
       case stringifyMessage.length === 1:
         const commands = helpListCommands.map(command => `\`\`\`${command.command}\`\`\``);
@@ -55,7 +54,8 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message) {
 
 function getCAEMessage(prefix, stringifyMessage, caeCommand, message) {
   try {
-    switch (true) {
+    switch (true) 
+    {
       case stringifyMessage.length === 1 :
         message.reply(`🔗 linktr.ee/caefisica`);
         break;
@@ -87,15 +87,16 @@ function getYoutubeVideoId(url) {
   return videoId;
 }
 
-function convertMp3ToOgg(filepath, transformedFilepath, message, client, MessageMedia) {
-  const command = `ffmpeg -i ${filepath} -c:a libopus ${transformedFilepath}`;
+/* Delete? */
+function convertMp3ToOgg(videoFilename, outputFilename, message, client, MessageMedia) {
+  const command = `ffmpeg -i ${videoFilename} -c:a libopus ${outputFilename}`;
   exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error: ${error}`);
       return;
     }
-    const media = MessageMedia.fromFilePath(transformedFilepath);
-    client.sendMessage(message.from, media, { sendAudioAsVoice : true });
+    const media = MessageMedia.fromFilePath(outputFilename);
+    client.sendMessage(message.id.remote, media, { sendAudioAsVoice : true });
   });
 }
 
@@ -117,54 +118,69 @@ async function getVideoLength(videoId) {
   return durationInSeconds;
 }
 
-async function mp3FromYoutube(message, client, MessageMedia, query) {
-  switch (true) {
-    case query.includes('youtube.com') || query.includes('youtu.be') :
-      const videoId = getYoutubeVideoId(query);
-      const videoLength = await getVideoLength(videoId)
-      switch (true) {
-        case videoLength <= 600:
-          const audio = ytdl(query, {
-            filter: 'audioonly',
-            quality: 'lowestaudio',
-          });
-          const info = await ytdl.getInfo(query);
-        
-          const filepath = `./audio/${info.videoDetails.videoId}.mp3`;
-          const transformedFilepath = `./audio/${info.videoDetails.videoId}.ogg`;
-          const writeStream = fs.createWriteStream(filepath);
-          audio.pipe(writeStream);
-        
-          audio.on ('end', () => {
-            console.log('Audio downloaded successfully');
-            convertMp3ToOgg(filepath, transformedFilepath, message, client, MessageMedia);
-          });
-          break;
-        default:
-          message.reply(`🤖 El video es demasiado largo. El límite es de 10 minutos.`);
+async function mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage) {
+  const youtubeURL = stringifyMessage[1];
+
+  if (youtubeURL.includes('youtube.com') || youtubeURL.includes('youtu.be')) {
+    const videoID = getYoutubeVideoId(youtubeURL);
+    const videoLength = await getVideoLength(videoID);
+
+    const startTime = stringifyMessage[2];
+    const endTime = stringifyMessage[3];
+    const videoFilename = `audio/${videoID}.webm`;
+    const outputFilename = `audio/${videoID}.ogg`;
+
+    const commands = {
+      fullVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg -o "audio/%(id)s.%(ext)s"`,
+      cutAtStart: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-ss ${startTime}" -o "audio/%(id)s.%(ext)s"`,
+      cutAtEnd: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-to ${endTime}" -o "audio/%(id)s.%(ext)s"`,
+      cutVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-ss ${startTime} -to ${endTime}" -o "audio/%(id)s.%(ext)s"`,
+    };
+
+    const command = commands[commandMode] || `comando no válido`;
+
+    if (videoLength <= 600) {
+      exec(command, (error) => {
+        if (error) {
+          console.error(`Error: ${error}`);
+          return;
         }
-      break;
-    default:
-      message.reply(`🤖 La URL no es válida.`);
-      break;
+        convertMp3ToOgg(videoFilename, outputFilename, message, client, MessageMedia);
+      });
+    } else {
+      message.reply(`🤖 El video es demasiado largo. El límite es de 10 minutos.`);
+    }
+  } else {
+    message.reply(`🤖 La URL no es válida.`);
   }
+
 }
 
 async function getRedditImage(message, subreddit, client, MessageMedia) {
   try {
+
     const response = await fetch(`https://meme-api.com/gimme/${subreddit}`);
+    if (response.ok) {
+      throw new Error(`Unable to fetch image: ${response.statusText}`);
+    }
+
     const imageData = await response.json();
+    if (!imageData) {
+      throw new Error("Unable to parse image data");
+    }
+
     const imageMedia = await MessageMedia.fromUrl(imageData.url);
     client.sendMessage(message.from, imageMedia, { caption: imageData.title });
-  } catch {
-    // reply with an error message and react with a cross
-    message.reply("Hubo un error al tratar de enviar la imagen.");
+
+  } catch (err) {
+    message.reply("🤖 Hubo un error al tratar de enviar la imagen.");
+    console.error(err);
   }
 }
 
-async function getWikiArticle(message, query, language_code, UserNameWS) {
+async function getWikiArticle(message, query, languagecode, UserNameWS) {
   try {
-    const url = `https://${language_code}.wikipedia.org/api/rest_v1/page/summary/${query}`;
+    const url = `https://${languagecode}.wikipedia.org/api/rest_v1/page/summary/${query}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -174,19 +190,24 @@ async function getWikiArticle(message, query, language_code, UserNameWS) {
     }
 
     const handleNotFound = async () => {
-      const search_url = `https://${language_code}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${query}&format=json`;
-      const response = await fetch(search_url);
+      const searchURL = `https://${languagecode}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${query}&format=json`;
+      const response = await fetch(searchURL);
       const data = await response.json();
-      const similarArticles = data.query.search;
-      const answer = similarArticles[0].title.replace(/ /g, "_");;
-      message.reply(`🤖 ${UserNameWS}, tu búsqueda no dió resultados, puedes ver artículos similares aquí: https://${language_code}.wikipedia.org/wiki/${answer}`);
+      if (data.query.searchinfo.totalhits === 0) {
+        message.reply(`🤖 ${UserNameWS}, tu búsqueda no dió resultados.`);
+      } else {
+        const similarArticles = data.query.search;
+        const answer = similarArticles[0].title.replace(/ /g, "_");;
+        message.reply(`🤖 ${UserNameWS}, tu búsqueda no dió resultados, puedes ver artículos similares aquí: https://${languagecode.toLowerCase()}.wikipedia.org/wiki/${answer}`);
+      }
     }
 
     const handleSuccess = () => {
       message.reply(`🤖 *${data.title}*: ${data.extract}`);
     }
 
-    switch (data.type) {
+    switch (data.type) 
+    {
       case "disambiguation":
         handleDisambiguation();
         break;
@@ -243,7 +264,8 @@ async function searchYoutubeVideo(message, client, MessageMedia, query) {
     // Get the video, playlist, and channel IDs from the response
     const { videoId, playlistId, channelId } = data.items[0].id;
 
-    switch (data.items[0].id.kind) {
+    switch (data.items[0].id.kind) 
+    {
       case "youtube#video":
         // Send the media message for a video
         sendMediaMessage(videoId, "🎬", "https://youtu.be/", message, client, MessageMedia);
@@ -263,7 +285,6 @@ async function searchYoutubeVideo(message, client, MessageMedia, query) {
     }
   } else {
     // Handle the case when there are no results
-    console.log("No results found for the given query.");
     message.reply("🤖 Hubo un error con tu búsqueda, intenta de nuevo.")
   }
 }

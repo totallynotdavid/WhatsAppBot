@@ -1,6 +1,7 @@
 // Import the required modules
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const fetch = require('node-fetch');
 
 const general = require('../commands/general');
 const admin = require('../commands/admin');
@@ -43,7 +44,7 @@ client.on('message_create', async message => {
   let prefix = '!';
   let prefix_admin = '@';
   // Get the full message sent by the user. Example: from "!spot dkdk" it will get "!spot dkdk"
-  let stringifyMessage = message.body.split(' ');
+  let stringifyMessage = message.body.trim().split(/\s+/);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
@@ -88,7 +89,8 @@ client.on('message_create', async message => {
 
     if (message.body === `${prefix}${stickerCommand}`) {
       try {
-        switch(true) {
+        switch(true) 
+        {
           case message.hasQuotedMsg:
             const quoted = await message.getQuotedMessage();
             if (quoted.hasMedia) {
@@ -111,75 +113,119 @@ client.on('message_create', async message => {
     }
 
     if (stringifyMessage[0] === `${prefix}${stickerUrlCommand}`) {
+      const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+      const imageOrVideoRegex = /\.(jpg|jpeg|png|mp4)$/i;
 
-      const stickerURL = stringifyMessage[1];
+      if (stringifyMessage.length !== 2) {
+        message.reply(`🤖 Debes adjuntar solo la URL de la imagen o video a la que quieres convertir en sticker.`);
+        message.react("⚠️");
+      } else {
+        console.log(`Received URL: ${stringifyMessage[1]}`);
 
-      switch(true) {
-        case typeof stickerURL !== 'undefined' && stickerURL !== null && stickerURL !== '':
-          const sticker = await MessageMedia.fromUrl(stickerURL);
-          loggedconvertUrlImageToSticker(chat, message, sticker, UserNameWS);
-          break;
-        default:
-          message.reply("Debes adjuntar la imagen a la que quieres convertir en sticker.");
-          message.react("⚠️");
-          break;
+        const stickerURL = stringifyMessage[1];
+
+        if (urlRegex.test(stickerURL) && imageOrVideoRegex.test(stickerURL)) {
+          try {
+            const response = await fetch(stickerURL);
+            const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
+
+            if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
+              if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
+                message.reply(`🤖 El video no puede ser mayor a 20 segundos.`);
+              } else {
+                const sticker = await MessageMedia.fromUrl(stickerURL);
+                loggedconvertUrlImageToSticker(chat, message, sticker, UserNameWS);
+              }
+            } else {
+              message.reply(`🤖 La URL no es una imagen o video válido.`);
+            }
+          } catch (error) {
+            console.error(error);
+            message.reply(`🤖 Hubo un error al intentar obtener la imagen o video de la URL.`);
+          }
+        } else {
+          message.reply(`🤖 Debes adjuntar una URL válida.`);
+        }
       }
     }
 
     if (stringifyMessage[0] === `${prefix}${spotifyCommand}`) {
-
-      /* Preparing variables */
-      const url = `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`;
-      const song = await spotifyAPI.getSongData(url);
-
-      if (song === null) {
-        message.reply(`🤖 No se encontró una preview de la canción *${song.name}* de *${song.artists[0].name}*`);
-        message.react("⚠️");
-        return;
+      switch (stringifyMessage.length) 
+      {
+        case 1:
+          message.reply(`🤖 Debes adjuntar la canción de Spotify.`);
+          message.react("⚠️");
+          break;
+        default:
+          const url = `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`;
+          const song = await spotifyAPI.getSongData(url);
+          await spotifyAPI.downloadSpotifyAudio(song);
+          await loggedSendSpotifyAudio(MessageMedia, client, message, song);
+          break;
       }
+    }    
 
-      await spotifyAPI.downloadSpotifyAudio(song);
-      await loggedSendSpotifyAudio(MessageMedia, client, message, song);
-
-    }
-
-    if (stringifyMessage[0] === `${prefix}${fromisCommand}`) {
+    if (message.body === `${prefix}${fromisCommand}`) {
       const subreddit = general.capitalizeText(fromisCommand);
-      //general.getRedditImage(message, subreddit, client, MessageMedia);
       loggedGetFromisMessage(message, subreddit, client, MessageMedia);
     }
 
     if (stringifyMessage[0].startsWith(`${prefix}${wikiCommand}`)) {
-      const language_code = message.body.split(' ')[0].slice(2) || 'en';
-      //general.getWikiArticle(message, query, language_code, UserNameWS);
-      loggedGetWikiMessage(message, query, language_code, UserNameWS);
+      const languageCode = message.body.split(' ')[0].slice(2) || 'en';
+      loggedGetWikiMessage(message, query, languageCode, UserNameWS);
     }
 
     if (stringifyMessage[0].startsWith(`${prefix}${ytCommand}`)) {
-      switch (true) {
+      switch (true) 
+      {
         case (stringifyMessage.length === 1):
-          message.reply("Debes adjuntar el link del video de YouTube.");
+          message.reply(`🤖 Debes adjuntar el link del video de YouTube.`);
           break;
         case (stringifyMessage.length === 2 && (query.includes(`youtube.com`)) ):
-          //general.getYoutubeVideo(message, client, MessageMedia, query);
           loggedGetYoutubeMessage(message, client, MessageMedia, query);
           break;
         case (stringifyMessage.length === 2 && (query.includes(`youtu.be`)) ):
-          //general.getYoutubeVideo(message, client, MessageMedia, query);
           loggedGetYoutubeMessage(message, client, MessageMedia, query);
           break;
         default:
-          //general.searchYoutubeVideo(message, client, MessageMedia, query);
           loggedSearchYoutubeMessage(message, client, MessageMedia, query);
           break;
       }
     }
 
     if (stringifyMessage[0].startsWith(`${prefix}${playCommand}`)) {
+      const commands = {
+        1: {
+          notice: `🤖 Debes adjuntar el link del video de YouTube.`,
+          commandMode: null,
+        },
+        2: {
+          commandMode: `fullVideo`,
+        },
+        3: {
+          commandMode: `cutAtStart`,
+        },
+        4: {
+          commandMode: `cutVideo`,
+        },
+        default: {
+          notice: `🤖 Revisa la sintaxis del comando.`,
+          commandMode: null,
+        },
+      };
+      
+      const { notice = '', commandMode } = commands[stringifyMessage.length] || commands.default;
+      if (notice) {
+        message.reply(notice);
+      } else {
+        loggedGetPlayMessage(commandMode, message, client, MessageMedia, stringifyMessage);
+      }      
+
+      /*
       console.time('mp3FromYoutube');
       loggedGetPlayMessage(message, client, MessageMedia, query);
-      //general.mp3FromYoutube(message, client, MessageMedia, query)
       console.timeEnd('mp3FromYoutube');
+      */
     }
 
   }
