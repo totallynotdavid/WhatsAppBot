@@ -202,7 +202,7 @@ client.on('message_create', async message => {
       }
     }
 
-    if (stringifyMessage[0].startsWith(`${prefix}${playCommand}` && stringifyMessage.length <= 2)) {
+    if (stringifyMessage[0].startsWith(`${prefix}${playCommand}`) && stringifyMessage.length <= 2 ) {
       const commands = {
         1: {
           notice: `🤖 Debes adjuntar el link del video de YouTube.`,
