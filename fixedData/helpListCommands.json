@@ -1,22 +1,32 @@
 [
   {
     "command": "spot",
-    "message": "Este comando busca en Spotify y obten una canción"
+    "message": "Busca y reproduce tu música favorita de Spotify",
+    "usage": "!spot fromis airplane mode"
   },
   {
     "command": "sticker",
-    "message": "Este comando transforma una imagen, video o gif en un sticker"
+    "message": "Transforma una imagen, video o gif en un sticker. Necesitas adjuntar el archivo al mensaje",
+    "usage": "!sticker"
   },
   {
     "command": "yt",
-    "message": "Este comando busca videos en YouTube y obten el primer resultado (imagen, título y URL)"
+    "message": "Busca tu video favorito en YouTube",
+    "usage": "!yt blue flame"
+  },
+  {
+    "command": "play",
+    "message": "Reproduce tu música favorita en el chat, solo acepta URLs de YouTube",
+    "usage": "!play https://youtu.be/f0FDOw3zvGo"
   },
   {
     "command": "w",
-    "message": "Este comando busca en Wikipedia y obten una breve descripción"
+    "message": "Obten definiciones de Wikipedia",
+    "usage": "!w portugal the man"
   },
   {
     "command": "cae",
-    "message": "Este comando obtiene URLs del CAE-Física"
+    "message": "Reservado para el CAE-Física",
+    "usage": "!cae"
   }
 ]

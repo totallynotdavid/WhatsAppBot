@@ -1,15 +1,19 @@
 [
   {
     "command": "bib",
-    "message": "https://bit.ly/3gbArg2"
+    "message": "https://bit.ly/cae_biblioteca"
   },
   {
-    "command": "cal",
-    "message": "1: https://bit.ly/3TMwIo1\n  2: https://bit.ly/3gj7nmY\n  3: https://bit.ly/3z2Ch9Q"
+    "command": "calculo",
+    "message": "\n\n1: https://bit.ly/3TMwIo1\n2: https://bit.ly/3gj7nmY\n3: https://bit.ly/3z2Ch9Q"
   },
   {
-    "command": "fg",
-    "message": "1: https://bit.ly/3eT3a9m\n  2: https://bit.ly/3N7njW1"
+    "command": "fisica_matematica",
+    "message": "\n\n1: http://bit.ly/3IMqi5M\n2: http://bit.ly/3WbK8uj\n3: http://bit.ly/3vYH8XL"
+  },
+  {
+    "command": "mecanica_clasica",
+    "message": "\n\n1: http://bit.ly/3Xb6Wf8\n2: http://bit.ly/3Xah3kn"
   },
   {
     "command": "ayuda",

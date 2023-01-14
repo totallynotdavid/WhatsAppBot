@@ -10,11 +10,15 @@ const youtubeKey = process.env.youtubeKey;
 const helpListCommands = require('../fixedData/helpListCommands.json');
 const CAEListCommands = require('../fixedData/CAEListCommands.json');
 
+function codeWrapper(message) {
+  return "```" + message + "```";
+}
+
 function commandGenerator(fixedDataCommand, message, stringifyMessage) {
   try {
     for (const command of fixedDataCommand) {
       if (command.command === stringifyMessage[1]) {
-        const builtMessage = `🤖\n\n${command.message}`;
+        const builtMessage = `🤖 ${codeWrapper(stringifyMessage[1])}: ${command.message}`;
         message.reply(builtMessage);
       }
     }
@@ -27,16 +31,24 @@ function capitalizeText(s) {
     return s && s[0].toUpperCase() + s.slice(1);
 }
 
-function getHelpMessage(prefix, stringifyMessage, helpCommand, message) {
+function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List) {
   try {
 
     switch (true) 
     {
       // If the message is just "${prefix}ayuda", print all the commands
       case stringifyMessage.length === 1:
-        const commands = helpListCommands.map(command => `\`\`\`${command.command}\`\`\``);
-        const helpMessage = `🤖 Los comandos disponibles son:\n\n${commands.join(' \n')}\n\nPara obtener más información sobre un comando, escribe:\n\n\`\`\`${prefix}${helpCommand} comando\`\`\``;
-        message.reply(helpMessage);
+        const examples = helpListCommands.map(command => `${command.usage}`);
+        const section = new List(
+          "Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?",
+          "Cómo usar los comandos",
+          [
+            {
+              title: `Usa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando`,
+              rows: examples.map(example => ({title: example})),
+            }
+        ]);
+        client.sendMessage(message.from, section);
         break;
       // If the message is "${prefix}ayuda comando", print the info about that command
       case stringifyMessage.length === 2:
@@ -52,14 +64,28 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message) {
   }
 }
 
-function getCAEMessage(prefix, stringifyMessage, caeCommand, message) {
+function getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Buttons) {
   try {
-    switch (true) 
+    switch (stringifyMessage.length) 
     {
-      case stringifyMessage.length === 1 :
+      case 1 :
         message.reply(`🔗 linktr.ee/caefisica`);
+
+        const buttonsReplyUrl = new Buttons(
+          'Podrás encontrar: libros y canales de YouTube recomendados para el estudio de la Física', 
+          [
+            { body: `${prefix}${caeCommand} calculo` },
+            { body: `${prefix}${caeCommand} fisica_matematica` },
+            { body: `${prefix}${caeCommand} mecanica_clasica` },
+            { body: '🔗 Linktree', url: 'https://linktr.ee/caefisica' },
+            { body: '📚 BiblioteCAE', url: 'https://bit.ly/cae_biblioteca'}
+          ], 
+          'Guías de Estudio', 
+          'Redactado por el equipo del Centro de Apoyo al Estudiante de Física'
+        );
+        client.sendMessage(message.from, buttonsReplyUrl);      
         break;
-      case stringifyMessage.length === 2 :
+      case 2 :
         const fixedDataCommand = CAEListCommands;
         commandGenerator(fixedDataCommand, message, stringifyMessage);
         break;
@@ -67,7 +93,8 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message) {
         message.reply(`🤖 Este comando no es válido. Usa ${prefix}${caeCommand} ayuda para ver los comandos disponibles.`);
     }
   } catch (err) {
-    console.error(err);
+    errorMessage = err;
+    console.error(errorMessage);
   }
 }
 
@@ -125,21 +152,36 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
     const videoID = getYoutubeVideoId(youtubeURL);
     const videoLength = await getVideoLength(videoID);
 
-    const startTime = stringifyMessage[2];
-    const endTime = stringifyMessage[3];
-    const videoFilename = `audio/${videoID}.webm`;
+    //const startTime = stringifyMessage[2];
+    //const endTime = stringifyMessage[3];
+    const videoFilename = `audio/${videoID}.weba`;
     const outputFilename = `audio/${videoID}.ogg`;
 
     const commands = {
-      fullVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg -o "audio/%(id)s.%(ext)s"`,
+      fullVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} -o "audio/%(id)s.%(ext)s"`,
+      /*
       cutAtStart: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-ss ${startTime}" -o "audio/%(id)s.%(ext)s"`,
       cutAtEnd: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-to ${endTime}" -o "audio/%(id)s.%(ext)s"`,
       cutVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} --external-downloader ffmpeg --external-downloader-args "-ss ${startTime} -to ${endTime}" -o "audio/%(id)s.%(ext)s"`,
+      */
     };
+
+    /*
+    if(startTime > videoLength || endTime > videoLength) {
+      message.reply(`🤖 El tiempo de inicio o fin es mayor que la duración del video.`);
+      return;
+    }
+
+    if(startTime > endTime) {
+        message.reply(`🤖 El tiempo de inicio es mayor que el tiempo de fin.`);
+        return;
+    }
+    */
 
     const command = commands[commandMode] || `comando no válido`;
 
     if (videoLength <= 600) {
+      console.log(command);
       exec(command, (error) => {
         if (error) {
           console.error(`Error: ${error}`);
@@ -160,7 +202,7 @@ async function getRedditImage(message, subreddit, client, MessageMedia) {
   try {
 
     const response = await fetch(`https://meme-api.com/gimme/${subreddit}`);
-    if (response.ok) {
+    if (!response.ok) {
       throw new Error(`Unable to fetch image: ${response.statusText}`);
     }
 
@@ -178,7 +220,7 @@ async function getRedditImage(message, subreddit, client, MessageMedia) {
   }
 }
 
-async function getWikiArticle(message, query, languagecode, UserNameWS) {
+async function getWikiArticle(message, query, languagecode, senderName, client, MessageMedia) {
   try {
     const url = `https://${languagecode}.wikipedia.org/api/rest_v1/page/summary/${query}`;
     const res = await fetch(url);
@@ -186,7 +228,7 @@ async function getWikiArticle(message, query, languagecode, UserNameWS) {
 
     const handleDisambiguation = () => {
       const disambiguation = data.content_urls.desktop.page;
-      message.reply(`🤖 ${UserNameWS}, tu búsqueda dió resultados ambiguos, puedes verlos aquí: ${disambiguation}`);
+      message.reply(`🤖 ${senderName}, tu búsqueda dió resultados ambiguos, puedes verlos aquí: ${disambiguation}`);
     }
 
     const handleNotFound = async () => {
@@ -194,16 +236,22 @@ async function getWikiArticle(message, query, languagecode, UserNameWS) {
       const response = await fetch(searchURL);
       const data = await response.json();
       if (data.query.searchinfo.totalhits === 0) {
-        message.reply(`🤖 ${UserNameWS}, tu búsqueda no dió resultados.`);
+        message.reply(`🤖 ${senderName}, tu búsqueda no dió resultados.`);
       } else {
         const similarArticles = data.query.search;
         const answer = similarArticles[0].title.replace(/ /g, "_");;
-        message.reply(`🤖 ${UserNameWS}, tu búsqueda no dió resultados, puedes ver artículos similares aquí: https://${languagecode.toLowerCase()}.wikipedia.org/wiki/${answer}`);
+        message.reply(`🤖 ${senderName}, tu búsqueda no dió resultados, puedes ver artículos similares aquí: https://${languagecode.toLowerCase()}.wikipedia.org/wiki/${answer}`);
       }
     }
 
-    const handleSuccess = () => {
-      message.reply(`🤖 *${data.title}*: ${data.extract}`);
+    const handleSuccess = async () => {
+      const summary = `🤖 *${data.title}*: ${data.extract}`;
+      if (data.originalimage) {
+        const imageMedia = await MessageMedia.fromUrl(data.originalimage.source);
+        client.sendMessage(message.from, imageMedia, { caption: summary })
+      } else {	
+      message.reply(summary);
+      }
     }
 
     switch (data.type) 
@@ -320,11 +368,15 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   });
 }
 
-async function convertImageToSticker(chat, message, sticker, UserNameWS) {
+async function convertImageToSticker(chat, message, sticker, senderName, senderNumber) {
   try {
+    if (senderName.length < 2) {
+      var match = senderNumber.match(/\d{11}/);
+      senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
+    }
     chat.sendMessage(sticker, {
       sendMediaAsSticker: true,
-      stickerName: `${UserNameWS}`,
+      stickerName: `${senderName}`,
       stickerAuthor: "davibot",
     });
     message.reply("🤖 ¡Sticker en camino!");
@@ -333,8 +385,8 @@ async function convertImageToSticker(chat, message, sticker, UserNameWS) {
   }
 }
 
-async function convertUrlImageToSticker (chat, message, sticker, UserNameWS) {
-  convertImageToSticker(chat, message, sticker, UserNameWS);
+async function convertUrlImageToSticker (chat, message, sticker, senderName) {
+  convertImageToSticker(chat, message, sticker, senderName);
 }
 
 module.exports = {

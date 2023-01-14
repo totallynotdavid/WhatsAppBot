@@ -1,5 +1,5 @@
 // Import the required modules
-const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia, Buttons, List } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fetch = require('node-fetch');
 
@@ -43,22 +43,29 @@ client.on('message_create', async message => {
   // Prefixes for the commands
   let prefix = '!';
   let prefix_admin = '@';
-  // Get the full message sent by the user. Example: from "!spot dkdk" it will get "!spot dkdk"
+  // Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]"
   let stringifyMessage = message.body.trim().split(/\s+/);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
-  const loggedMentionEveryone = logFunctionCall(message, admin.mentionEveryone);
-  const loggedGetHelpMessage = logFunctionCall(message, general.getHelpMessage);
-  const loggedGetCAEMessage = logFunctionCall(message, general.getCAEMessage);
-  const loggedConvertImageToSticker = logFunctionCall(message, general.convertImageToSticker);
-  const loggedconvertUrlImageToSticker = logFunctionCall(message, general.convertUrlImageToSticker);
-  const loggedSendSpotifyAudio = logFunctionCall(message, spotifyAPI.sendSpotifyAudio);
-  const loggedGetFromisMessage = logFunctionCall(message, general.getRedditImage);
-  const loggedGetWikiMessage = logFunctionCall(message, general.getWikiArticle);
-  const loggedGetYoutubeMessage = logFunctionCall(message, general.getYoutubeVideo);
-  const loggedSearchYoutubeMessage = logFunctionCall(message, general.searchYoutubeVideo);
-  const loggedGetPlayMessage = logFunctionCall(message, general.mp3FromYoutube);
+
+  const functions = {
+    mentionEveryone: admin.mentionEveryone,
+    getHelpMessage: general.getHelpMessage,
+    getCAEMessage: general.getCAEMessage,
+    convertImageToSticker: general.convertImageToSticker,
+    convertUrlImageToSticker: general.convertUrlImageToSticker,
+    sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
+    getRedditImage: general.getRedditImage,
+    getWikiArticle: general.getWikiArticle,
+    getYoutubeVideo: general.getYoutubeVideo,
+    searchYoutubeVideo: general.searchYoutubeVideo,
+    mp3FromYoutube: general.mp3FromYoutube
+  }
+  
+  Object.keys(functions).forEach(functionName => {
+    functions[functionName] = logFunctionCall(message, functions[functionName]);
+  });
 
   if (message.body.startsWith(prefix)) {
 
@@ -72,19 +79,20 @@ client.on('message_create', async message => {
     const ytCommand = 'yt';
     const playCommand = 'play';
 
-    /* Method to get the name of a user */
-    const getUserNameWS = await message.getContact();
-    const UserNameWS = getUserNameWS.pushname;
+    /* Method to get the name and number of a user */
+    const contactInfo = await message.getContact();
+    const senderName = contactInfo.pushname;
+    const senderNumber = message.from;
 
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
   
     if (stringifyMessage[0] === `${prefix}${helpCommand}`) {
-      loggedGetHelpMessage(prefix, stringifyMessage, helpCommand, message);
+      functions.getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List);
     }
 
     if (stringifyMessage[0] === `${prefix}${caeCommand}`) {
-      loggedGetCAEMessage(prefix, stringifyMessage, caeCommand, message);
+      functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Buttons);
     }
 
     if (message.body === `${prefix}${stickerCommand}`) {
@@ -95,12 +103,12 @@ client.on('message_create', async message => {
             const quoted = await message.getQuotedMessage();
             if (quoted.hasMedia) {
               const sticker = await quoted.downloadMedia();
-              await loggedConvertImageToSticker(chat, message, sticker, UserNameWS);
+              await functions.convertImageToSticker(chat, message, sticker, senderName, senderNumber);
             };
             break;
           case message.hasMedia:
             const sticker = await message.downloadMedia();
-            await loggedConvertImageToSticker(chat, message, sticker, UserNameWS);
+            await functions.convertImageToSticker(chat, message, sticker, senderName, senderNumber);
             break;
           default:
             message.reply("Debes adjuntar la imagen a la que quieres convertir en sticker.");
@@ -113,7 +121,8 @@ client.on('message_create', async message => {
     }
 
     if (stringifyMessage[0] === `${prefix}${stickerUrlCommand}`) {
-      const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+      // GIFs are not supported because they are not animated stickers
+      const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.%]+(\.(jpg|jpeg|png|mp4))$/;
       const imageOrVideoRegex = /\.(jpg|jpeg|png|mp4)$/i;
 
       if (stringifyMessage.length !== 2) {
@@ -134,7 +143,7 @@ client.on('message_create', async message => {
                 message.reply(`🤖 El video no puede ser mayor a 20 segundos.`);
               } else {
                 const sticker = await MessageMedia.fromUrl(stickerURL);
-                loggedconvertUrlImageToSticker(chat, message, sticker, UserNameWS);
+                functions.convertUrlImageToSticker(chat, message, sticker, senderName);
               }
             } else {
               message.reply(`🤖 La URL no es una imagen o video válido.`);
@@ -160,19 +169,19 @@ client.on('message_create', async message => {
           const url = `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`;
           const song = await spotifyAPI.getSongData(url);
           await spotifyAPI.downloadSpotifyAudio(song);
-          await loggedSendSpotifyAudio(MessageMedia, client, message, song);
+          await functions.sendSpotifyAudio(MessageMedia, client, message, song);
           break;
       }
     }    
 
     if (message.body === `${prefix}${fromisCommand}`) {
       const subreddit = general.capitalizeText(fromisCommand);
-      loggedGetFromisMessage(message, subreddit, client, MessageMedia);
+      functions.getRedditImage(message, subreddit, client, MessageMedia);
     }
 
     if (stringifyMessage[0].startsWith(`${prefix}${wikiCommand}`)) {
-      const languageCode = message.body.split(' ')[0].slice(2) || 'en';
-      loggedGetWikiMessage(message, query, languageCode, UserNameWS);
+      const languageCode = message.body.split(' ')[0].slice(2) || 'es';
+      functions.getWikiArticle(message, query, languageCode, senderName, client, MessageMedia);
     }
 
     if (stringifyMessage[0].startsWith(`${prefix}${ytCommand}`)) {
@@ -182,18 +191,18 @@ client.on('message_create', async message => {
           message.reply(`🤖 Debes adjuntar el link del video de YouTube.`);
           break;
         case (stringifyMessage.length === 2 && (query.includes(`youtube.com`)) ):
-          loggedGetYoutubeMessage(message, client, MessageMedia, query);
+          functions.getYoutubeVideo(message, client, MessageMedia, query);
           break;
         case (stringifyMessage.length === 2 && (query.includes(`youtu.be`)) ):
-          loggedGetYoutubeMessage(message, client, MessageMedia, query);
+          functions.getYoutubeVideo(message, client, MessageMedia, query);
           break;
         default:
-          loggedSearchYoutubeMessage(message, client, MessageMedia, query);
+          functions.searchYoutubeVideo(message, client, MessageMedia, query);
           break;
       }
     }
 
-    if (stringifyMessage[0].startsWith(`${prefix}${playCommand}`)) {
+    if (stringifyMessage[0].startsWith(`${prefix}${playCommand}` && stringifyMessage.length <= 2)) {
       const commands = {
         1: {
           notice: `🤖 Debes adjuntar el link del video de YouTube.`,
@@ -202,6 +211,7 @@ client.on('message_create', async message => {
         2: {
           commandMode: `fullVideo`,
         },
+        /*
         3: {
           commandMode: `cutAtStart`,
         },
@@ -212,18 +222,19 @@ client.on('message_create', async message => {
           notice: `🤖 Revisa la sintaxis del comando.`,
           commandMode: null,
         },
+        */
       };
       
       const { notice = '', commandMode } = commands[stringifyMessage.length] || commands.default;
       if (notice) {
         message.reply(notice);
       } else {
-        loggedGetPlayMessage(commandMode, message, client, MessageMedia, stringifyMessage);
-      }      
+        functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
+      }
 
       /*
       console.time('mp3FromYoutube');
-      loggedGetPlayMessage(message, client, MessageMedia, query);
+      functions.mp3FromYoutube(message, client, MessageMedia, query);
       console.timeEnd('mp3FromYoutube');
       */
     }
@@ -236,9 +247,9 @@ client.on('message_create', async message => {
     const admins = administrators.filter(a => message.from === `${a.phone}`);
   
     if (admins.length > 0 && message.body === `${prefix_admin}${mentionEveryoneCommand}`) {
-      loggedMentionEveryone(chat, client, message);
+      functions.mentionEveryone(chat, client, message);
     }
-  }  
+  }
 
 });
 
