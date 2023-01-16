@@ -9,7 +9,7 @@ async function mentionEveryone(chat, client, message) {
     if (chat.isGroup) {
       if (message.body === '@todos') {
         
-        let text = "";
+        let text = '';
         let mentions = [];
 
         /* Looping through all the members */
@@ -35,8 +35,8 @@ async function mentionEveryone(chat, client, message) {
   } catch (err) {
     console.error(err);
   }
-};
+}
 
 module.exports = { 
-  mentionEveryone
+  mentionEveryone,
 };

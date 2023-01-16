@@ -19,5 +19,5 @@ function checkEnvironmentVariables() {
 }
 
 module.exports = {
-  checkEnvironmentVariables
+  checkEnvironmentVariables,
 };

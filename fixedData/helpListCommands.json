@@ -2,31 +2,31 @@
   {
     "command": "spot",
     "message": "Busca y reproduce tu música favorita de Spotify",
-    "usage": "!spot fromis airplane mode"
+    "usage": "spot fromis airplane mode"
   },
   {
     "command": "sticker",
     "message": "Transforma una imagen, video o gif en un sticker. Necesitas adjuntar el archivo al mensaje",
-    "usage": "!sticker"
+    "usage": "sticker"
   },
   {
     "command": "yt",
     "message": "Busca tu video favorito en YouTube",
-    "usage": "!yt blue flame"
+    "usage": "yt blue flame"
   },
   {
     "command": "play",
     "message": "Reproduce tu música favorita en el chat, solo acepta URLs de YouTube",
-    "usage": "!play https://youtu.be/f0FDOw3zvGo"
+    "usage": "play https://youtu.be/f0FDOw3zvGo"
   },
   {
     "command": "w",
     "message": "Obten definiciones de Wikipedia",
-    "usage": "!w portugal the man"
+    "usage": "w portugal the man"
   },
   {
     "command": "cae",
     "message": "Reservado para el CAE-Física",
-    "usage": "!cae"
+    "usage": "cae"
   }
 ]

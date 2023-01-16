@@ -12,7 +12,7 @@ const spotifyClientSecret = process.env.spotifyClientSecret;
 const spotifyApi = new SpotifyWebApi({
   clientId: spotifyClientId,
   clientSecret: spotifyClientSecret,
-  redirectUri: 'http://localhost:3000'
+  redirectUri: 'http://localhost:3000',
 });
 
 /* Keep a timeline of the accessToken */
@@ -56,7 +56,7 @@ async function downloadSpotifyAudio(song) {
     const audio2 = await axios({
       method: 'get',
       url: song.preview_url,
-      responseType: 'stream'
+      responseType: 'stream',
     });
 
     audio2.data.pipe(fs.createWriteStream(`./audio/${song.id}.mp3`));
