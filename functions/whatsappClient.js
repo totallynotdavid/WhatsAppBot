@@ -7,25 +7,12 @@ const fetch = require('node-fetch');
 // Function Locations
 const general = require('../commands/general');
 const admin = require('../commands/admin');
+const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
 
-const functions = {
-  mentionEveryone: admin.mentionEveryone,
-  getHelpMessage: general.getHelpMessage,
-  getCAEMessage: general.getCAEMessage,
-  convertImageToSticker: general.convertImageToSticker,
-  convertUrlImageToSticker: general.convertUrlImageToSticker,
-  sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
-  getRedditImage: general.getRedditImage,
-  getWikiArticle: general.getWikiArticle,
-  getYoutubeInformation: general.getYoutubeInformation,
-  searchYoutubeVideo: general.searchYoutubeVideo,
-  mp3FromYoutube: general.mp3FromYoutube,
-}
-
 /* Global Variables */ 
-let prefix = '!';
+let prefix = '/';
 let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
@@ -125,9 +112,6 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
     if (!(command in commands)) return;
 
-    /* Log the times a function is called and by who */
-    const logFunctionCall = require('./logFunctionCall');
-
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
 
@@ -138,6 +122,21 @@ client.on('message_create', async message => {
 
     /* It is important to know who and why a function was called */
     /* This also takes care of reacting if whatever function is succesfully executed */
+    /* The functions variable should be generated each time, if not, it will loop through all past messages */
+    const functions = {
+      mentionEveryone: admin.mentionEveryone,
+      getHelpMessage: general.getHelpMessage,
+      getCAEMessage: general.getCAEMessage,
+      convertImageToSticker: general.convertImageToSticker,
+      convertUrlImageToSticker: general.convertUrlImageToSticker,
+      sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
+      getRedditImage: general.getRedditImage,
+      getWikiArticle: general.getWikiArticle,
+      getYoutubeInformation: general.getYoutubeInformation,
+      searchYoutubeVideo: general.searchYoutubeVideo,
+      mp3FromYoutube: general.mp3FromYoutube,
+    }
+
     Object.keys(functions).forEach(functionName => {
       functions[functionName] = logFunctionCall(message, functions[functionName]);
     });
