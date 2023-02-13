@@ -3,3 +3,4 @@
 **/node_modules/
 **/.wwebjs_auth/
 **/audio/
+/fixedData/administrators.json
