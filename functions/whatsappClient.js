@@ -7,7 +7,6 @@ const fetch = require('node-fetch');
 // Function Locations
 const general = require('../commands/general');
 const admin = require('../commands/admin');
-const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
 
@@ -125,6 +124,9 @@ client.on('message_create', async message => {
 
     const command = stringifyMessage[0].split(prefix)[1];
     if (!(command in commands)) return;
+
+    /* Log the times a function is called and by who */
+    const logFunctionCall = require('./logFunctionCall');
 
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
