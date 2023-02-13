@@ -12,7 +12,7 @@ const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
 
 /* Global Variables */ 
-let prefix = '/';
+let prefix = '!';
 let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
@@ -80,7 +80,7 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome' // Path to the Chrome executable on Linux
+    executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
     // executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
   },
 });
@@ -105,6 +105,27 @@ client.on('ready', () => {
 
 client.on('message_create', async message => {
 
+  /* It is important to know who and why a function was called */
+  /* This also takes care of reacting if whatever function is succesfully executed */
+  /* The functions variable should be generated each time, if not, it will loop through all past messages */
+  const functions = {
+    mentionEveryone: admin.mentionEveryone,
+    getHelpMessage: general.getHelpMessage,
+    getCAEMessage: general.getCAEMessage,
+    convertImageToSticker: general.convertImageToSticker,
+    convertUrlImageToSticker: general.convertUrlImageToSticker,
+    sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
+    getRedditImage: general.getRedditImage,
+    getWikiArticle: general.getWikiArticle,
+    getYoutubeInformation: general.getYoutubeInformation,
+    searchYoutubeVideo: general.searchYoutubeVideo,
+    mp3FromYoutube: general.mp3FromYoutube,
+  }
+
+  Object.keys(functions).forEach(functionName => {
+    functions[functionName] = logFunctionCall(message, functions[functionName]);
+  });
+
   if (message.body.startsWith(prefix)) {
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
     let stringifyMessage = message.body.trim().split(/\s+/);
@@ -119,27 +140,6 @@ client.on('message_create', async message => {
     const contactInfo = await message.getContact();
     const senderName = contactInfo.pushname;
     const senderNumber = message.id.participant || message.id.remote;
-
-    /* It is important to know who and why a function was called */
-    /* This also takes care of reacting if whatever function is succesfully executed */
-    /* The functions variable should be generated each time, if not, it will loop through all past messages */
-    const functions = {
-      mentionEveryone: admin.mentionEveryone,
-      getHelpMessage: general.getHelpMessage,
-      getCAEMessage: general.getCAEMessage,
-      convertImageToSticker: general.convertImageToSticker,
-      convertUrlImageToSticker: general.convertUrlImageToSticker,
-      sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
-      getRedditImage: general.getRedditImage,
-      getWikiArticle: general.getWikiArticle,
-      getYoutubeInformation: general.getYoutubeInformation,
-      searchYoutubeVideo: general.searchYoutubeVideo,
-      mp3FromYoutube: general.mp3FromYoutube,
-    }
-
-    Object.keys(functions).forEach(functionName => {
-      functions[functionName] = logFunctionCall(message, functions[functionName]);
-    });
 
     let chat = await message.getChat();
 
