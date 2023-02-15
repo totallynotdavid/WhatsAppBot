@@ -10,6 +10,7 @@ const admin = require('../commands/admin');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
+const database = require('../database/connectToDatabase');
 
 /* Global Variables */ 
 let prefix = '!';
@@ -105,6 +106,14 @@ client.on('ready', () => {
 
 client.on('message_create', async message => {
 
+  /* Method to get the name and number of a user */
+  const contactInfo = await message.getContact();
+  const senderName = contactInfo.pushname;
+  const senderNumber = message.id.participant || message.id.remote;
+
+  /* Logging all messages received to Supabase */
+  database.insertMessage(senderNumber, message.body, message.to);
+
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
   /* The functions variable should be generated each time, if not, it will loop through all past messages */
@@ -136,10 +145,7 @@ client.on('message_create', async message => {
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
 
-    /* Method to get the name and number of a user */
-    const contactInfo = await message.getContact();
-    const senderName = contactInfo.pushname;
-    const senderNumber = message.id.participant || message.id.remote;
+    // We used to get the name and number of a user here, but it was moved to the top of the function to be used in other functions
 
     let chat = await message.getChat();
 
