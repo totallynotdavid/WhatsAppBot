@@ -15,6 +15,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 - Node.js
 - ffmpeg
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation#third-party-package-managers)
 
 ## Instalación
 

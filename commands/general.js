@@ -129,9 +129,13 @@ function getYoutubePlaylistId(url) {
   return playlistId;
 }
 
+function hasNonWhitespace(str) {
+  return /[^ \t\n\r\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/.test(str);
+}
+
 function containsVisibleChars(str) {
-  // The regular expression matches any visible character excluding zero-width or invisible characters
-  return /[^\s\u200B-\u200D\uFEFF]/.test(str);
+  // Check if the string contains any alphanumeric or non-whitespace character
+  return /[a-zA-Z0-9]/.test(str) && hasNonWhitespace(str);
 }
 
 async function getYoutubeChannelId(url) {
@@ -367,7 +371,6 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
     }
     const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=snippet&${searchApiType}=${mediaId}&key=${youtubeKey}`;
 
-    console.log(searchUrl)
     const response = await fetch(searchUrl);
     if (!response.ok || !mediaId) return message.reply('🤖 Houston, tenemos un problema. ¿Estás seguro de que la URL es válida?');
     const data = await response.json();
@@ -464,7 +467,8 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
 
 async function convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber) {
   try {
-    if (containsVisibleChars(senderName) || senderName.length < 2) {
+    senderName = senderName.trim();
+    if (!containsVisibleChars(senderName) || senderName.length < 2) {
       var match = senderNumber.match(/(^|[^])\d+/);
       senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
     }
