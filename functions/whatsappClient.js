@@ -108,7 +108,7 @@ client.on('message_create', async message => {
 
   /* Method to get the name and number of a user */
   const contactInfo = await message.getContact();
-  const senderName = contactInfo.pushname;
+  const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined in the contact list, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
 
   /* Logging all messages received to Supabase */

@@ -101,12 +101,12 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Bu
 
 function getYoutubeVideoId(url) {
   // Grande, domi, https://stackoverflow.com/a/71006865/14035380
-  const youtubeRegex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/;
+  const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[?&#].*)?$/;
 
   let videoId = null;
 
   if (youtubeRegex.test(url)) {
-    videoId = url.match(youtubeRegex)[3];
+    videoId = url.match(youtubeRegex)[1];
   } else {
     throw new Error('Invalid YouTube URL');
   }
@@ -127,6 +127,11 @@ function getYoutubePlaylistId(url) {
   }
 
   return playlistId;
+}
+
+function containsVisibleChars(str) {
+  // The regular expression matches any visible character excluding zero-width or invisible characters
+  return /[^\s\u200B-\u200D\uFEFF]/.test(str);
 }
 
 async function getYoutubeChannelId(url) {
@@ -362,6 +367,7 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
     }
     const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=snippet&${searchApiType}=${mediaId}&key=${youtubeKey}`;
 
+    console.log(searchUrl)
     const response = await fetch(searchUrl);
     if (!response.ok || !mediaId) return message.reply('🤖 Houston, tenemos un problema. ¿Estás seguro de que la URL es válida?');
     const data = await response.json();
@@ -458,7 +464,7 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
 
 async function convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber) {
   try {
-    if (senderName.length < 2) {
+    if (containsVisibleChars(senderName) || senderName.length < 2) {
       var match = senderNumber.match(/(^|[^])\d+/);
       senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
     }
