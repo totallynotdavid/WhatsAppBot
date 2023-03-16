@@ -5,6 +5,7 @@ const { readdirSync, rmSync } = require('fs');
 // Don't see this as relative to this file, but to the index.js file
 const audioDirectory = './audio';
 const pdfDirectory = './pdf';
+const imgDirectory = './img';
 
 function checkAndCreateFolder(directory, purpose) {
   if (!fs.existsSync(directory)) {
@@ -25,11 +26,13 @@ function cleanFolder(directory, purpose) {
 function checkFolderStructure() {
   checkAndCreateFolder(audioDirectory, 'audio');
   checkAndCreateFolder(pdfDirectory, 'PDF');
+	checkAndCreateFolder(imgDirectory, 'images');
 }
 
 function cleanFolderStructure() {
   cleanFolder(audioDirectory, 'audio');
   cleanFolder(pdfDirectory, 'PDF');
+	cleanFolder(imgDirectory, 'images');
 }
 
 module.exports = {

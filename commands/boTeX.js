@@ -24,7 +24,6 @@ async function cleanUp() {
       fs.unlinkSync(path.join(folderPath, file));
     }
 
-    console.log('Cleaned up /img/ folder.');
   } catch (error) {
     console.error('Error cleaning up /img/ folder:', error);
   }
@@ -40,12 +39,12 @@ async function transformLatexToImage(message, client, MessageMedia, query) {
     await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
 
     await executeCommand(
-			`convert -density 300 -trim -background white -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
+			`convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
 		);
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
     await client.sendMessage(message.id.remote, media, {
-      caption: 'boTeX',
+      caption: 'Generado por boTeX',
     });
 
 		// Call the cleanUp function after sending the image
@@ -66,7 +65,6 @@ function executeCommand(command) {
         console.error('Error output:', stderr);
         reject(error);
       } else {
-        console.log(`Command executed successfully: ${command}`);
         resolve(stdout);
       }
     });
