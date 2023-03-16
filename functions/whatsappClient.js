@@ -279,7 +279,6 @@ client.on('message_create', async message => {
 			case commands.lx:
 				if (stringifyMessage.length > 1) {
 					const query = stringifyMessage.slice(1).join(' ');
-					console.log(query);
 					functions.transformLatexToImage(message, client, MessageMedia, query);
 				}
 				break;

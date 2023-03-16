@@ -15,6 +15,21 @@ const latexTemplate = `
 \\end{document}
 `;
 
+async function cleanUp() {
+  try {
+    const folderPath = path.join(__dirname, '..', 'img');
+    const files = fs.readdirSync(folderPath);
+
+    for (const file of files) {
+      fs.unlinkSync(path.join(folderPath, file));
+    }
+
+    console.log('Cleaned up /img/ folder.');
+  } catch (error) {
+    console.error('Error cleaning up /img/ folder:', error);
+  }
+}
+
 async function transformLatexToImage(message, client, MessageMedia, query) {
   const latexCode = query;
 
@@ -22,24 +37,22 @@ async function transformLatexToImage(message, client, MessageMedia, query) {
     const latexDocument = latexTemplate.replace('%s', latexCode);
     fs.writeFileSync(path.join(__dirname, '..', 'img', 'input.tex'), latexDocument);
 
-    await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img', 'output')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
-
-    if (!fs.existsSync(path.join(__dirname, '..', 'img', 'output'))) {
-      fs.mkdirSync(path.join(__dirname, '..', 'img', 'output'));
-    }
+    await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
 
     await executeCommand(
-      `convert -density 300 -trim -background white -alpha remove ${path.join(__dirname, '..', 'img', 'output', 'latex.pdf')} -quality 100 ${path.join(__dirname, '..', 'img', 'output', 'latex.png')}`
-    );
+			`convert -density 300 -trim -background white -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
+		);
 
-    const img = fs.readFileSync(path.join(__dirname, '..', 'img', 'output', 'latex.png'));
-    const media = new MessageMedia('image/png', img.toString('base64'));
-    await client.sendMessage(message.from, media, {
-      caption: 'Here is your LaTeX equation as an image:',
+    const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
+    await client.sendMessage(message.id.remote, media, {
+      caption: 'boTeX',
     });
+
+		// Call the cleanUp function after sending the image
+    await cleanUp();
   } catch (error) {
     console.error('Error:', error);
-    message.reply('An error occurred while generating the image.');
+    message.reply('🤖 Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.');
   }
 }
 
@@ -47,10 +60,13 @@ function executeCommand(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
+        console.error('Error executing command:', command);
         console.error('Error:', error);
         console.error('Output:', stdout);
+        console.error('Error output:', stderr);
         reject(error);
       } else {
+        console.log(`Command executed successfully: ${command}`);
         resolve(stdout);
       }
     });
