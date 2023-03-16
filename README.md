@@ -25,7 +25,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	```
 - ImageMagick
 	```bash
-	sudo apt install imagemagick
+	sudo apt install imagemagick -y
 	```
 - TeXLive 
 	```bash
@@ -41,30 +41,31 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 ## Instalación
 
 1. Clonar el repositorio
-
    ```
-   git clone https://github.com/<username>/Bot-for-WhatsApp-Web.git
+   git clone https://github.com/totallynotdavid/WhatsAppBot
    ```
 
-2. Crear un `.env` con las siguientes variables:
-
+2. Crear un `.env` y agregar las siguientes variables:
    - `spotifyClientId`
    - `spotifyClientSecret`
    - `youtubeKey`
+	 - `SUPABASE_API_KEY`
+	 - `SUPABASE_BASE_URL`
 
 3. Instalar las dependencias
-
    ```
    npm install
    ```
 
-4. Inicia el bot
-
+4. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
+5. Inicia el bot por primera vez
    ```
    node index.js
    ```
-
-5. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
+6. Usar pm2 para mantener el bot funcionando continuamente:
+	 ```
+	 pm2 start index.js --cron-restart="0 * * * *"
+	 ```
 
 ## Uso
 
@@ -81,6 +82,8 @@ El Bot funciona interpretando los comandos que empiezan por `!` o `@`.
 - `!w <consulta_búsqueda>` - Busca un artículo en Wikipedia
 - `!yt <search_query>` - Busca un vídeo en YouTube
 - `!play <youtube_url> [tiempo_de_inicio] [tiempo_final]` - Descarga y escucha una video de Youtube
+- `!lx <código de LaTeX>` - Transforma código LaTeX en imagen
+- `!sh <doi>` - Obten el PDF de un artículo científico
 
 ### Comandos para administradores
 
