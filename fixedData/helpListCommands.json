@@ -6,12 +6,12 @@
   },
   {
     "command": "sticker",
-    "message": "Transforma una imagen, video o gif en un sticker. Necesitas adjuntar el archivo al mensaje",
+    "message": "Transforma una imagen, video o gif (Tenor) en un sticker. Necesitas adjuntar el archivo al mensaje",
     "usage": "sticker"
   },
   {
     "command": "yt",
-    "message": "Busca tu video favorito en YouTube",
+    "message": "Busca tu video, playlist o canal favorito en YouTube",
     "usage": "yt blue flame"
   },
   {
@@ -28,5 +28,15 @@
     "command": "cae",
     "message": "Reservado para el CAE-Física",
     "usage": "cae"
-  }
+  },
+	{
+		"command": "lx",
+		"message": "Transforma código LaTeX en una imagen",
+		"usage": "lx \\int_{a}^{b} f(x) dx"
+	},
+	{
+		"command": "sh",
+		"message": "Obten el PDF de un artículo científico",
+		"usage": "sh 10.1063/1.2195321"
+	}
 ]
