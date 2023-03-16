@@ -345,34 +345,47 @@ async function getWikiArticle(message, query, languageCode, senderName, client, 
 
 async function getYoutubeInformation(message, client, MessageMedia, query, youtubeType) {
   try {
-    let mediaId, baseYoutubeUrl;
+    let mediaId, baseYoutubeUrl, requiredFields, searchApiType;
     const searchApiTypes = {
       videos: 'id',
       playlists: 'id',
       channels: 'id',
       users: 'forUsername',
     }
-    const searchApiType = searchApiTypes[youtubeType]
+		searchApiType = searchApiTypes[youtubeType];
     switch (youtubeType) {
       case 'videos':
         baseYoutubeUrl = 'https://youtu.be/';
         mediaId = getYoutubeVideoId(query);
+				requiredFields = 'snippet%2Cstatistics%2CcontentDetails';
         break;
       case 'playlists':
         baseYoutubeUrl = 'https://www.youtube.com/playlist?list=';
         mediaId = getYoutubePlaylistId(query);
+				requiredFields = 'snippet';
         break;
       case 'channels':
         baseYoutubeUrl = 'https://www.youtube.com/channel/';
         mediaId = await getYoutubeChannelId(query);
+				requiredFields = 'snippet%2Cstatistics';
         break;
       case 'users':
         baseYoutubeUrl = 'https://www.youtube.com/user/';
-        mediaId = await getYoutubeChannelId(query);
-        youtubeType = 'channels';
-        break;
+				mediaId = await getYoutubeChannelId(query);
+				
+				// Check if the query contains the '@' symbol
+				if (query.includes('@')) {
+					searchApiType = searchApiTypes.channels;
+					mediaId = mediaId.replace('@', ''); // Remove the '@' symbol
+				} else {
+					searchApiType = searchApiTypes[youtubeType];
+				}
+
+				youtubeType = 'channels';
+				requiredFields = 'snippet%2Cstatistics';
+				break;
     }
-    const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=snippet&${searchApiType}=${mediaId}&key=${youtubeKey}`;
+    const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=${requiredFields}&${searchApiType}=${mediaId}&key=${youtubeKey}`;
 
     const response = await fetch(searchUrl);
     if (!response.ok || !mediaId) return message.reply('🤖 Houston, tenemos un problema. ¿Estás seguro de que la URL es válida?');
@@ -383,13 +396,17 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
     const { title, channelTitle, thumbnails } = data.items[0].snippet;
     const thumbnail = thumbnails.high.url;
 
-    const media = await MessageMedia.fromUrl(thumbnail, { unsafeMime: true });
-    let captionMediaYoutube;
-    if (channelTitle) {
-      captionMediaYoutube = `🎬: ${title}\n📺: ${channelTitle}\n🔗: ${baseYoutubeUrl}${mediaId}`;
-    } else {
-      captionMediaYoutube = `📺: ${title}\n🔗: ${baseYoutubeUrl}${mediaId}`;
-    }
+		let viewCount, likeCount;
+		if (data.items[0].statistics) {
+			({ viewCount, likeCount } = data.items[0].statistics);
+		}
+
+    const media = await MessageMedia.fromUrl(thumbnail, { 
+			unsafeMime: true 
+		});
+
+		const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${viewCount} vistas` : ''}${likeCount ? `\n👍: ${likeCount} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
+
     await client.sendMessage(message.id.remote, media, {
       caption: captionMediaYoutube,
     });
@@ -449,7 +466,7 @@ async function searchYoutubeVideo(message, client, MessageMedia, query) {
 
 async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMedia) {
   // Build the URL for the details request
-  const detailsUrl = `https://www.googleapis.com/youtube/v3/${emoji === '🎬' ? 'videos' : emoji === '🎵' ? 'playlists' : 'channels'}?part=snippet&id=${id}&key=${youtubeKey}`;
+  const detailsUrl = `https://www.googleapis.com/youtube/v3/${emoji === '🎬' ? 'videos' : emoji === '🎵' ? 'playlists' : 'channels'}?part=snippet%2Cstatistics&id=${id}&key=${youtubeKey}`;
 
   // Make the request and get the JSON response
   const response = await fetch(detailsUrl);
@@ -458,13 +475,19 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   // Get the details from the response
   const { title, thumbnails, channelTitle } = data.items[0].snippet;
   const thumbnailUrl = thumbnails.high.url;
+  const { viewCount, likeCount } = data.items[0].statistics;
 
   // Create the media message using the thumbnail URL
-  const media = await MessageMedia.fromUrl(thumbnailUrl, { unsafeMime: true });
+  const media = await MessageMedia.fromUrl(thumbnailUrl, {
+    unsafeMime: true,
+  });
+
+  // Compose the caption text
+  const captionText = `${emoji}: ${title}\n👤: ${channelTitle}\n👀: ${viewCount} vistas \n👍: ${likeCount} me gustas \n🔗: ${urlPrefix}${id}`;
 
   // Send the media message with the caption
   await client.sendMessage(message.id.remote, media, {
-    caption: `${emoji}: ${title}\n👤: ${channelTitle}\n🔗: ${urlPrefix}${id}`,
+    caption: captionText,
   });
 }
 

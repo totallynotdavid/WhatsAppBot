@@ -72,8 +72,8 @@ const imageOrVideoRegex = /\.(jpg|jpeg|png|mp4)$/i;
 // Types of youtube links
 const youtubeTypes = {
   channels: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/channel\/.+$/,
-  playlists: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/playlist\/.+$/,
-  users: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/user\/.+$/,
+  playlists: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/playlist.+$/,
+  users: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(user\/|c\/|@)?[A-Za-z0-9-_]+$/,
   videos: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/,
   search: null,
 }
