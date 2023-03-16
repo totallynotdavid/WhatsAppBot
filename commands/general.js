@@ -74,9 +74,10 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, 
 
 function getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Buttons) {
   try {
-    let buttonsMessage;
+    //let buttonsMessage;
     switch (stringifyMessage.length) {
       case 1:
+        /*
         buttonsMessage = new Buttons(
           '¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!', 
           [
@@ -87,6 +88,8 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Bu
           'Proporcionado por el equipo del Centro de Apoyo al Estudiante de Física'
         );
         client.sendMessage(message.id.remote, buttonsMessage);
+        */
+        message.reply('🤖 Este comando está en mantenimiento. Prueba más tarde.');
         break;
       case 2:
         commandGenerator(CAEListCommands, message, stringifyMessage);
