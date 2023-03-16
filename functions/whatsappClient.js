@@ -8,6 +8,7 @@ const fetch = require('node-fetch');
 const general = require('../commands/general');
 const admin = require('../commands/admin');
 const sciHub = require('../commands/sciHub');
+const boTeX = require('../commands/boTeX');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
@@ -31,6 +32,7 @@ const commands  = {
   yt: 'yt',
   play: 'play',
   sh: 'sh',
+	lx: 'lx',
 }
 
 const adminCommands = {
@@ -132,6 +134,7 @@ client.on('message_create', async message => {
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,
     getSciHubArticle: sciHub.getPdfLink,
+		transformLatexToImage: boTeX.transformLatexToImage,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -273,6 +276,13 @@ client.on('message_create', async message => {
           message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
         }
         break;
+			case commands.lx:
+				if (stringifyMessage.length > 1) {
+					const query = stringifyMessage.slice(1).join(' ');
+					console.log(query);
+					functions.transformLatexToImage(message, client, MessageMedia, query);
+				}
+				break;
       default:
         message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
         break;
