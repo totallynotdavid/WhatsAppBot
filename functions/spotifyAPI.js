@@ -63,6 +63,7 @@ async function downloadSpotifyAudio(song) {
     return new Promise((resolve) => audio2.data.on('end', resolve));
   } catch (error) {
     console.error('Error downloading audio file:', error);
+    message.reply('🤖 Houston, tenemos un problema. Esa canción no se ha encontrado o no está disponible en tu pais.')
     return null;
   }
 }
@@ -74,6 +75,7 @@ async function sendSpotifyAudio(MessageMedia, client, message, song) {
     await client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
   } catch (error) {
     console.error('Error sending audio file:', error);
+    message.reply('🤖 Houston, tenemos un problema. No se pudo enviar el audio.')
     return null;
   }
 }
