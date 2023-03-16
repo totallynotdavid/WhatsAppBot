@@ -52,34 +52,19 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
    - `spotifyClientSecret`
    - `youtubeKey`
 
-3. Crear un archivo llamado `administrators.json` dentro de la carpeta fixedData. Sugiero que tenga la siguiente estructura:
-
-   ```
-   [
-      {
-         "name": "Nombre",
-         "phone": "XXXXXXXXXXX@c.us"
-      },
-      {
-         "name": "Nombre",
-         "phone": "XXXXXXXXXXX@c.us"
-      }
-   ]
-   ```
-
-4. Instalar las dependencias
+3. Instalar las dependencias
 
    ```
    npm install
    ```
 
-5. Inicia el bot
+4. Inicia el bot
 
    ```
    node index.js
    ```
 
-6. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
+5. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
 
 ## Uso
 

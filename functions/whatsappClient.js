@@ -11,7 +11,6 @@ const sciHub = require('../commands/sciHub');
 const boTeX = require('../commands/boTeX');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
-const administrators = require('../fixedData/administrators.json');
 const database = require('../database/connectToDatabase');
 
 /* Global Variables */ 
@@ -298,17 +297,26 @@ client.on('message_create', async message => {
     if (!(command in adminCommands)) return;
     
     let chat = await message.getChat();
-    const admins = administrators.some(admin => admin.phone === message.from);
-
-    if (!admins) return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
-
-    switch (command) {
-      case adminCommands.todos:
-        functions.mentionEveryone(chat, client, message);
-        break;
-    }
-
-  }
+	
+    if (chat.isGroup) {
+			const participantsArray = Object.values(chat.participants);
+			const admins = participantsArray.filter(participant => participant.isAdmin);
+			const isAdmin = admins.some(admin => admin.id._serialized === message.from);
+	
+			if (!isAdmin) {
+				return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
+			}
+	
+			switch (command) {
+				case adminCommands.todos:
+					functions.mentionEveryone(chat, client, message, senderName);
+					break;
+				default:
+					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+					break;
+			}
+		}
+	}
 
 });
 

@@ -1,7 +1,7 @@
 /* Here we use let instead of const to a avoid the following error: */
 /* TypeError: Assignment to constant variable. */
 
-async function mentionEveryone(chat, client, message) {
+async function mentionEveryone(chat, client, message, senderName) {
   try {
 
     const og = await message.getQuotedMessage();
@@ -25,9 +25,11 @@ async function mentionEveryone(chat, client, message) {
 
         if(message.hasQuotedMsg){
           og.reply(text, null, { mentions });
+					message.reply(`🤖 Este mensaje fue solicitado por ${senderName}`)
         }
         else{
           chat.sendMessage(text,{mentions})
+					message.reply(`🤖 Este mensaje fue solicitado por ${senderName}`)
         }
 
       }
