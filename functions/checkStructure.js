@@ -3,23 +3,33 @@ const { readdirSync, rmSync } = require('fs');
 
 // IMPORTANT: Use ./audio instead of ../audio because the index.js file is in the root folder
 // Don't see this as relative to this file, but to the index.js file
-let audioDirectory = './audio';
+const audioDirectory = './audio';
+const pdfDirectory = './pdf';
 
-function checkFolderStructure() {
-  // Check if the './audio' folder exists
-  if (!fs.existsSync(audioDirectory)) {
-    fs.mkdirSync(audioDirectory);
-    console.log(`Created [${audioDirectory}] folder because there was none. This is to store the audio files.`);
+function checkAndCreateFolder(directory, purpose) {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory);
+    console.log(`Created [${directory}] folder because there was none. This is to store the ${purpose} files.`);
   }
 }
 
-function cleanFolderStructure() {
+function cleanFolder(directory, purpose) {
   try {
-    readdirSync(audioDirectory).forEach(f => rmSync(`${audioDirectory}/${f}`));
-    console.log(`Cleaned [${audioDirectory}] folder. This is to avoid accumulating audio files.`)
+    readdirSync(directory).forEach(f => rmSync(`${directory}/${f}`));
+    console.log(`Cleaned [${directory}] folder. This is to avoid accumulating ${purpose} files.`);
   } catch (error) {
-    console.error('Error cleaning audio folder:', error);
+    console.error(`Error cleaning ${purpose} folder:`, error);
   }
+}
+
+function checkFolderStructure() {
+  checkAndCreateFolder(audioDirectory, 'audio');
+  checkAndCreateFolder(pdfDirectory, 'PDF');
+}
+
+function cleanFolderStructure() {
+  cleanFolder(audioDirectory, 'audio');
+  cleanFolder(pdfDirectory, 'PDF');
 }
 
 module.exports = {

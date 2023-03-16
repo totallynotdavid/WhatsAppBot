@@ -7,6 +7,7 @@ const fetch = require('node-fetch');
 // Function Locations
 const general = require('../commands/general');
 const admin = require('../commands/admin');
+const sciHub = require('../commands/sciHub');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const administrators = require('../fixedData/administrators.json');
@@ -29,6 +30,7 @@ const commands  = {
   w: 'w',
   yt: 'yt',
   play: 'play',
+  sh: 'sh',
 }
 
 const adminCommands = {
@@ -129,6 +131,7 @@ client.on('message_create', async message => {
     getYoutubeInformation: general.getYoutubeInformation,
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,
+    getSciHubArticle: sciHub.getPdfLink,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -262,6 +265,14 @@ client.on('message_create', async message => {
         }
         functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
         break;
+      case commands.sh:
+        if (stringifyMessage.length === 2) {
+          functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage);
+          return;
+        } else {
+          message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
+        }
+        break;
       default:
         message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
         break;
@@ -274,7 +285,7 @@ client.on('message_create', async message => {
     if (!(command in adminCommands)) return;
     
     let chat = await message.getChat();
-    const admins = administrators.has(message.from);
+    const admins = administrators.some(admin => admin.phone === message.from);
 
     if (!admins) return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
 
