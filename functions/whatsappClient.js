@@ -279,6 +279,10 @@ client.on('message_create', async message => {
 			case commands.lx:
 				if (stringifyMessage.length > 1) {
 					const query = stringifyMessage.slice(1).join(' ');
+					const beginRegex = /\\begin\{[a-z]*\}/g;
+					if (beginRegex.test(query)) {
+						message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
+					}
 					functions.transformLatexToImage(message, client, MessageMedia, query);
 				}
 				break;
