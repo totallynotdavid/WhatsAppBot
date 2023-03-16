@@ -116,6 +116,7 @@ searchByKeyword("machine learning").then(response => console.log(response));
 */
 
 /*
+// Find the papers of an author using their ID
 const fs = require("fs");
 
 let api = `https://api.semanticscholar.org/graph/v1/author/`;

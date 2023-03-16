@@ -18,7 +18,6 @@ async function getPdfLink(message, client, MessageMedia, stringifyMessage) {
     if (pdfLink) {
       const pdfFilename = await downloadPdf(pdfLink, link);
       const media = await MessageMedia.fromFilePath(path.join(__dirname, '../pdf', pdfFilename));
-      message.reply(`Downloaded ${pdfFilename}`);
       await client.sendMessage(message.id.remote, media, {
         caption: 'PDF file',
       });
