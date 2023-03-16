@@ -15,7 +15,20 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 - Node.js
 - ffmpeg
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/Installation#third-party-package-managers)
+- yt-dlp
+	```bash
+	sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+	sudo chmod a+rx /usr/local/bin/yt-dlp  # Make executable
+	```
+- TeXLive 
+	```bash
+	sudo apt install texlive-latex-extra
+	tlmgr init-usertree
+	```
+- ImageMagick
+	```bash
+	sudo apt install imagemagick
+	```
 
 ## Instalación
 
