@@ -36,6 +36,7 @@ const commands  = {
 
 const adminCommands = {
 	todos: 'todos',
+	ban: 'ban',
 };
 
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
@@ -121,6 +122,7 @@ client.on('message_create', async message => {
   /* This also takes care of reacting if whatever function is succesfully executed */
   /* The functions variable should be generated each time, if not, it will loop through all past messages */
   const functions = {
+		//banUser: admin.banUser,
     mentionEveryone: admin.mentionEveryone,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
@@ -149,8 +151,6 @@ client.on('message_create', async message => {
 
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
-
-    // We used to get the name and number of a user here, but it was moved to the top of the function to be used in other functions
 
     let chat = await message.getChat();
 
@@ -298,12 +298,13 @@ client.on('message_create', async message => {
     
     let chat = await message.getChat();
 	
+		/* Admins only exist on groups */
     if (chat.isGroup) {
 			const participantsArray = Object.values(chat.participants);
 			const admins = participantsArray.filter(participant => participant.isAdmin);
 			const isAdmin = admins.some(admin => admin.id._serialized === message.from);
-	
-			if (!isAdmin) {
+
+			if (message.id.remote === !isAdmin) {
 				return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
 			}
 	
@@ -311,10 +312,23 @@ client.on('message_create', async message => {
 				case adminCommands.todos:
 					functions.mentionEveryone(chat, client, message, senderName);
 					break;
+				/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067
+				case adminCommands.ban:
+					const quotedMessage = await message.getQuotedMessage();
+					if (quotedMessage) {
+						const quotedAuthor = quotedMessage.author;
+						functions.banUser(chat, quotedAuthor, message, robotEmoji);
+					} else {
+						message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
+					}
+					break;
+				*/
 				default:
 					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 					break;
 			}
+		} else {
+			message.reply(`${robotEmoji} Este comando solo funciona en grupos.`);
 		}
 	}
 

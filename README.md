@@ -23,7 +23,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
 	sudo chmod a+rx /usr/local/bin/yt-dlp  # Make executable
 	```
-- ImageMagick
+- [ImageMagick](https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion)
 	```bash
 	sudo apt install imagemagick -y
 	```
