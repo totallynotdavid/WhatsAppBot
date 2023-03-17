@@ -32,6 +32,7 @@ const commands  = {
   play: 'play',
   sh: 'sh',
 	lx: 'lx',
+	paper: 'paper',
 }
 
 const adminCommands = {
@@ -135,6 +136,7 @@ client.on('message_create', async message => {
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,
     getSciHubArticle: sciHub.getPdfLink,
+		paperKeyword: sciHub.paperKeyword,
 		transformLatexToImage: boTeX.transformLatexToImage,
   }
 
@@ -283,6 +285,13 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
 					}
 					functions.transformLatexToImage(message, client, MessageMedia, query);
+				}
+				break;
+			case commands.paper:
+				if (stringifyMessage.length === 2) {
+					functions.paperKeyword(message, stringifyMessage, robotEmoji);
+				} else {
+					message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
 				}
 				break;
       default:

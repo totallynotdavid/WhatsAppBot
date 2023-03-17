@@ -38,5 +38,10 @@
 		"command": "sh",
 		"message": "Obten el PDF de un artículo científico",
 		"usage": "sh 10.1063/1.2195321"
+	},
+	{
+		"command": "paper",
+		"message": "Busca artículos científicos sobre tu tema de interés",
+		"usage": "paper mechanics"
 	}
 ]

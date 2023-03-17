@@ -55,6 +55,73 @@ async function downloadPdf(pdfLink, link) {
   });
 }
 
+async function paperKeyword(message, stringifyMessage, robotEmoji) {
+  const keywords = stringifyMessage[1];
+  try {
+    const response = await searchByKeyword(keywords);
+    if (response) {
+      message.reply(`${robotEmoji} Resultados:\n\n${response}`);
+    } else {
+      message.reply("No se han encontrado artículos.");
+    }
+  } catch (error) {
+    console.log("Error buscando papers:", error);
+    message.reply("Ha ocurrido un error al buscar los artículos.");
+  }
+}
+
+async function searchByKeyword(keywords, maxResults = 5) {
+  const api = "https://api.semanticscholar.org/graph/v1/paper/search";
+  const query = {
+    query: keywords,
+    fields: "paperId,title,authors"
+  };
+
+  let response = null;
+  try {
+    response = await request(api, query);
+  } catch (error) {
+    console.log("error", error);
+  }
+
+  if (response && response.data && response.data.length > 0) {
+    return formatResponse(response.data.slice(0, maxResults));
+  } else {
+    return "No se han encontrado artículos.";
+  }
+}
+
+function formatResponse(results) {
+  return results
+    .map((result, index) => {
+      const maxAuthors = 2;
+      const authors = result.authors.slice(0, maxAuthors).map(author => author.name);
+      const authorString =
+        authors.length === result.authors.length
+          ? authors.join(", ")
+          : `${authors.join(", ")} et al.`;
+      return `${index + 1}. *${result.title}* de _${authorString}_`;
+    })
+    .join("\n\n");
+}
+
+async function request(api, query) {
+  try {
+    const queryString = Object.entries(query)
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
+    const url = `${api}?${queryString}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getPdfLink,
+	paperKeyword,
 };
