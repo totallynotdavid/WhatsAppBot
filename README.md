@@ -1,4 +1,4 @@
-# WhatsApp web
+# WhatsAppBot
 
 Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitiendo a los usuarios interactuar con él mediante comandos enviados a través del chat.
 
@@ -14,23 +14,32 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 ## Prerrequisitos
 
 - Node.js
-	```
+
+	```bash
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 	```
+
 - ffmpeg
-	```
+
+	```bash
 	sudo apt install ffmpeg
 	```
+
 - yt-dlp
+
 	```bash
 	sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
 	sudo chmod a+rx /usr/local/bin/yt-dlp  # Make executable
 	```
+
 - [ImageMagick](https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion)
+
 	```bash
 	sudo apt install imagemagick -y
 	```
+
 - TeXLive 
+
 	```bash
 	cd /tmp
 	wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
@@ -44,27 +53,32 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 ## Instalación
 
 1. Clonar el repositorio
-   ```
+
+   ```bash
    git clone https://github.com/totallynotdavid/WhatsAppBot
    ```
 
 2. Crear un `.env` y agregar las siguientes variables:
-   - `spotifyClientId`
-   - `spotifyClientSecret`
-   - `youtubeKey`
-	 - `SUPABASE_API_KEY`
-	 - `SUPABASE_BASE_URL`
 
-3. Instalar las dependencias
-   ```
-   npm install
-   ```
+	- `spotifyClientId`
+	- `spotifyClientSecret`
+	- `youtubeKey`
+	- `SUPABASE_API_KEY`
+	- `SUPABASE_BASE_URL`
+
+3. Instalar las dependencias:
+
+	```bash
+	npm install
+	```
 
 4. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
-5. Inicia el bot por primera vez
-   ```
-   node index.js
-   ```
+5. Inicia el bot por primera vez:
+
+	```bash
+	node index.js
+	```
+
 6. Usar pm2 para mantener el bot funcionando continuamente:
 	 ```
 	 pm2 start index.js --cron-restart="0 * * * *"
