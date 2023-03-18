@@ -9,7 +9,7 @@
     "clean:mundane": "shx rm -rf music logs.txt",
     "clean:packages": "shx rm -rf package-lock.json node_modules",
     "clean:session": "shx rm -rf .wwebjs_auth",
-    "lint": "eslint commands functions index.js",
+    "lint": "eslint commands functions database index.js",
     "lint:fix": "eslint commands functions index.js --fix"
   },
   "author": "totallynotdavid",
