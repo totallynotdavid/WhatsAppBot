@@ -30,7 +30,7 @@ function commandGenerator(fixedDataCommand, message, stringifyMessage) {
     }
 
     if (!commandFound) {
-      message.reply(`🤖 Parece que este comando no existe: ${codeWrapper(stringifyMessage[1])}`);
+      message.reply(`🤖 Parece que ${codeWrapper(stringifyMessage[1])} no existe.`);
     }
   } catch (err) {
     console.error(err);
@@ -410,7 +410,7 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
 		}
 
     const media = await MessageMedia.fromUrl(thumbnail, { 
-			unsafeMime: true 
+			unsafeMime: true,
 		});
 
 		const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${viewCount} vistas` : ''}${likeCount ? `\n👍: ${likeCount} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
