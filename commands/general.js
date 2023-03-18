@@ -41,6 +41,19 @@ function capitalizeText(s) {
     return s && s[0].toUpperCase() + s.slice(1);
 }
 
+function formatNumber(number) {
+  const parts = [];
+  let str = number.toString();
+  while (str.length > 3) {
+    parts.unshift(str.slice(-3));
+    str = str.slice(0, -3);
+  }
+  if (str.length > 0) {
+    parts.unshift(str);
+  }
+  return parts.join(' ');
+}
+
 function deleteFile(filePath) {
   fs.unlink(filePath, (err) => {
     if (err) {
@@ -413,7 +426,7 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
 			unsafeMime: true,
 		});
 
-		const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${viewCount} vistas` : ''}${likeCount ? `\n👍: ${likeCount} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
+		const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${formatNumber(likeCount)} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
 
     await client.sendMessage(message.id.remote, media, {
       caption: captionMediaYoutube,
@@ -483,7 +496,11 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   // Get the details from the response
   const { title, thumbnails, channelTitle } = data.items[0].snippet;
   const thumbnailUrl = thumbnails.high.url;
-  const { viewCount, likeCount } = data.items[0].statistics;
+  
+	let viewCount, likeCount;
+	if (data.items[0].statistics) {
+		({ viewCount, likeCount } = data.items[0].statistics);
+	}
 
   // Create the media message using the thumbnail URL
   const media = await MessageMedia.fromUrl(thumbnailUrl, {
@@ -491,7 +508,7 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   });
 
   // Compose the caption text
-  const captionText = `${emoji}: ${title}\n👤: ${channelTitle}\n👀: ${viewCount} vistas \n👍: ${likeCount} me gustas \n🔗: ${urlPrefix}${id}`;
+	const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
 
   // Send the media message with the caption
   await client.sendMessage(message.id.remote, media, {

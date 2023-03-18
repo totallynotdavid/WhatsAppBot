@@ -255,7 +255,6 @@ client.on('message_create', async message => {
           }
         }
         
-				console.log('youtubeType', youtubeType)
         if (youtubeType === 'search') {
           functions.searchYoutubeVideo(message, client, MessageMedia, query);
         } else {
