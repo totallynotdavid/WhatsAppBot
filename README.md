@@ -72,7 +72,12 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	npm install
 	```
 
-4. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717)
+4. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717). También:
+
+	```bash
+	npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
+	```
+
 5. Inicia el bot por primera vez:
 
 	```bash
