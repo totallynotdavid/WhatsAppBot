@@ -37,7 +37,7 @@ const commands  = {
 
 const adminCommands = {
 	todos: 'todos',
-	ban: 'ban',
+	//ban: 'ban',
 };
 
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
@@ -73,10 +73,10 @@ const imageOrVideoRegex = /\.(jpg|jpeg|png|mp4)$/i;
 
 // Types of youtube links
 const youtubeTypes = {
-  channels: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/channel\/.+$/,
-  playlists: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/playlist.+$/,
-  users: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(user\/|c\/|@)?[A-Za-z0-9-_]+$/,
-  videos: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/,
+	videos: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)(\/watch\?v=|\/)([A-Za-z0-9-_]{11}).*$/,
+	users: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(user\/|c\/|@)?[A-Za-z0-9-_]+$/,
+  channels: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/channel\/[A-Za-z0-9-_]+$/,
+  playlists: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/playlist\?list=[A-Za-z0-9-_]+$/,
   search: null,
 }
 
@@ -255,6 +255,7 @@ client.on('message_create', async message => {
           }
         }
         
+				console.log('youtubeType', youtubeType)
         if (youtubeType === 'search') {
           functions.searchYoutubeVideo(message, client, MessageMedia, query);
         } else {
