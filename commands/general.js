@@ -80,7 +80,7 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, 
   }
 }
 
-function getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Buttons) {
+function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/) {
   try {
     //let buttonsMessage;
     switch (stringifyMessage.length) {

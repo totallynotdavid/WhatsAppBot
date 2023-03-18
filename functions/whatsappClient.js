@@ -228,7 +228,7 @@ client.on('message_create', async message => {
         }
         break;
       case commands.cae:
-        functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message, client, Buttons);
+        functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/);
         break;
       case commands.fromis:
         functions.getRedditImage(message, subreddit, client, MessageMedia);
