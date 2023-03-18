@@ -16,7 +16,6 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 - Node.js
 	```
 	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-
 	```
 - ffmpeg
 	```
