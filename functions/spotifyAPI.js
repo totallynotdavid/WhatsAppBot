@@ -60,11 +60,10 @@ async function downloadSpotifyAudio(song) {
     });
 
     audio2.data.pipe(fs.createWriteStream(`./audio/${song.id}.mp3`));
-    return new Promise((resolve) => audio2.data.on('end', resolve));
+    return new Promise((resolve) => audio2.data.on('end', () => resolve(true)));
   } catch (error) {
     console.error('Error downloading audio file:', error);
-    message.reply('🤖 Houston, tenemos un problema. Esa canción no se ha encontrado o no está disponible en tu pais.')
-    return null;
+    return false;
   }
 }
 

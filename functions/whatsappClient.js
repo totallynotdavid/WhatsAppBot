@@ -218,8 +218,13 @@ client.on('message_create', async message => {
           message.reply(`${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`);
           message.react('⚠️');
         } else {
-          await spotifyAPI.downloadSpotifyAudio(song);
-          await functions.sendSpotifyAudio(MessageMedia, client, message, song);
+          const audioDownloaded = await spotifyAPI.downloadSpotifyAudio(song);
+
+					if (audioDownloaded) {
+						await functions.sendSpotifyAudio(MessageMedia, client, message, song);
+					} else {
+						message.reply(`${robotEmoji} Houston, tenemos un problema. Intenta de nuevo.`);
+					}
         }
         break;
       case commands.cae:
