@@ -29,7 +29,7 @@ async function cleanUp() {
   }
 }
 
-async function transformLatexToImage(message, client, MessageMedia, query) {
+async function transformLatexToImage(message, client, MessageMedia, query, robotEmoji) {
   const latexCode = query;
 
   try {
@@ -44,14 +44,14 @@ async function transformLatexToImage(message, client, MessageMedia, query) {
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
     await client.sendMessage(message.id.remote, media, {
-      caption: 'Generado por boTeX',
+      caption: `${robotEmoji} Generado por boTeX`,
     });
 
 		// Call the cleanUp function after sending the image
     await cleanUp();
   } catch (error) {
     console.error('Error:', error);
-    message.reply('🤖 Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.');
+    message.reply(`${robotEmoji} Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.`);
   }
 }
 

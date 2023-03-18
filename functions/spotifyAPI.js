@@ -68,13 +68,13 @@ async function downloadSpotifyAudio(song) {
 }
 
 // Function to send the audio file to the user
-async function sendSpotifyAudio(MessageMedia, client, message, song) {
+async function sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji) {
   try {
     const media = MessageMedia.fromFilePath(`./audio/${song.id}.mp3`);
     await client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
   } catch (error) {
     console.error('Error sending audio file:', error);
-    message.reply('🤖 Houston, tenemos un problema. No se pudo enviar el audio.')
+    message.reply(`${robotEmoji} Houston, tenemos un problema. No se pudo enviar el audio.`)
     return null;
   }
 }

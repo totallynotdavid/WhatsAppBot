@@ -221,7 +221,7 @@ client.on('message_create', async message => {
           const audioDownloaded = await spotifyAPI.downloadSpotifyAudio(song);
 
 					if (audioDownloaded) {
-						await functions.sendSpotifyAudio(MessageMedia, client, message, song);
+						await functions.sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji);
 					} else {
 						message.reply(`${robotEmoji} Houston, tenemos un problema. Intenta de nuevo.`);
 					}
@@ -289,7 +289,7 @@ client.on('message_create', async message => {
 					if (beginRegex.test(query)) {
 						message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
 					}
-					functions.transformLatexToImage(message, client, MessageMedia, query);
+					functions.transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
 				}
 				break;
 			case commands.paper:
