@@ -13,7 +13,7 @@ async function getPdfLink(message, client, MessageMedia, stringifyMessage) {
     const response = await fetch(`${sciHub_baseURL}${link}`);
     const html = await response.text();
     const match = iframeRegex.exec(html);
-    const pdfLink = match?.[1] ? match[1].startsWith('http') ? match[1] : `http:${match[1]}` : null;
+    const pdfLink = match ? (match[1].startsWith('http') ? match[1] : `http:${match[1]}`) : null;
 
     if (pdfLink) {
       const pdfFilename = await downloadPdf(pdfLink, link);
@@ -62,32 +62,32 @@ async function paperKeyword(message, stringifyMessage, robotEmoji) {
     if (response) {
       message.reply(`${robotEmoji} Resultados:\n\n${response}`);
     } else {
-      message.reply("No se han encontrado artículos.");
+      message.reply('No se han encontrado artículos.');
     }
   } catch (error) {
-    console.log("Error buscando papers:", error);
-    message.reply("Ha ocurrido un error al buscar los artículos.");
+    console.log('Error buscando papers:', error);
+    message.reply('Ha ocurrido un error al buscar los artículos.');
   }
 }
 
 async function searchByKeyword(keywords, maxResults = 5) {
-  const api = "https://api.semanticscholar.org/graph/v1/paper/search";
+  const api = 'https://api.semanticscholar.org/graph/v1/paper/search';
   const query = {
     query: keywords,
-    fields: "paperId,title,authors"
+    fields: 'paperId,title,authors',
   };
 
   let response = null;
   try {
     response = await request(api, query);
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error);
   }
 
   if (response && response.data && response.data.length > 0) {
     return formatResponse(response.data.slice(0, maxResults));
   } else {
-    return "No se han encontrado artículos.";
+    return 'No se han encontrado artículos.';
   }
 }
 
@@ -98,22 +98,22 @@ function formatResponse(results) {
       const authors = result.authors.slice(0, maxAuthors).map(author => author.name);
       const authorString =
         authors.length === result.authors.length
-          ? authors.join(", ")
-          : `${authors.join(", ")} et al.`;
+          ? authors.join(', ')
+          : `${authors.join(', ')} et al.`;
       return `${index + 1}. *${result.title}* de _${authorString}_`;
     })
-    .join("\n\n");
+    .join('\n\n');
 }
 
 async function request(api, query) {
   try {
     const queryString = Object.entries(query)
       .map(([key, value]) => `${key}=${value}`)
-      .join("&");
+      .join('&');
     const url = `${api}?${queryString}`;
     const response = await fetch(url, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     });
     return await response.json();
   } catch (error) {
