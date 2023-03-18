@@ -18,11 +18,19 @@ function codeWrapper(message) {
 
 function commandGenerator(fixedDataCommand, message, stringifyMessage) {
   try {
+    let commandFound = false;
+
     for (const command of fixedDataCommand) {
       if (command.command === stringifyMessage[1]) {
+        commandFound = true;
         const builtMessage = `🤖 ${codeWrapper(stringifyMessage[1])}: ${command.message}`;
         message.reply(builtMessage);
+        break;
       }
+    }
+
+    if (!commandFound) {
+      message.reply(`🤖 Parece que este comando no existe: ${codeWrapper(stringifyMessage[1])}`);
     }
   } catch (err) {
     console.error(err);
