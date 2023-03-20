@@ -33,6 +33,7 @@ const commands  = {
   sh: 'sh',
 	lx: 'lx',
 	paper: 'paper',
+	author: 'author',
 }
 
 const adminCommands = {
@@ -137,6 +138,7 @@ client.on('message_create', async message => {
     mp3FromYoutube: general.mp3FromYoutube,
     getSciHubArticle: sciHub.getPdfLink,
 		paperKeyword: sciHub.paperKeyword,
+		getAuthorInfo: sciHub.authorRecentPapers,
 		transformLatexToImage: boTeX.transformLatexToImage,
   }
 
@@ -298,6 +300,13 @@ client.on('message_create', async message => {
 					functions.paperKeyword(message, query, robotEmoji);
 				} else {
 					message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
+				}
+				break;
+			case commands.author:
+				if (stringifyMessage.length >= 2) {
+					functions.getAuthorInfo(message, query, robotEmoji);
+				} else {
+					message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
 				}
 				break;
       default:

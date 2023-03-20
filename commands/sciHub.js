@@ -104,6 +104,51 @@ async function searchByKeyword(keywords, maxResults = 5) {
   }
 }
 
+async function authorRecentPapers(message, authorQuery, robotEmoji) {
+  try {
+    const papers = await getAuthorRecentPapers(authorQuery);
+    if (papers.length > 0) {
+      const paperList = papers
+        .map(
+          (paper, index) =>
+            `${index + 1}. *${paper.title}* ${
+              paper.year ? `(${paper.year})` : ""
+            }${paper.doi ? ` (DOI: https://doi.org/${paper.doi})` : ""}`
+        )
+        .join("\n\n");
+      message.reply(`${robotEmoji} Últimos artículos de ${authorQuery}:\n\n${paperList}`);
+    } else {
+      message.reply(`${robotEmoji} No se encontraron artículos recientes para ${authorQuery}.`);
+    }
+  } catch (error) {
+    console.log("Error al buscar artículos recientes:", error);
+    message.reply("Ha ocurrido un error al buscar los artículos recientes.");
+  }
+}
+
+async function getAuthorRecentPapers(authorQuery, maxResults = 5) {
+  const api = "https://api.semanticscholar.org/graph/v1/author/search";
+  const query = {
+    query: encodeURIComponent(authorQuery),
+    fields: "papers,papers.paperId,papers.externalIds,papers.title,papers.year", // papers(paperId,title,year,externalIds)
+  };
+
+  const response = await request(api, query);
+
+  if (response && response.data && response.data.length > 0) {
+    const author = response.data[0];
+    const sortedPapers = author.papers.sort((a, b) => b.year - a.year);
+    const recentPapers = sortedPapers.slice(0, maxResults);
+    return recentPapers.map((paper) => ({
+      title: paper.title,
+      year: paper.year,
+      doi: paper.externalIds ? paper.externalIds.DOI : null,
+    }));
+  } else {
+    return [];
+  }
+}
+
 async function formatResponse(results) {
   const formattedResults = await Promise.all(
     results.map(async (result, index) => {
@@ -138,4 +183,5 @@ async function request(api, query) {
 module.exports = {
   getPdfLink,
 	paperKeyword,
+	authorRecentPapers,
 };
