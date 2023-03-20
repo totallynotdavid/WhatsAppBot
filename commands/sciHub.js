@@ -70,6 +70,7 @@ async function paperKeyword(message, query, robotEmoji) {
   const keywords = query;
   try {
     const response = await searchByKeyword(keywords);
+
     if (response) {
       message.reply(`${robotEmoji} Resultados:\n\n${response}`);
     } else {
@@ -112,10 +113,10 @@ async function formatResponse(results) {
         authors.length === result.authors.length
           ? authors.join(', ')
           : `${authors.join(', ')} et al.`;
-      
+
       const doi = await getDoi(result.paperId);
 
-      return `${index + 1}. *${result.title}* (${result.year}) de _${authorString}_ ${result.journal.name ? `publicado en ${result.journal.name}` : ''} ${doi ? `(DOI: https://doi.org/${doi})` : ''}`;
+      return `${index + 1}. *${result.title}* (${result.year}) de _${authorString}_ ${result.journal && result.journal.name ? `publicado en ${result.journal.name}` : ''} ${doi ? `(DOI: https://doi.org/${doi})` : ''}`;
     })
   );
 
