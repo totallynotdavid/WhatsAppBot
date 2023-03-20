@@ -51,6 +51,21 @@ async function downloadPdf(pdfLink, link) {
   });
 }
 
+async function getDoi(paperId) {
+  const api = `https://api.semanticscholar.org/graph/v1/paper/${paperId}`;
+  const query = {
+    fields: 'externalIds',
+  };
+
+  try {
+    const response = await request(api, query);
+    return response.externalIds ? response.externalIds.DOI : null;
+  } catch (error) {
+    console.log('Error getting DOI:', error);
+    return null;
+  }
+}
+
 async function paperKeyword(message, query, robotEmoji) {
   const keywords = query;
   try {
@@ -58,10 +73,9 @@ async function paperKeyword(message, query, robotEmoji) {
     if (response) {
       message.reply(`${robotEmoji} Resultados:\n\n${response}`);
     } else {
-      message.reply('No se han encontrado artículos.');
+      message.reply(`${robotEmoji} No se han encontrado artículos.`);
     }
   } catch (error) {
-    console.log('Error buscando papers:', error);
     message.reply('Ha ocurrido un error al buscar los artículos.');
   }
 }
@@ -72,7 +86,7 @@ async function searchByKeyword(keywords, maxResults = 5) {
 
   const query = {
     query: encodeURIComponent(formattedKeywords),
-    fields: 'paperId,title,authors',
+    fields: 'paperId,title,authors,year,journal',
   };
 
   let response = null;
@@ -89,18 +103,23 @@ async function searchByKeyword(keywords, maxResults = 5) {
   }
 }
 
-function formatResponse(results) {
-  return results
-    .map((result, index) => {
+async function formatResponse(results) {
+  const formattedResults = await Promise.all(
+    results.map(async (result, index) => {
       const maxAuthors = 2;
       const authors = result.authors.slice(0, maxAuthors).map(author => author.name);
       const authorString =
         authors.length === result.authors.length
           ? authors.join(', ')
           : `${authors.join(', ')} et al.`;
-      return `${index + 1}. *${result.title}* de _${authorString}_`;
+      
+      const doi = await getDoi(result.paperId);
+
+      return `${index + 1}. *${result.title}* (${result.year}) de _${authorString}_ ${result.journal.name ? `publicado en ${result.journal.name}` : ''} ${doi ? `(DOI: https://doi.org/${doi})` : ''}`;
     })
-    .join('\n\n');
+  );
+
+  return formattedResults.join('\n\n');
 }
 
 async function request(api, query) {
