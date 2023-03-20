@@ -1,6 +1,6 @@
 /* Import */
 // Packages
-const { Client, LocalAuth, MessageMedia, Buttons, List } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia, /*Buttons,*/ List } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fetch = require('node-fetch');
 
@@ -261,19 +261,20 @@ client.on('message_create', async message => {
           functions.getYoutubeInformation(message, client, MessageMedia, query, youtubeType);
         }
         break;
-      case commands.play:
-        const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
-        
-        if (notice) {
-          message.reply(notice);
-          return;
-        }
-        if (stringifyMessage.length > 2 && (isNaN(Number(stringifyMessage[2])) || (stringifyMessage.length > 3 && isNaN(Number(stringifyMessage[3]))))) {
-          message.reply(`${robotEmoji} El formato del comando es incorrecto, los valores deben ser números.`);
-          return;
-        }
-        functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
-        break;
+			case commands.play: {
+				const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
+		
+				if (notice) {
+						message.reply(notice);
+						return;
+				}
+				if (stringifyMessage.length > 2 && (isNaN(Number(stringifyMessage[2])) || (stringifyMessage.length > 3 && isNaN(Number(stringifyMessage[3]))))) {
+						message.reply(`${robotEmoji} El formato del comando es incorrecto, los valores deben ser números.`);
+						return;
+				}
+				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
+				break;
+			}
       case commands.sh:
         if (stringifyMessage.length === 2) {
           functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage);
@@ -316,34 +317,34 @@ client.on('message_create', async message => {
     if (chat.isGroup) {
 			const participantsArray = Object.values(chat.participants);
 			const admins = participantsArray.filter(participant => participant.isAdmin);
-			const isAdmin = admins.some(admin => admin.id._serialized === message.from);
+			const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
 
-			if (message.id.remote === !isAdmin) {
+			if (isAdmin) {
+				switch (command) {
+					case adminCommands.todos:
+						functions.mentionEveryone(chat, client, message, senderName);
+						break;
+					/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067
+					case adminCommands.ban:
+						const quotedMessage = await message.getQuotedMessage();
+						if (quotedMessage) {
+							const quotedAuthor = quotedMessage.author;
+							functions.banUser(chat, quotedAuthor, message, robotEmoji);
+						} else {
+							message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
+						}
+						break;
+					*/
+					default:
+						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+						break;
+				}
+			} else {
+				console.log('you are not admin')
 				return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
 			}
-	
-			switch (command) {
-				case adminCommands.todos:
-					functions.mentionEveryone(chat, client, message, senderName);
-					break;
-				/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067
-				case adminCommands.ban:
-					const quotedMessage = await message.getQuotedMessage();
-					if (quotedMessage) {
-						const quotedAuthor = quotedMessage.author;
-						functions.banUser(chat, quotedAuthor, message, robotEmoji);
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
-					}
-					break;
-				*/
-				default:
-					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
-					break;
-			}
-		} else {
-			message.reply(`${robotEmoji} Este comando solo funciona en grupos.`);
 		}
+
 	}
 
 });
