@@ -47,7 +47,7 @@ const subreddit = general.capitalizeText(fromisCommand); // Subreddit for the co
 // Youtube variables to be passed to yt-dlp
 const commandsYoutubeDownload = {
   1: {
-    notice: '🤖 Adjunta un enlace de YouTube, no seas tan tímido.',
+    notice: `${robotEmoji} Adjunta un enlace de YouTube, no seas tan tímido.`,
     commandMode: null,
   },
   2: {
@@ -60,7 +60,7 @@ const commandsYoutubeDownload = {
     commandMode: 'cutVideo',
   },
   default: {
-    notice: '🤖 Sintaxis incorrecta.',
+    notice: `${robotEmoji} Sintaxis incorrecta.`,
     commandMode: null,
   },
 };
@@ -277,7 +277,7 @@ client.on('message_create', async message => {
 			}
       case commands.sh:
         if (stringifyMessage.length === 2) {
-          functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage);
+          functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage, robotEmoji);
           return;
         } else {
           message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
@@ -294,8 +294,8 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.paper:
-				if (stringifyMessage.length === 2) {
-					functions.paperKeyword(message, stringifyMessage, robotEmoji);
+				if (stringifyMessage.length >= 2) {
+					functions.paperKeyword(message, query, robotEmoji);
 				} else {
 					message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
 				}
