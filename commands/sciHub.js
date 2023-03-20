@@ -6,7 +6,7 @@ const { pipeline } = require('stream');
 const sciHub_baseURL = 'https://sci-hub.mksa.top/';
 const iframeRegex = /<iframe src="(.*?)"(?:.*?)>/;
 
-async function getPdfLink(message, client, MessageMedia, stringifyMessage) {
+async function getPdfLink(message, client, MessageMedia, stringifyMessage, robotEmoji) {
   const link = stringifyMessage[1];
 
   const response = await fetch(`${sciHub_baseURL}${link}`);
@@ -23,7 +23,7 @@ async function getPdfLink(message, client, MessageMedia, stringifyMessage) {
 
 		fs.unlinkSync(path.join(__dirname, '../pdf', pdfFilename));
 	} else {
-		message.reply('🤖 No hemos podido encontrar el PDF de este artículo.');
+		message.reply(`${robotEmoji} No hemos podido encontrar el PDF de este artículo.`);
 	}
 }
 
@@ -51,8 +51,8 @@ async function downloadPdf(pdfLink, link) {
   });
 }
 
-async function paperKeyword(message, stringifyMessage, robotEmoji) {
-  const keywords = stringifyMessage[1];
+async function paperKeyword(message, query, robotEmoji) {
+  const keywords = query;
   try {
     const response = await searchByKeyword(keywords);
     if (response) {
@@ -68,8 +68,10 @@ async function paperKeyword(message, stringifyMessage, robotEmoji) {
 
 async function searchByKeyword(keywords, maxResults = 5) {
   const api = 'https://api.semanticscholar.org/graph/v1/paper/search';
+  const formattedKeywords = keywords.trim().replace(/\s\s+/g, ' ');
+
   const query = {
-    query: keywords,
+    query: encodeURIComponent(formattedKeywords),
     fields: 'paperId,title,authors',
   };
 
@@ -103,14 +105,14 @@ function formatResponse(results) {
 
 async function request(api, query) {
   const queryString = Object.entries(query)
-		.map(([key, value]) => `${key}=${value}`)
-		.join('&');
-	const url = `${api}?${queryString}`;
-	const response = await fetch(url, {
-		method: 'GET',
-		headers: { 'Content-Type': 'application/json' },
-	});
-	return await response.json();
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+  const url = `${api}?${queryString}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return await response.json();
 }
 
 module.exports = {
