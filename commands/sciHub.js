@@ -9,26 +9,22 @@ const iframeRegex = /<iframe src="(.*?)"(?:.*?)>/;
 async function getPdfLink(message, client, MessageMedia, stringifyMessage) {
   const link = stringifyMessage[1];
 
-  try {
-    const response = await fetch(`${sciHub_baseURL}${link}`);
-    const html = await response.text();
-    const match = iframeRegex.exec(html);
-    const pdfLink = match ? (match[1].startsWith('http') ? match[1] : `http:${match[1]}`) : null;
+  const response = await fetch(`${sciHub_baseURL}${link}`);
+	const html = await response.text();
+	const match = iframeRegex.exec(html);
+	const pdfLink = match ? (match[1].startsWith('http') ? match[1] : `http:${match[1]}`) : null;
 
-    if (pdfLink) {
-      const pdfFilename = await downloadPdf(pdfLink, link);
-      const media = await MessageMedia.fromFilePath(path.join(__dirname, '../pdf', pdfFilename));
-      await client.sendMessage(message.id.remote, media, {
-        caption: 'PDF file',
-      });
+	if (pdfLink) {
+		const pdfFilename = await downloadPdf(pdfLink, link);
+		const media = await MessageMedia.fromFilePath(path.join(__dirname, '../pdf', pdfFilename));
+		await client.sendMessage(message.id.remote, media, {
+			caption: 'PDF file',
+		});
 
-      fs.unlinkSync(path.join(__dirname, '../pdf', pdfFilename));
-    } else {
-      message.reply('🤖 No hemos podido encontrar el PDF de este artículo.');
-    }
-  } catch (error) {
-    console.error(error);
-  }
+		fs.unlinkSync(path.join(__dirname, '../pdf', pdfFilename));
+	} else {
+		message.reply('🤖 No hemos podido encontrar el PDF de este artículo.');
+	}
 }
 
 async function downloadPdf(pdfLink, link) {
@@ -106,19 +102,15 @@ function formatResponse(results) {
 }
 
 async function request(api, query) {
-  try {
-    const queryString = Object.entries(query)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&');
-    const url = `${api}?${queryString}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    return await response.json();
-  } catch (error) {
-    throw error;
-  }
+  const queryString = Object.entries(query)
+		.map(([key, value]) => `${key}=${value}`)
+		.join('&');
+	const url = `${api}?${queryString}`;
+	const response = await fetch(url, {
+		method: 'GET',
+		headers: { 'Content-Type': 'application/json' },
+	});
+	return await response.json();
 }
 
 module.exports = {

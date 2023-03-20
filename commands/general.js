@@ -178,14 +178,16 @@ async function getYoutubeChannelId(url) {
     match = userRegex.exec(url);
     channelId = match[1];
     console.log(`Channel ID (user): ${channelId}`	)
-  } else if (match = usernameRegex.exec(url)) {
-    const preChannelId = match[1];
-    channelId = await getChannel(preChannelId);
-    console.log(`Channel ID (custom): ${channelId}`);
-  }
-  else {
-    throw new Error('Invalid YouTube URL');
-  }
+  } else {
+    match = usernameRegex.exec(url);
+    if (match) {
+			const preChannelId = match[1];
+			channelId = await getChannel(preChannelId);
+			console.log(`Channel ID (custom): ${channelId}`);
+		} else {
+			throw new Error('Invalid YouTube URL');
+		}
+	}
 
   return channelId;
 }
@@ -495,13 +497,13 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   const { title, thumbnailUrl, channelTitle, viewCount, likeCount } = await fetchYoutubeData(detailsUrl);
 
   const media = await MessageMedia.fromUrl(thumbnailUrl, { 
-		unsafeMime: true 
+		unsafeMime: true,
 	});
 
   const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
 
   await client.sendMessage(message.id.remote, media, { 
-		caption: captionText 
+		caption: captionText,
 	});
 }
 
