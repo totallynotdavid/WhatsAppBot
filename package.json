@@ -15,10 +15,12 @@
   "author": "totallynotdavid",
   "license": "MIT",
   "devDependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
     "@supabase/supabase-js": "^2.7.1",
     "axios": "^0.27.2",
     "dotenv": "^16.0.3",
     "eslint": "^8.31.0",
+    "googleapis": "^105.0.0",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "qrcode-terminal": "^0.12.0",
