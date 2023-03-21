@@ -1,6 +1,6 @@
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const fs = require('fs').promises;
 const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
