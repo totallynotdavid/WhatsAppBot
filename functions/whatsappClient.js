@@ -19,6 +19,14 @@ let prefix = '!';
 let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
+let paidUsers = [];
+
+/* Paid users */
+function setPaidUsers(users) {
+  paidUsers = users;
+	console.log('Paid users loaded successfully');
+	console.log('Paid users2:', paidUsers);
+}
 
 // User and admin commands
 const commands  = {
@@ -352,7 +360,6 @@ client.on('message_create', async message => {
 
 			if (isAdmin) {
 				switch (command) {
-					
 					case adminCommands.todos:
 						functions.mentionEveryone(chat, client, message, senderName);
 						break;
@@ -383,4 +390,7 @@ client.on('message_create', async message => {
 
 });
 
-module.exports = client;
+module.exports = {
+	client,
+	setPaidUsers,
+}

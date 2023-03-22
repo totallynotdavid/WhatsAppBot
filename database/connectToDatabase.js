@@ -38,6 +38,25 @@ async function insertMessage(phoneNumber, message, group) {
 		*/
 }
 
+async function loadPaidUsers() {
+  const { data: users, error } = await supabase
+    .from('paid_users')
+    .select('phone_number');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  paidUsers = users.map(user => user.phone_number);
+}
+
+function getPaidUsers() {
+  return paidUsers;
+}
+
 module.exports = {
     insertMessage,
+		loadPaidUsers,
+		getPaidUsers,
 };
