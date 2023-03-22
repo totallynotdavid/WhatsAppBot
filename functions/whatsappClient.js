@@ -357,9 +357,16 @@ client.on('message_create', async message => {
 						break;
 					case adminCommands.ban:
 						const quotedMessage = await message.getQuotedMessage();
+
 						if (quotedMessage) {
 							const quotedAuthor = quotedMessage.author;
-							console.log(`the author is ${quotedAuthor}`)
+
+							console.log(`quotedAuthor: ${quotedAuthor}`);
+							console.log(`client.info.wid._serialized: ${client.info.wid._serialized}`);
+
+							if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
+								return message.reply(`${robotEmoji} Cómo te atreves.`);
+							}
 							functions.banUser(chat, quotedAuthor, message, robotEmoji);
 						} else {
 							message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
