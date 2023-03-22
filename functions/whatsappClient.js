@@ -135,8 +135,6 @@ client.on('message_create', async message => {
   /* Logging all messages received to Supabase */
   database.insertMessage(senderNumber, message.body, message.to);
 
-	console.log('Message received from', senderName, '(', senderNumber, '):', message.body);
-
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
   /* The functions variable should be generated each time, if not, it will loop through all past messages */
