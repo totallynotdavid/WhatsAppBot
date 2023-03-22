@@ -65,6 +65,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	- `youtubeKey`
 	- `SUPABASE_API_KEY`
 	- `SUPABASE_BASE_URL`
+	- `FOLDER_ID`
 
 3. Instalar las dependencias:
 
@@ -72,7 +73,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	npm install
 	```
 
-4. Aplica estas [correcciones](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717). También:
+4. Aplica estas correcciones: [1](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717), [2](https://github.com/pedroslopez/whatsapp-web.js/pull/2087/files). También:
 
 	```bash
 	npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
