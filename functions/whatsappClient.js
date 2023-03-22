@@ -352,6 +352,7 @@ client.on('message_create', async message => {
 
 			if (isAdmin) {
 				switch (command) {
+					
 					case adminCommands.todos:
 						functions.mentionEveryone(chat, client, message, senderName);
 						break;
@@ -360,9 +361,6 @@ client.on('message_create', async message => {
 
 						if (quotedMessage) {
 							const quotedAuthor = quotedMessage.author;
-
-							console.log(`quotedAuthor: ${quotedAuthor}`);
-							console.log(`client.info.wid._serialized: ${client.info.wid._serialized}`);
 
 							if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
 								return message.reply(`${robotEmoji} Cómo te atreves.`);
@@ -377,7 +375,6 @@ client.on('message_create', async message => {
 						break;
 				}
 			} else {
-				console.log('you are not admin')
 				return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
 			}
 		}
