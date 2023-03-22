@@ -51,12 +51,31 @@ async function loadPaidUsers() {
   paidUsers = users.map(user => user.phone_number);
 }
 
+async function loadPhysicsUsers() {
+	const { data: users, error } = await supabase
+		.from('physics_users')
+		.select('phone_number');
+
+	if (error) {
+		console.error(error);
+		return;
+	}
+
+	physicsUsers = users.map(user => user.phone_number);
+}
+
 function getPaidUsers() {
   return paidUsers;
+}
+
+function getPhysicsUsers() {
+	return physicsUsers;
 }
 
 module.exports = {
     insertMessage,
 		loadPaidUsers,
 		getPaidUsers,
+		loadPhysicsUsers,
+		getPhysicsUsers,
 };

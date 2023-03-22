@@ -20,11 +20,17 @@ let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
 let paidUsers = [];
+let physicsUsers = [];
 
 /* Paid users */
 function setPaidUsers(users) {
   paidUsers = users;
 	console.log('Paid users loaded successfully');
+}
+
+function setPhysicsUsers(users) {
+	physicsUsers = users;
+	console.log('Physics users loaded successfully');
 }
 
 // User and admin commands
@@ -322,6 +328,9 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.doc:
+				if (!physicsUsers.includes(senderNumber)) {
+					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
+				}
 				if (stringifyMessage.length >= 2) {
 					functions.getDocumentsFromGoogleDrive(query)
 						.then((results) => {
@@ -397,4 +406,5 @@ client.on('message_create', async message => {
 module.exports = {
 	client,
 	setPaidUsers,
+	setPhysicsUsers,
 }

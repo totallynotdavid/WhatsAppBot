@@ -22,6 +22,9 @@ database.loadPaidUsers().then(() => {
   // Pass the paidUsers array to the whatsappClient
   whatsappClient.setPaidUsers(database.getPaidUsers());
 });
+database.loadPhysicsUsers().then(() => {
+	whatsappClient.setPhysicsUsers(database.getPhysicsUsers());
+});
 
 /* SPOTIFY API */
 spotifyAPI.refreshAccessToken();
