@@ -33,7 +33,7 @@ async function mentionEveryone(chat, client, message, senderName) {
   }
 }
 
-/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067
+/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067 */
 async function banUser(chat, participantId, message, robotEmoji) {
 	try {
 		console.log('participantId:', participantId)
@@ -42,11 +42,12 @@ async function banUser(chat, participantId, message, robotEmoji) {
 		message.reply(`${robotEmoji} Usuario baneado exitosamente.`)
 	} catch (error) {
 		console.log('Failed to remove participant:', error);
+		message.reply(`${robotEmoji} Houston, tenemos un problema.`)
 	}
 }
-*/
+/**/
 
 module.exports = { 
   mentionEveryone,
-	//banUser,
+	banUser,
 };
