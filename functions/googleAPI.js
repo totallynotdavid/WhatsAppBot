@@ -6,8 +6,8 @@ const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
+const TOKEN_PATH = path.join(process.cwd(), 'fixedData', 'DRIVE_token.json');
+const CREDENTIALS_PATH = path.join(process.cwd(), 'fixedData', 'DRIVE_credenciales.json');
 
 const folderId = process.env.FOLDER_ID;
 
@@ -58,7 +58,7 @@ async function getAllFolders(authClient) {
     const res = await drive.files.list({
       pageSize: 1000,
       pageToken,
-      q: "mimeType='application/vnd.google-apps.folder' and trashed=false",
+      q: 'mimeType=\'application/vnd.google-apps.folder\' and trashed=false',
       fields: 'nextPageToken, files(id, name, parents)',
     });
 
@@ -83,17 +83,7 @@ async function buildFolderTree(folderMap, folderId) {
   return folderIds;
 }
 
-function findFolderPath(folderMap, fileId) {
-  const folder = folderMap.get(fileId);
-  if (!folder) {
-    return '';
-  }
-  const parentFolderId = folder.parents ? folder.parents[0] : null;
-  const parentFolderPath = parentFolderId ? findFolderPath(folderMap, parentFolderId) : '';
-  return `${parentFolderPath}/${folder.name}`;
-}
-
-async function searchFilesInFolders(authClient, folderIds, query, folderMap) {
+async function searchFilesInFolders(authClient, folderIds, query/*, folderMap*/) {
   const drive = google.drive({ version: 'v3', auth: authClient });
   const parentQueries = folderIds.map((id) => `'${id}' in parents`).join(' or ');
   const files = [];
@@ -116,16 +106,7 @@ async function searchFilesInFolders(authClient, folderIds, query, folderMap) {
     return;
   }
 
-  console.log('Files:');
-  const limit = Math.min(5, files.length);
-  for (let i = 0; i < limit; i++) {
-    const file = files[i];
-    const parentFolderId = file.parents ? file.parents[0] : null;
-    const folderPath = parentFolderId ? findFolderPath(folderMap, parentFolderId) : '';
-    console.log(`Path: ${folderPath}/${file.name}`);
-    console.log(`Link: ${file.webViewLink}`);
-    console.log(`File: ${file.name} (${file.id})\n`);
-  }
+	return files;
 }
 
 class FolderCache {
@@ -143,7 +124,7 @@ class FolderCache {
       await this.load(authClient);
     }
     const folderIds = await buildFolderTree(this.folderMap, folderId);
-    return searchFilesInFolders(authClient, folderIds, query, this.folderMap);
+    return searchFilesInFolders(authClient, folderIds, query/*, this.folderMap*/);
   }
 
   scheduleRefresh() {
@@ -163,12 +144,16 @@ class FolderCache {
 }
 
 const folderCache = new FolderCache();
-const query1 = '2021';
-const query2 = '2022';
 
-authorize()
-  .then(async (authClient) => {
-    await folderCache.search(folderId, query1, authClient);
-    await folderCache.search(folderId, query2, authClient);
-  })
-  .catch(console.error);
+async function searchFolderCache(query) {
+  try {
+    const authClient = await authorize();
+    return await folderCache.search(folderId, query, authClient);
+  } catch (error) {
+    console.error('Error buscando en la caché:', error);
+  }
+}
+
+module.exports = {
+  searchFolderCache,
+};

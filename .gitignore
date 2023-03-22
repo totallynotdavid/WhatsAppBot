@@ -1,7 +1,10 @@
-.env
+# Generated files	and folders
 **/node_modules/
 **/.wwebjs_auth/
 **/audio/
 **/pdf/
-/functions/credentials.json
-/functions/token.json
+
+# Sensitive data
+.env
+/fixedData/DRIVE_credenciales.json
+/fixedData/DRIVE_token.json

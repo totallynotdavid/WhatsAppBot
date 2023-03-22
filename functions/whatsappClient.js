@@ -11,6 +11,7 @@ const sciHub = require('../commands/sciHub');
 const boTeX = require('../commands/boTeX');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
+const driveAPI = require('./googleAPI');
 const database = require('../database/connectToDatabase');
 
 /* Global Variables */ 
@@ -30,15 +31,16 @@ const commands  = {
   w: 'w',
   yt: 'yt',
   play: 'play',
-  sh: 'sh',
-	lx: 'lx',
+  doi: 'doi',
+	tex: 'tex',
 	paper: 'paper',
 	author: 'author',
+	doc: 'doc',
 }
 
 const adminCommands = {
 	todos: 'todos',
-	//ban: 'ban',
+	ban: 'ban',
 };
 
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
@@ -61,7 +63,7 @@ const commandsYoutubeDownload = {
     commandMode: 'cutVideo',
   },
   default: {
-    notice: `${robotEmoji} Sintaxis incorrecta.`,
+    notice: `${robotEmoji} Sintaxis incorrecta. Solo envía el comando y el enlace de YouTube.`,
     commandMode: null,
   },
 };
@@ -124,13 +126,14 @@ client.on('message_create', async message => {
   /* This also takes care of reacting if whatever function is succesfully executed */
   /* The functions variable should be generated each time, if not, it will loop through all past messages */
   const functions = {
-		//banUser: admin.banUser,
+		banUser: admin.banUser,
     mentionEveryone: admin.mentionEveryone,
+		transformLatexToImage: boTeX.transformLatexToImage,
+		getDocumentsFromGoogleDrive: driveAPI.searchFolderCache,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
     convertUrlImageToSticker: general.convertUrlImageToSticker,
-    sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
     getRedditImage: general.getRedditImage,
     getWikiArticle: general.getWikiArticle,
     getYoutubeInformation: general.getYoutubeInformation,
@@ -139,7 +142,7 @@ client.on('message_create', async message => {
     getSciHubArticle: sciHub.getPdfLink,
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
-		transformLatexToImage: boTeX.transformLatexToImage,
+		sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -277,7 +280,7 @@ client.on('message_create', async message => {
 				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
 				break;
 			}
-      case commands.sh:
+      case commands.doi:
         if (stringifyMessage.length === 2) {
           functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage, robotEmoji);
           return;
@@ -285,7 +288,7 @@ client.on('message_create', async message => {
           message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
         }
         break;
-			case commands.lx:
+			case commands.tex:
 				if (stringifyMessage.length > 1) {
 					const query = stringifyMessage.slice(1).join(' ');
 					const beginRegex = /\\begin\{[a-z]*\}/g;
@@ -307,6 +310,25 @@ client.on('message_create', async message => {
 					functions.getAuthorInfo(message, query, robotEmoji);
 				} else {
 					message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
+				}
+				break;
+			case commands.doc:
+				if (stringifyMessage.length >= 2) {
+					functions.getDocumentsFromGoogleDrive(query)
+						.then((results) => {
+							let messageText = `${robotEmoji} Resultados:\n\n`;
+							const limit = Math.min(5, results.length);
+							for (let i = 0; i < limit; i++) {
+								const file = results[i];
+								messageText += `${i+1}. ${file.name} (${file.webViewLink})\n`;
+							}
+							message.reply(messageText);
+						})
+						.catch((error) => {
+							console.error('Error searching folder cache:', error);
+						});
+				} else {
+					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres buscar?`);
 				}
 				break;
       default:
@@ -333,17 +355,16 @@ client.on('message_create', async message => {
 					case adminCommands.todos:
 						functions.mentionEveryone(chat, client, message, senderName);
 						break;
-					/* https://github.com/pedroslopez/whatsapp-web.js/issues/2067
 					case adminCommands.ban:
 						const quotedMessage = await message.getQuotedMessage();
 						if (quotedMessage) {
 							const quotedAuthor = quotedMessage.author;
+							console.log(`the author is ${quotedAuthor}`)
 							functions.banUser(chat, quotedAuthor, message, robotEmoji);
 						} else {
 							message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
 						}
 						break;
-					*/
 					default:
 						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 						break;
