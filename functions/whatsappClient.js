@@ -25,7 +25,6 @@ let paidUsers = [];
 function setPaidUsers(users) {
   paidUsers = users;
 	console.log('Paid users loaded successfully');
-	console.log('Paid users2:', paidUsers);
 }
 
 // User and admin commands
@@ -129,6 +128,8 @@ client.on('message_create', async message => {
 
   /* Logging all messages received to Supabase */
   database.insertMessage(senderNumber, message.body, message.to);
+
+	console.log('Message received from', senderName, '(', senderNumber, '):', message.body);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
@@ -364,6 +365,9 @@ client.on('message_create', async message => {
 						functions.mentionEveryone(chat, client, message, senderName);
 						break;
 					case adminCommands.ban:
+						if (!paidUsers.includes(senderNumber)) {
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+						}
 						const quotedMessage = await message.getQuotedMessage();
 
 						if (quotedMessage) {
