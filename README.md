@@ -46,7 +46,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	tar -xf install-tl-unx.tar.gz
 	cd install-tl-*/
 	sudo perl install-tl --no-interaction
-	echo 'export PATH="/usr/local/texlive/2022/bin/x86_64-linux:$PATH"' >> ~/.bashrc
+	echo 'export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$PATH"' >> ~/.bashrc
 	source ~/.bashrc
 	pdflatex --version
 	```
