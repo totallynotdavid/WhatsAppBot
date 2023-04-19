@@ -1,0 +1,22 @@
+{
+	"name": "Ubuntu 22.02",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": { "VARIANT": "jammy" }
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"CoderCoder.codercoder-dark-theme",
+				"analytic-signal.preview-pdf",
+				"esbenp.prettier-vscode",
+				"dbaeumer.vscode-eslint",
+				"mgmcdermott.vscode-language-babel",
+				"GitHub.copilot-nightly",
+				"GitHub.copilot-labs",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
+	"remoteUser": "vscode"
+}
