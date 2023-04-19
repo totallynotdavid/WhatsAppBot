@@ -8,7 +8,7 @@ function checkEnvironmentVariables() {
   }
 
   // Define the required environment variables
-  const requiredVariables = ['spotifyClientId', 'spotifyClientSecret', 'youtubeKey'];
+  const requiredVariables = ['spotify_client_id', 'spotify_client_secret', 'youtube_api_key'];
 
   // Check if all of the required environment variables are defined in the .env file
   for (const variable of requiredVariables) {

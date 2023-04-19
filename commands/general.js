@@ -6,7 +6,7 @@ const axios = require('axios').default;
 const moment = require('moment');
 const { exec } = require('child_process');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const youtubeKey = process.env.youtubeKey;
+const youtube_api_key = process.env.youtube_api_key;
 
 /* Commands stored as JSON files for better readability */
 const helpListCommands = require('../fixedData/helpListCommands.json');
@@ -195,9 +195,9 @@ async function getYoutubeChannelId(url) {
 async function getChannel(username) {
   const baseUrl = 'https://www.googleapis.com/youtube/v3/';
   try {
-    const searchResults = await fetchData(`${baseUrl}search?key=${youtubeKey}&part=snippet&q=${username}&maxResults=50&order=relevance&type=channel`);
+    const searchResults = await fetchData(`${baseUrl}search?key=${youtube_api_key}&part=snippet&q=${username}&maxResults=50&order=relevance&type=channel`);
     const channelIds = searchResults.items.map(item => item.id.channelId);
-    const channelDetails = await fetchData(`${baseUrl}channels?key=${youtubeKey}&part=snippet&id=${channelIds.join(',')}&maxResults=50`);
+    const channelDetails = await fetchData(`${baseUrl}channels?key=${youtube_api_key}&part=snippet&id=${channelIds.join(',')}&maxResults=50`);
     const finalUsername = `@${username}`;
     const selectedChannel = channelDetails.items.find(item => item.snippet.customUrl === finalUsername);
     if (selectedChannel) {
@@ -238,7 +238,7 @@ function convertMp3ToOgg(videoFilename, outputFilename, message, client, Message
 }
 
 async function getVideoLength(videoId) {
-  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${youtubeKey}&fields=items(contentDetails(duration))&part=contentDetails`;
+  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${youtube_api_key}&fields=items(contentDetails(duration))&part=contentDetails`;
 
   const response = await fetch(url);
   const data = await response.json();
@@ -422,7 +422,7 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
         requiredFields = 'snippet%2Cstatistics';
         break;
     }
-    const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=${requiredFields}&${searchApiType}=${mediaId}&key=${youtubeKey}`;
+    const searchUrl = `https://www.googleapis.com/youtube/v3/${youtubeType}?part=${requiredFields}&${searchApiType}=${mediaId}&key=${youtube_api_key}`;
 
     if (!mediaId) return message.reply('🤖 Houston, tenemos un problema. ¿Estás seguro de que la URL es válida?');
 
@@ -444,8 +444,8 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
 }
 
 async function searchYoutubeVideo(message, client, MessageMedia, query) {
-  // Build the search URL with the query and youtubeKey
-  const searchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${youtubeKey}`;
+  // Build the search URL with the query and youtube_api_key
+  const searchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${youtube_api_key}`;
 
   // Make the search request and get response
   const response = await fetch(searchURL);
@@ -492,7 +492,7 @@ async function searchYoutubeVideo(message, client, MessageMedia, query) {
 //
 
 async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMedia) {
-  const detailsUrl = `https://www.googleapis.com/youtube/v3/${emoji === '🎬' ? 'videos' : emoji === '🎵' ? 'playlists' : 'channels'}?part=snippet%2Cstatistics&id=${id}&key=${youtubeKey}`;
+  const detailsUrl = `https://www.googleapis.com/youtube/v3/${emoji === '🎬' ? 'videos' : emoji === '🎵' ? 'playlists' : 'channels'}?part=snippet%2Cstatistics&id=${id}&key=${youtube_api_key}`;
 
   const { title, thumbnailUrl, channelTitle, viewCount, likeCount } = await fetchYoutubeData(detailsUrl);
 

@@ -48,6 +48,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	sudo perl install-tl --no-interaction
 	echo 'export PATH="/usr/local/texlive/2022/bin/x86_64-linux:$PATH"' >> ~/.bashrc
 	source ~/.bashrc
+	pdflatex --version
 	```
 
 ## Instalación
@@ -60,12 +61,12 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 2. Crear un `.env` y agregar las siguientes variables:
 
-	- `spotifyClientId`
-	- `spotifyClientSecret`
-	- `youtubeKey`
-	- `SUPABASE_API_KEY`
-	- `SUPABASE_BASE_URL`
-	- `FOLDER_ID`
+	- `spotify_client_id`
+	- `spotify_client_secret`
+	- `youtube_api_key`
+	- `supabase_api_key`
+	- `supabase_base_url`
+	- `folder_id`
 
 3. Instalar las dependencias:
 
@@ -110,6 +111,5 @@ El Bot funciona interpretando los comandos que empiezan por `!` o `@`.
 
 ### Comandos para administradores
 
-Los siguientes comandos sólo están disponibles para los usuarios que han sido añadidos al archivo `administrators.json`.
-
-- `@todos` - Menciona a todos los miembros del grupo.
+- `@todos` - Menciona a todos los miembros del grupo
+- `@ban` - Elimina a un miembro del grupo

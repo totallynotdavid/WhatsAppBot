@@ -9,7 +9,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = path.join(process.cwd(), 'fixedData', 'DRIVE_token.json');
 const CREDENTIALS_PATH = path.join(process.cwd(), 'fixedData', 'DRIVE_credenciales.json');
 
-const folderId = process.env.FOLDER_ID;
+const folderId = process.env.folder_id;
 
 async function loadSavedCredentialsIfExist() {
   try {

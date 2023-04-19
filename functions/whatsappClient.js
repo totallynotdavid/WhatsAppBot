@@ -395,6 +395,8 @@ client.on('message_create', async message => {
 			} else {
 				return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
 			}
+		} else {
+			return
 		}
 
 	}

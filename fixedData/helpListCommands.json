@@ -22,6 +22,21 @@
   {
     "command": "w",
     "message": "Obten definiciones de Wikipedia",
-    "usage": "w portugal the man"
-  }
+    "usage": "w Portugal. The Man"
+  },
+	{
+		"command": "lx",
+		"message": "Transforma código LaTeX en una imagen",
+		"usage": "lx \\int_{a}^{b} f(x) dx"
+	},
+	{
+		"command": "sh",
+		"message": "Obten el PDF de un artículo científico",
+		"usage": "sh 10.1063/1.2195321"
+	},
+	{
+		"command": "paper",
+		"message": "Busca artículos científicos sobre tu tema de interés",
+		"usage": "paper mechanics"
+	}
 ]
