@@ -27,5 +27,5 @@
 		"memory": "8gb",
 		"storage": "32gb"
  	},
-	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y upgrade && bash /workspaces/WhatsAppBot/util/install-dependencies.sh"
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y upgrade && sudo /workspaces/WhatsAppBot/util/install-dependencies.sh"
 }
