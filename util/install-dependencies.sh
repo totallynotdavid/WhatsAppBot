@@ -23,5 +23,5 @@ wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
 tar -xf install-tl-unx.tar.gz
 cd install-tl-*/
 sudo perl install-tl --no-interaction
-echo 'export PATH="/usr/local/texlive/2022/bin/x86_64-linux:$PATH"' >> ~/.bashrc
+echo 'export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$PATH"' >> ~/.bashrc
 source ~/.bashrc
