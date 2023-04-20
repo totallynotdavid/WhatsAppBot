@@ -2,7 +2,6 @@
 // Packages
 const { Client, LocalAuth, MessageMedia, /*Buttons,*/ List } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const fetch = require('node-fetch');
 
 // Function Locations
 const general = require('../commands/general');
@@ -25,12 +24,9 @@ let physicsUsers = [];
 /* Paid users */
 function setPaidUsers(users) {
   paidUsers = users;
-	console.log('Paid users loaded successfully');
 }
-
 function setPhysicsUsers(users) {
 	physicsUsers = users;
-	console.log('Physics users loaded successfully');
 }
 
 // User and admin commands
@@ -134,7 +130,7 @@ client.on('message_create', async message => {
   const senderNumber = message.id.participant || message.id.remote;
 
   /* Logging all messages received to Supabase */
-  // database.insertMessage(senderNumber, message.body, message.to);
+  database.insertMessage(senderNumber, message.body, message.to);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
@@ -221,14 +217,11 @@ client.on('message_create', async message => {
 					let mediaURL;
 
 					if (stickerURL.includes('reddit.com')) {
-						console.log('Reddit detected')
 						const { mediaURL: redditMediaURL, media } = await general.handleRedditMedia(stickerURL, message, robotEmoji);
 						if (!redditMediaURL) {
-							console.log('No media URL found, aborting')
 							return;
 						}
 						mediaURL = redditMediaURL;
-						console.log('Media URL root: ', mediaURL)
 						
 						if (media.is_video) { // check if the media is a video
 							const localFilePath = await general.saveRedditVideo(media);
@@ -238,7 +231,6 @@ client.on('message_create', async message => {
 						}
 					} else {
 						mediaURL = stickerURL;
-						console.log('This is a normal URL', mediaURL)
 						await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
 					}
 				}
@@ -381,6 +373,7 @@ client.on('message_create', async message => {
 			const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
 
 			if (isAdmin) {
+				const quotedMessage = await message.getQuotedMessage();
 				switch (command) {
 					case adminCommands.todos:
 						functions.mentionEveryone(chat, client, message, senderName);
@@ -389,7 +382,6 @@ client.on('message_create', async message => {
 						if (!paidUsers.includes(senderNumber)) {
 							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
 						}
-						const quotedMessage = await message.getQuotedMessage();
 
 						if (quotedMessage) {
 							const quotedAuthor = quotedMessage.author;

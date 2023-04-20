@@ -102,7 +102,9 @@ function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
 
 function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/) {
   try {
-    //let buttonsMessage;
+    //let buttonsMessage; // For now, we can't send buttons messages
+		const physicsResourcesMessage = '🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH';
+
     switch (stringifyMessage.length) {
       case 1:
         /*
@@ -117,7 +119,6 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, 
         );
         client.sendMessage(message.id.remote, buttonsMessage);
         */
-				const physicsResourcesMessage = `🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH`;
 				message.reply(`🤖 ¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!\n\n${codeWrapper(physicsResourcesMessage)}\n\nProporcionado por el equipo del CAE-Física`);
         break;
       case 2:
@@ -352,13 +353,11 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
     const postData = await response.json();
 
     const media = postData[0].data.children[0].data;
-    console.log('Our media is: ', media.url);
 
     let mediaURL;
 
     if (media.is_video) {
       mediaURL = media.secure_media.reddit_video.fallback_url;
-      console.log('We are dealing with a video: ', mediaURL)
       const localFilePath = await saveRedditVideo(media);
       return {
         mediaURL: mediaURL,
@@ -367,9 +366,7 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
       };
     } else if (media.url.startsWith('https://v.redd.it/') || media.url.startsWith('https://i.imgur.com/')) {
 			mediaURL = media.url;
-			console.log('Left the media url as is')
 		} else if (media.preview && media.preview.images && media.preview.images.length > 0) {
-			console.log('The media url is being updated from preview')
 			mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
     } else if (media.url) {
       mediaURL = media.url;
@@ -380,7 +377,6 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
         media: media,
       };
     }
-    console.log('We are returning: ', mediaURL)
     return {
       mediaURL: mediaURL,
       media: media,
@@ -412,9 +408,7 @@ async function saveRedditVideo(media) {
 
 async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
 	try {
-		console.log('owo, validating media: ', mediaURL)
 		if (mediaURL.endsWith('.gifv')) {
-			console.log('We are dealing with a gifv: ', mediaURL)
 			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
 		}
 

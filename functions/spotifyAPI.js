@@ -17,7 +17,6 @@ const spotifyApi = new SpotifyWebApi({
 
 /* Keep a timeline of the accessToken */
 let accessToken = null;
-let tokenExpiration = null;
 
 // Function to refresh the access token every 30 minutes
 async function refreshAccessToken() {
@@ -26,8 +25,6 @@ async function refreshAccessToken() {
     const data = await spotifyApi.clientCredentialsGrant();
     spotifyApi.setAccessToken(data.body['access_token']);
     accessToken = data.body['access_token'];
-    tokenExpiration = data.body['expires_in'];
-    console.log(`refreshAccessToken: ${accessToken} expires in ${tokenExpiration} seconds.`)
   } catch (error) {
     console.error('Error refreshing access token:', error);
   }
