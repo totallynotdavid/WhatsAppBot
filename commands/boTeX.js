@@ -37,9 +37,9 @@ async function transformLatexToImage(message, client, MessageMedia, query, robot
     fs.writeFileSync(path.join(__dirname, '..', 'img', 'input.tex'), latexDocument);
 
     await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
-
+		// on Windows: we use "magick convert" instead of "convert"
     await executeCommand(
-			`magick convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
+			`convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
 		);
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
