@@ -64,22 +64,11 @@ function deleteFile(filePath) {
   });
 }
 
-function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List) {
+function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List, robotEmoji) {
   try {
-    let examples, helpList;
     switch (stringifyMessage.length) {
       case 1:
-        examples = helpListCommands.map(command => `${prefix}${command.usage}`);
-        helpList = new List(
-          'Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?',
-          'Cómo usar los comandos',
-          [
-            {
-              title: `Usa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando`,
-              rows: examples.map(example => ({title: example})),
-            },
-        ]);
-        client.sendMessage(message.id.remote, helpList);
+        sendHelpList(prefix, helpCommand, message, client, List, robotEmoji);
         break;
       case 2:
         commandGenerator(helpListCommands, message, stringifyMessage);
@@ -88,6 +77,24 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, 
         message.reply(`🤖 Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`);
     }
 
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
+  try {
+    const examples = helpListCommands.map(command => `${prefix}${command.usage}`);
+    const helpList = new List(
+      `${robotEmoji} Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?`,
+      'Cómo usar los comandos',
+      [
+        {
+          title: `Usa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando`,
+          rows: examples.map(example => ({title: example})),
+        },
+    ]);
+    client.sendMessage(message.id.remote, helpList);
   } catch (err) {
     console.error(err);
   }
@@ -110,7 +117,8 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, 
         );
         client.sendMessage(message.id.remote, buttonsMessage);
         */
-        message.reply('🤖 Este comando está en mantenimiento. Prueba más tarde.');
+				const physicsResourcesMessage = `🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH`;
+				message.reply(`🤖 ¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!\n\n${codeWrapper(physicsResourcesMessage)}\n\nProporcionado por el equipo del CAE-Física`);
         break;
       case 2:
         commandGenerator(CAEListCommands, message, stringifyMessage);
@@ -313,6 +321,27 @@ async function getRedditImage(message, subreddit, client, MessageMedia) {
   } catch (err) {
     message.reply('🤖 Hubo un error al tratar de enviar la imagen.');
     console.error(err);
+  }
+}
+
+async function getRedditVideo(media) {
+  const baseUrl = media.secure_media.reddit_video.fallback_url;
+  const cases = [1080, 720, 480, 360, 240, 220];
+  const videoTitle = media.title.replace(/[^a-zA-Z0-9]/g, '_') + '.mp4';
+
+  for (const c of cases) {
+    const response = await fetch(`${baseUrl}/DASH_${c}.mp4`);
+    if (response.status != 200) { continue; }
+
+    const fileStream = fs.createWriteStream(path.join(__dirname, videoTitle));
+    response.body.pipe(fileStream);
+    fileStream.on('error', (error) => {
+      console.error('Error while saving the file:', error);
+    });
+    fileStream.on('finish', () => {
+      console.log('Video file saved:', videoTitle);
+    });
+    break;
   }
 }
 
@@ -540,4 +569,5 @@ module.exports = {
   mp3FromYoutube,
   convertImageToSticker,
   convertUrlImageToSticker,
+	getRedditVideo,
 };

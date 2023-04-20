@@ -3,6 +3,8 @@
 **/.wwebjs_auth/
 **/audio/
 **/pdf/
+**/video/
+*.mp4
 
 # Sensitive data
 .env
