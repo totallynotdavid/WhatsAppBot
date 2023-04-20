@@ -14,8 +14,8 @@ const driveAPI = require('./googleAPI');
 const database = require('../database/connectToDatabase');
 
 /* Global Variables */ 
-let prefix = '/';
-let prefix_admin = '-';
+let prefix = '!';
+let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
 let paidUsers = [];
