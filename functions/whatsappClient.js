@@ -143,7 +143,7 @@ client.on('message_create', async message => {
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
-    convertUrlImageToSticker: general.convertUrlImageToSticker,
+		validateAndConvertMedia: general.validateAndConvertMedia,
     getRedditImage: general.getRedditImage,
     getWikiArticle: general.getWikiArticle,
     getYoutubeInformation: general.getYoutubeInformation,
@@ -225,13 +225,13 @@ client.on('message_create', async message => {
 						
 						if (media.is_video) { // check if the media is a video
 							const localFilePath = await general.saveRedditVideo(media);
-							await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
+							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
 						} else {
-							await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
+							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
 						}
 					} else {
 						mediaURL = stickerURL;
-						await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
+						await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
 					}
 				}
         break;

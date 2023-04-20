@@ -1,7 +1,7 @@
 [
   {
     "command": "spot",
-    "message": "Busca y reproduce tu música favorita de Spotify",
+    "message": "Busca y reproduce tu música favorita de Spotify. Para mayor precisión, pon primero el nombre de tu artista",
     "usage": "spot fromis airplane mode"
   },
   {
@@ -12,12 +12,12 @@
 	{
 		"command": "url",
 		"message": "Transforma una imagen o video en un sticker. Necesitas adjuntar la URL al mensaje",
-		"usage": "url https://i.imgur.com/1ZQ3Z4C.jpg"
+		"usage": "url https://i.imgur.com/NUyttbn.mp4"
 	},
   {
     "command": "yt",
     "message": "Busca tu video, playlist o canal favorito en YouTube",
-    "usage": "yt blue flame"
+    "usage": "yt le sserafim blue flame"
   },
   {
     "command": "play",
@@ -30,18 +30,33 @@
     "usage": "w Portugal. The Man"
   },
 	{
-		"command": "lx",
+		"command": "tex",
 		"message": "Transforma código LaTeX en una imagen",
-		"usage": "lx \\int_{a}^{b} f(x) dx"
+		"usage": "tex \\int_{a}^{b} f(x) dx"
 	},
 	{
-		"command": "sh",
+		"command": "doi",
 		"message": "Obten el PDF de un artículo científico",
-		"usage": "sh 10.1063/1.2195321"
+		"usage": "doi 10.1063/1.2195321"
 	},
 	{
 		"command": "paper",
 		"message": "Busca artículos científicos sobre tu tema de interés",
 		"usage": "paper mechanics"
+	},
+	{
+		"command": "author",
+		"message": "Busca artículos científicos de un autor",
+		"usage": "author angel bustamante"
+	},
+	{
+		"command": "doc",
+		"message": "Busca documentos de tu tema de interés (relacionados con la física)",
+		"usage": "doc quantum mechanics townsend"
+	},
+	{
+		"command": "cae",
+		"message": "Recursos de estudio de la física",
+		"usage": "cae"
 	}
 ]
