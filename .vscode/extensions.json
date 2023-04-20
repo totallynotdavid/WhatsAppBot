@@ -3,6 +3,10 @@
 	[
 		"CoderCoder.codercoder-dark-theme", 
 		"analytic-signal.preview-pdf", 
-		"esbenp.prettier-vscode"
+		"esbenp.prettier-vscode",
+		"mgmcdermott.vscode-language-babel",
+		"dbaeumer.vscode-eslint",
+		"GitHub.copilot-nightly",
+		"GitHub.copilot-labs"
 	]
 }
