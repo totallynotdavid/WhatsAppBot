@@ -345,6 +345,103 @@ async function getRedditVideo(media) {
   }
 }
 
+async function handleRedditMedia(stickerURL, message, robotEmoji) {
+  try {
+    const postURL = stickerURL.replace(/\/$/, '') + '.json';
+    const response = await fetch(postURL);
+    const postData = await response.json();
+
+    const media = postData[0].data.children[0].data;
+    console.log('Our media is: ', media.url);
+
+    let mediaURL;
+
+    if (media.is_video) {
+      mediaURL = media.secure_media.reddit_video.fallback_url;
+      console.log('We are dealing with a video: ', mediaURL)
+      const localFilePath = await saveRedditVideo(media);
+      return {
+        mediaURL: mediaURL,
+        media: media,
+        localFilePath: localFilePath,
+      };
+    } else if (media.url.startsWith('https://v.redd.it/') || media.url.startsWith('https://i.imgur.com/')) {
+			mediaURL = media.url;
+			console.log('Left the media url as is')
+		} else if (media.preview && media.preview.images && media.preview.images.length > 0) {
+			console.log('The media url is being updated from preview')
+			mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
+    } else if (media.url) {
+      mediaURL = media.url;
+    } else {
+      message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
+      return {
+        mediaURL: mediaURL,
+        media: media,
+      };
+    }
+    console.log('We are returning: ', mediaURL)
+    return {
+      mediaURL: mediaURL,
+      media: media,
+    };
+  } catch (error) {
+    console.error(error);
+    message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+    return null;
+  }
+}
+
+async function saveRedditVideo(media) {
+  try {
+    if (!media.secure_media || !media.secure_media.reddit_video) {
+      throw new Error('Reddit video not found');
+    }
+    const videoURL = media.secure_media.reddit_video.fallback_url;
+    const videoResponse = await fetch(videoURL);
+    const videoBuffer = await videoResponse.buffer();
+    const videoId = media.id;
+    const videoPath = path.join(__dirname, '..', 'video', `${videoId}.mp4`);
+    fs.writeFileSync(videoPath, videoBuffer);
+    return videoPath;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
+	try {
+		console.log('owo, validating media: ', mediaURL)
+		if (mediaURL.endsWith('.gifv')) {
+			console.log('We are dealing with a gifv: ', mediaURL)
+			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
+		}
+
+    const response = await fetch(mediaURL);
+    const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
+
+    if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
+      if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
+        message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
+      } else {
+        let sticker;
+        if (localFilePath) {
+          sticker = await MessageMedia.fromFilePath(localFilePath);
+        } else {
+          sticker = await MessageMedia.fromUrl(mediaURL);
+        }
+        convertUrlImageToSticker(chat, message, sticker, senderName, senderNumber);
+      }
+    } else {
+      message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`);
+    }
+  } catch (error) {
+    console.error(error);
+    message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+  }
+}
+
 async function getWikiArticle(message, query, languageCode, senderName, client, MessageMedia) {
   try {
     const wikipediaApiUrl = `https://${languageCode}.wikipedia.org/api/rest_v1/page/summary/${query}`;
@@ -570,4 +667,7 @@ module.exports = {
   convertImageToSticker,
   convertUrlImageToSticker,
 	getRedditVideo,
+	handleRedditMedia,
+	validateAndConvertMedia,
+	saveRedditVideo,
 };

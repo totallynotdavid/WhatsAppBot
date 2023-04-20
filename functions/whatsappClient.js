@@ -15,8 +15,8 @@ const driveAPI = require('./googleAPI');
 const database = require('../database/connectToDatabase');
 
 /* Global Variables */ 
-let prefix = '!';
-let prefix_admin = '@';
+let prefix = '/';
+let prefix_admin = '-';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
 let paidUsers = [];
@@ -103,8 +103,8 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
-    // executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
+    // executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
+    executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
   },
 });
   
@@ -134,7 +134,7 @@ client.on('message_create', async message => {
   const senderNumber = message.id.participant || message.id.remote;
 
   /* Logging all messages received to Supabase */
-  database.insertMessage(senderNumber, message.body, message.to);
+  // database.insertMessage(senderNumber, message.body, message.to);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
@@ -199,63 +199,47 @@ client.on('message_create', async message => {
         }
         break;
       case commands.url:
+				/*
+				Test case:
+				Youtube: https://www.reddit.com/r/neverchangejapan/comments/12spx82/ningen_isu_ringo_no_namida_a_metal_song_about_an/
+				Imagen: https://www.reddit.com/r/unixporn/comments/12ruaq1/xperia_10_iii_w_sailfish_w_arch_my_mobile_office/
+				Video: https://www.reddit.com/r/blackmagicfuckery/comments/12sex2d/pool_black_magic/
+				*/
         if (stringifyMessage.length !== 2) {
 					message.reply(`${robotEmoji} URL, solo la URL.`);
 					message.react('⚠️');
 				} else {
 					let stickerURL = stringifyMessage[1];
-				
+
 					if (!(websiteAllowedRegex.test(stickerURL) || (urlRegex.test(stickerURL) || imageOrVideoRegex.test(stickerURL)))) {
 						message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
 						return;
 					}
-				
-					stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
-				
-					try {
-						const encodedStickerURL = encodeURIComponent(stickerURL);
-						let mediaURL;
-				
-						if (stickerURL.includes('reddit.com')) {
-							// Use Reddit API to get post data and extract media URL
-							const postURL = stickerURL.replace(/\/$/, '') + '.json';
-							const response = await fetch(postURL);
-							const postData = await response.json();
-				
-							const media = postData[0].data.children[0].data;
-							console.log('Our media is: ', media.url);
-				
-							if (media.is_video) {
-								mediaURL = media.secure_media.reddit_video.fallback_url;
-								await general.getRedditVideo(media);
-							} else if (media.preview && media.preview.images && media.preview.images.length > 0) {
-								mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
-							} else if (media.url) {
-								mediaURL = media.url;
-							} else {
-								message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
-								return;
-							}
-						} else {
-							mediaURL = stickerURL;
-						}
-				
-						const response = await fetch(mediaURL);
-						const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
 
-						if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
-							if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
-								message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
-							} else {
-								const sticker = await MessageMedia.fromUrl(mediaURL);
-								functions.convertUrlImageToSticker(chat, message, sticker, senderName, senderNumber);
-							}
-						} else {
-							message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`);
+					stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
+
+					let mediaURL;
+
+					if (stickerURL.includes('reddit.com')) {
+						console.log('Reddit detected')
+						const { mediaURL: redditMediaURL, media } = await general.handleRedditMedia(stickerURL, message, robotEmoji);
+						if (!redditMediaURL) {
+							console.log('No media URL found, aborting')
+							return;
 						}
-					} catch (error) {
-						console.error(error);
-						message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+						mediaURL = redditMediaURL;
+						console.log('Media URL root: ', mediaURL)
+						
+						if (media.is_video) { // check if the media is a video
+							const localFilePath = await general.saveRedditVideo(media);
+							await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
+						} else {
+							await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
+						}
+					} else {
+						mediaURL = stickerURL;
+						console.log('This is a normal URL', mediaURL)
+						await general.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
 					}
 				}
         break;
