@@ -9,6 +9,11 @@
     "message": "Transforma una imagen, video o gif (Tenor) en un sticker. Necesitas adjuntar el archivo al mensaje",
     "usage": "sticker"
   },
+	{
+		"command": "url",
+		"message": "Transforma una imagen o video en un sticker. Necesitas adjuntar la URL al mensaje",
+		"usage": "url https://i.imgur.com/1ZQ3Z4C.jpg"
+	},
   {
     "command": "yt",
     "message": "Busca tu video, playlist o canal favorito en YouTube",
