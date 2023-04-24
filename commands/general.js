@@ -85,6 +85,7 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, 
 function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
   try {
     const examples = helpListCommands.map(command => `${prefix}${command.usage}`);
+		/*
     const helpList = new List(
       `${robotEmoji} Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?`,
       'Cómo usar los comandos',
@@ -95,6 +96,8 @@ function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
         },
     ]);
     client.sendMessage(message.id.remote, helpList);
+		*/
+		message.reply(`${robotEmoji} Cómo usar los comandos\n\nUsa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando\n\nEjemplos de uso:\n${examples.map(example => `• ${example}`).join('\n')}`);
   } catch (err) {
     console.error(err);
   }
