@@ -55,6 +55,11 @@
 		"usage": "doc quantum mechanics townsend"
 	},
 	{
+		"drive": "drive",
+		"message": "Descarga archivos de Google Drive",
+		"usage": "drive https://drive.google.com/file/d/1ClPRWwCQUc6ZKizIKHJdBjULKmdbLMyF/view"
+	},
+	{
 		"command": "cae",
 		"message": "Recursos de estudio de la física",
 		"usage": "cae"
