@@ -154,6 +154,43 @@ async function searchFolderCache(query) {
   }
 }
 
+async function downloadFilesFromGoogleDrive(query) {
+	const realFileId = extractFileIdFromDriveLink(query);
+
+  try {
+    const authClient = await authorize();
+    const service = google.drive({ version: 'v3', auth: authClient });
+
+    const fileMetadata = await service.files.get({
+      fileId: realFileId,
+			fields: 'webContentLink',
+    });
+
+    const response = await fetch(fileMetadata.data.webContentLink, {
+      headers: {
+        'Authorization': `Bearer ${authClient.credentials.access_token}`,
+      },
+    });
+
+		if (!response.ok) {
+      throw new Error(`Error downloading file: ${response.statusText}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    return Buffer.from(buffer);
+  } catch (err) {
+    console.error('Error downloading file:', err);
+    throw err;
+  }
+}
+
+function extractFileIdFromDriveLink(link) {
+  const fileIdRegex = /[-\w]{25,}/;
+  const match = fileIdRegex.exec(link);
+  return match ? match[0] : null;
+}
+
 module.exports = {
   searchFolderCache,
+	downloadFilesFromGoogleDrive,
 };

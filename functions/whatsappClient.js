@@ -45,6 +45,7 @@ const commands  = {
 	paper: 'paper',
 	author: 'author',
 	doc: 'doc',
+	drive: 'drive',
 }
 
 const adminCommands = {
@@ -140,6 +141,7 @@ client.on('message_create', async message => {
     mentionEveryone: admin.mentionEveryone,
 		transformLatexToImage: boTeX.transformLatexToImage,
 		getDocumentsFromGoogleDrive: driveAPI.searchFolderCache,
+		downloadFilesFromGoogleDrive: driveAPI.downloadFilesFromGoogleDrive,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
@@ -351,6 +353,24 @@ client.on('message_create', async message => {
 						});
 				} else {
 					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres buscar?`);
+				}
+				break;
+			case commands.drive:
+				if (!physicsUsers.includes(senderNumber)) {
+					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
+				}
+				if (stringifyMessage.length >= 2) {
+					functions.downloadFilesFromGoogleDrive(query).then(async (fileBuffer) => {
+						const media = new MessageMedia('application/pdf', fileBuffer.toString('base64'));
+						await client.sendMessage(message.id.remote, media, {
+							caption: 'PDF file',
+						});
+					}).catch((error) => {
+						console.error('Error sending file:', error);
+						message.reply(`${robotEmoji} ¿Seguro de que ese archivo existe?`)
+					});
+				} else {
+					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres descargar?`);
 				}
 				break;
       default:
