@@ -163,7 +163,7 @@ async function downloadFilesFromGoogleDrive(query) {
 
     const fileMetadata = await service.files.get({
       fileId: realFileId,
-			fields: 'webContentLink',
+			fields: 'webContentLink, size',
     });
 
     const response = await fetch(fileMetadata.data.webContentLink, {
@@ -177,7 +177,10 @@ async function downloadFilesFromGoogleDrive(query) {
     }
 
     const buffer = await response.arrayBuffer();
-    return Buffer.from(buffer);
+    return {
+			buffer: Buffer.from(buffer),
+      size: Number(fileMetadata.data.size),
+		};
   } catch (err) {
     console.error('Error downloading file:', err);
     throw err;

@@ -5,6 +5,7 @@
 **/pdf/
 **/video/
 *.mp4
+*.txt
 
 # Logs
 /commands/**.json

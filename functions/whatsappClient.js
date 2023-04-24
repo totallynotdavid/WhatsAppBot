@@ -12,6 +12,7 @@ const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const driveAPI = require('./googleAPI');
 const database = require('../database/connectToDatabase');
+const { monitorFacebookPage } = require('./checkNewPosts');
 
 /* Global Variables */ 
 let prefix = '!';
@@ -119,6 +120,8 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
+
+	monitorFacebookPage(client, 10000);
 });
 
 /* Commands */
@@ -359,9 +362,13 @@ client.on('message_create', async message => {
 				if (!physicsUsers.includes(senderNumber)) {
 					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
 				}
-				if (stringifyMessage.length >= 2) {
-					functions.downloadFilesFromGoogleDrive(query).then(async (fileBuffer) => {
-						const media = new MessageMedia('application/pdf', fileBuffer.toString('base64'));
+				if (stringifyMessage.length === 2) {
+					functions.downloadFilesFromGoogleDrive(query).then(async (fileData) => {
+						const maxSize = 200 * 1024 * 1024;
+						if (fileData.size > maxSize) {
+							return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`);
+						}
+						const media = new MessageMedia('application/pdf', fileData.buffer.toString('base64'));
 						await client.sendMessage(message.id.remote, media, {
 							caption: 'PDF file',
 						});
