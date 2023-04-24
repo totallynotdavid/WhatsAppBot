@@ -6,7 +6,9 @@
 **/video/
 *.mp4
 
+# Logs
+/commands/**.json
+
 # Sensitive data
 .env
-/fixedData/DRIVE_credenciales.json
-/fixedData/DRIVE_token.json
+/fixedData/**.json
