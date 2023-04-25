@@ -1,5 +1,6 @@
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
+const fetch = require('node-fetch');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const process = require('process');
 const { authenticate } = require('@google-cloud/local-auth');
@@ -13,16 +14,22 @@ const folderId = process.env.folder_id;
 
 async function loadSavedCredentialsIfExist() {
   try {
-    const content = await fs.readFile(TOKEN_PATH);
+    const content = await fs.promises.readFile(TOKEN_PATH);
     const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
+    const client = await google.auth.fromJSON(credentials);
+    client.setCredentials({
+      refresh_token: credentials.refresh_token,
+      access_token: credentials.access_token,
+      expiry_date: credentials.expiry_date,
+    });
+    return { client, expiry_date: credentials.expiry_date };
   } catch (err) {
     return null;
   }
 }
 
 async function saveCredentials(client) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
+  const content = await fs.promises.readFile(CREDENTIALS_PATH);
   const keys = JSON.parse(content);
   const key = keys.installed || keys.web;
   const payload = JSON.stringify({
@@ -30,19 +37,23 @@ async function saveCredentials(client) {
     client_id: key.client_id,
     client_secret: key.client_secret,
     refresh_token: client.credentials.refresh_token,
+    access_token: client.credentials.access_token,
+    expiry_date: client.credentials.expiry_date,
   });
-  await fs.writeFile(TOKEN_PATH, payload);
+  await fs.promises.writeFile(TOKEN_PATH, payload);
 }
 
 async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
+  let authData = await loadSavedCredentialsIfExist();
+  if (authData && authData.expiry_date && authData.expiry_date > Date.now() + 60 * 1000) {
+    return authData.client;
   }
-  client = await authenticate({
+
+  const client = await authenticate({
     scopes: SCOPES,
     keyfilePath: CREDENTIALS_PATH,
   });
+
   if (client.credentials) {
     await saveCredentials(client);
   }
@@ -155,7 +166,7 @@ async function searchFolderCache(query) {
 }
 
 async function downloadFilesFromGoogleDrive(query) {
-	const realFileId = extractFileIdFromDriveLink(query);
+  const realFileId = extractFileIdFromDriveLink(query);
 
   try {
     const authClient = await authorize();
@@ -163,7 +174,7 @@ async function downloadFilesFromGoogleDrive(query) {
 
     const fileMetadata = await service.files.get({
       fileId: realFileId,
-			fields: 'webContentLink, size',
+      fields: 'webContentLink',
     });
 
     const response = await fetch(fileMetadata.data.webContentLink, {
@@ -172,15 +183,23 @@ async function downloadFilesFromGoogleDrive(query) {
       },
     });
 
-		if (!response.ok) {
+    if (!response.ok) {
       throw new Error(`Error downloading file: ${response.statusText}`);
     }
 
-    const buffer = await response.arrayBuffer();
-    return {
-			buffer: Buffer.from(buffer),
-      size: Number(fileMetadata.data.size),
-		};
+    const pdfDir = '../pdf';
+    await fs.promises.mkdir(pdfDir, { recursive: true });
+    const filePath = path.join(__dirname, pdfDir, `${realFileId}.pdf`);
+		console.log('The file will be saved in:', filePath)
+
+    const fileStream = fs.createWriteStream(filePath);
+    await new Promise((resolve, reject) => {
+      response.body.pipe(fileStream);
+      response.body.on('error', reject);
+      fileStream.on('finish', resolve);
+    });
+
+    return filePath;
   } catch (err) {
     console.error('Error downloading file:', err);
     throw err;
