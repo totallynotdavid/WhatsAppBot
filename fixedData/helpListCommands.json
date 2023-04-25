@@ -51,12 +51,12 @@
 	},
 	{
 		"command": "doc",
-		"message": "Busca documentos de tu tema de interés (relacionados con la física)",
+		"message": "Busca documentos de tu tema de interés en la biblioteca del CAE",
 		"usage": "doc quantum mechanics townsend"
 	},
 	{
-		"drive": "drive",
-		"message": "Descarga archivos de Google Drive",
+		"command": "drive",
+		"message": "Descarga archivos de Google Drive. Límite: 200 MB",
 		"usage": "drive https://drive.google.com/file/d/1ClPRWwCQUc6ZKizIKHJdBjULKmdbLMyF/view"
 	},
 	{

@@ -16,21 +16,21 @@ function codeWrapper(message) {
   return '```' + message + '```';
 }
 
-function commandGenerator(fixedDataCommand, message, stringifyMessage) {
+function commandGenerator(fixedDataCommand, message, stringifyMessage, prefix, robotEmoji) {
   try {
     let commandFound = false;
 
     for (const command of fixedDataCommand) {
       if (command.command === stringifyMessage[1]) {
         commandFound = true;
-        const builtMessage = `🤖 ${codeWrapper(stringifyMessage[1])}: ${command.message}`;
+        const builtMessage = `${robotEmoji} ${command.message}. Ejemplo de uso:\n\n${prefix}${command.usage}`;
         message.reply(builtMessage);
         break;
       }
     }
 
     if (!commandFound) {
-      message.reply(`🤖 Parece que ${codeWrapper(stringifyMessage[1])} no existe.`);
+      message.reply(`${robotEmoji} Parece que ${codeWrapper(stringifyMessage[1])} no existe.`);
     }
   } catch (err) {
     console.error(err);
@@ -64,14 +64,14 @@ function deleteFile(filePath) {
   });
 }
 
-function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List, robotEmoji) {
+function getHelpMessage(prefix, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji) {
   try {
     switch (stringifyMessage.length) {
       case 1:
-        sendHelpList(prefix, helpCommand, message, client, List, robotEmoji);
+        sendHelpList(prefix, helpCommand, message, /*client, List,*/ robotEmoji);
         break;
       case 2:
-        commandGenerator(helpListCommands, message, stringifyMessage);
+        commandGenerator(helpListCommands, message, stringifyMessage, prefix, robotEmoji);
         break;
       default:
         message.reply(`🤖 Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`);
@@ -82,9 +82,9 @@ function getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, 
   }
 }
 
-function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
+function sendHelpList(prefix, helpCommand, message, /*client, List,*/ robotEmoji) {
   try {
-    const examples = helpListCommands.map(command => `${prefix}${command.usage}`);
+		const commands = helpListCommands.map(command => `${prefix}${command.command}`);
 		/*
     const helpList = new List(
       `${robotEmoji} Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?`,
@@ -97,7 +97,7 @@ function sendHelpList(prefix, helpCommand, message, client, List, robotEmoji) {
     ]);
     client.sendMessage(message.id.remote, helpList);
 		*/
-		message.reply(`${robotEmoji} Cómo usar los comandos\n\nUsa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando\n\nEjemplos de uso:\n${examples.map(example => `• ${example}`).join('\n')}`);
+		message.reply(`${robotEmoji} Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(commands.join('\n'))}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(`${prefix}${helpCommand} <comando>`)}`);
   } catch (err) {
     console.error(err);
   }
@@ -139,15 +139,26 @@ function getYoutubeVideoId(url) {
   // Grande, domi, https://stackoverflow.com/a/71006865/14035380
   const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[?&#].*)?$/;
 
-  let videoId = null;
-
   if (youtubeRegex.test(url)) {
-    videoId = url.match(youtubeRegex)[1];
-  } else {
-    throw new Error('Invalid YouTube URL');
+    return url.match(youtubeRegex)[1];
   }
+  return null;
+}
 
-  return videoId;
+function validateParams(youtubeURL, startTime, endTime, videoLength) {
+  if (!youtubeURL || (!youtubeURL.includes('youtube.com') && !youtubeURL.includes('youtu.be'))) {
+    return '🤖 La URL no es válida.';
+  }
+  if (startTime > videoLength || endTime > videoLength) {
+    return '🤖 El tiempo de inicio o fin es mayor que la duración del video.';
+  }
+  if (startTime > endTime) {
+    return '🤖 El tiempo de inicio es mayor que el tiempo de fin.';
+  }
+  if (videoLength > 600) {
+    return '🤖 El video es demasiado largo. El límite es de 10 minutos.';
+  }
+  return null;
 }
 
 function getYoutubePlaylistId(url) {
@@ -261,49 +272,55 @@ async function getVideoLength(videoId) {
   return durationInSeconds;
 }
 
-async function mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage) {
+async function mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji) {
   const youtubeURL = stringifyMessage[1];
   const videoID = getYoutubeVideoId(youtubeURL);
   const startTime = Number(stringifyMessage[2]);
   const endTime = Number(stringifyMessage[3]);
-  const videoFilename = `audio/${videoID}.webm`; // .weba on Windows and .webm on Linux
   const outputFilename = `audio/${videoID}.ogg`;
   const commands = {
     fullVideo: `yt-dlp -v -f bestaudio ${stringifyMessage[1]} -o "audio/%(id)s.%(ext)s"`,
     cutAtStart: `yt-dlp -v -f bestaudio -o "audio/%(id)s.%(ext)s" --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss ${startTime}" ${stringifyMessage[1]}`,
     cutVideo: `yt-dlp -v -f bestaudio -o "audio/%(id)s.%(ext)s" --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss ${startTime} -to ${endTime}" ${stringifyMessage[1]}`, // -t doesn't work for some reason
   };
-  const command = commands[commandMode] || 'comando no válido';
+  
+	const command = commands[commandMode];
 
-  if (!youtubeURL.includes('youtube.com') && !youtubeURL.includes('youtu.be')) {
-    message.reply('🤖 La URL no es válida.');
+  if (!command) {
+    message.reply(`${robotEmoji} Comando no válido.`);
     return;
   }
 
-  const videoLength = await getVideoLength(videoID);
-
-  if (startTime > videoLength || endTime > videoLength) {
-    message.reply('🤖 El tiempo de inicio o fin es mayor que la duración del video.');
+	if (!videoID) {
+    message.reply(`${robotEmoji} La URL no es válida.`);
     return;
   }
 
-  if (startTime > endTime) {
-    message.reply('🤖 El tiempo de inicio es mayor que el tiempo de fin.');
+	const videoLength = await getVideoLength(videoID);
+	const validationResult = validateParams(youtubeURL, startTime, endTime, videoLength);
+
+  if (validationResult) {
+    message.reply(validationResult);
     return;
   }
 
-  if (videoLength > 600) {
-    message.reply('🤖 El video es demasiado largo. El límite es de 10 minutos.');
-    return;
-  }
-
-  exec(command, (error) => {
+  exec(command, (error, stdout) => {
     if (error) {
       console.error(`Error: ${error}`);
       return;
     }
+
+		const videoFilename = getVideoFilename(stdout);
+
     convertMp3ToOgg(videoFilename, outputFilename, message, client, MessageMedia);
   });
+}
+
+function getVideoFilename(stdout) {
+	// We look for the line that contains the video filename in the stdout (output of the command)
+  const regex = /Destination: (audio[\/\\](.{11})\.(webm|m4a|mp3))/;
+  const match = stdout.match(regex);
+  return match ? match[1] : null;
 }
 
 async function getRedditImage(message, subreddit, client, MessageMedia) {

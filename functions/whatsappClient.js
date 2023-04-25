@@ -179,7 +179,7 @@ client.on('message_create', async message => {
 
     switch (command) {
       case commands.help:
-        functions.getHelpMessage(prefix, stringifyMessage, helpCommand, message, client, List, robotEmoji);
+        functions.getHelpMessage(prefix, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
         break;
       case commands.sticker:
         if (!message.hasQuotedMsg && !message.hasMedia) {
@@ -302,7 +302,7 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} El formato del comando es incorrecto, los valores deben ser números.`);
 						return;
 				}
-				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage);
+				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji);
 				break;
 			}
       case commands.doi:
@@ -373,7 +373,7 @@ client.on('message_create', async message => {
 							await fs.promises.unlink(filePath);
 							return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`);
 						}
-				
+
 						const media = await MessageMedia.fromFilePath(filePath);
 						await client.sendMessage(message.id.remote, media, {
 							caption: 'PDF file',
