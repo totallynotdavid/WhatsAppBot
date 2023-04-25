@@ -15,7 +15,7 @@ const checkStructure = require('./functions/checkStructure');
 checkEnvironmentVariables(); // Check all envs are set before starting
 checkStructure.checkFolderStructure();
 checkStructure.cleanFolderStructure();
-setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 24); // Clean every 24 hours
+setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 0.1); // Clean every 15 minutes
 
 /* SUPABASE API */
 database.loadPaidUsers().then(() => {
