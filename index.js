@@ -25,6 +25,9 @@ database.loadPaidUsers().then(() => {
 database.loadPhysicsUsers().then(() => {
 	whatsappClient.setPhysicsUsers(database.getPhysicsUsers());
 });
+database.loadPremiumGroups().then(() => {
+	whatsappClient.setPremiumGroups(database.getPremiumGroups());
+});
 
 /* SPOTIFY API */
 spotifyAPI.refreshAccessToken();

@@ -1,5 +1,6 @@
 const supabase = require('./Supabase');
 
+let premiumGroups = [];
 let paidUsers = [];
 let physicsUsers = [];
 
@@ -11,6 +12,19 @@ async function insertMessage(phoneNumber, message, group) {
 		if (error) {
 				console.log('Could not insert message', error);
 		}
+}
+
+async function loadPremiumGroups() {
+	const { data: groups, error } = await supabase
+		.from('premium_groups')
+		.select('group_id');
+
+	if (error) {
+		console.error(error);
+		return;
+	}
+
+	premiumGroups = groups.map(group => group.group_id);
 }
 
 async function loadPaidUsers() {
@@ -39,6 +53,10 @@ async function loadPhysicsUsers() {
 	physicsUsers = users.map(user => user.phone_number);
 }
 
+function getPremiumGroups() {
+	return premiumGroups;
+}
+
 function getPaidUsers() {
   return paidUsers;
 }
@@ -49,6 +67,8 @@ function getPhysicsUsers() {
 
 module.exports = {
 	insertMessage,
+	loadPremiumGroups,
+	getPremiumGroups,
 	loadPaidUsers,
 	getPaidUsers,
 	loadPhysicsUsers,

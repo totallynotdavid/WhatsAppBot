@@ -22,6 +22,7 @@ let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
 let paidUsers = [];
 let physicsUsers = [];
+let premiumGroups = [];
 
 /* Paid users */
 function setPaidUsers(users) {
@@ -29,6 +30,9 @@ function setPaidUsers(users) {
 }
 function setPhysicsUsers(users) {
 	physicsUsers = users;
+}
+function setPremiumGroups(groups) {
+	premiumGroups = groups;
 }
 
 // User and admin commands
@@ -125,6 +129,10 @@ client.on('ready', () => {
 	monitorFacebookPage(client, 10000);
 });
 
+function isPremiumGroup(groupId) {
+  return premiumGroups.includes(groupId);
+}
+
 /* Commands */
 
 client.on('message_create', async message => {
@@ -133,9 +141,6 @@ client.on('message_create', async message => {
   const contactInfo = await message.getContact();
   const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined in the contact list, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
-
-  /* Logging all messages received to Supabase */
-  database.insertMessage(senderNumber, message.body, message.to);
 
   /* It is important to know who and why a function was called */
   /* This also takes care of reacting if whatever function is succesfully executed */
@@ -172,6 +177,11 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
 		let chat = await message.getChat();
 		if (!chat.isGroup) return;
+		if (!isPremiumGroup(chat.id._serialized)) return;
+
+		/* Logging all messages received to Supabase */
+		database.insertMessage(senderNumber, message.body, message.to);
+
     if (!(command in commands)) return;
 
     /* Get all the text after the command (yt & wiki) */
@@ -460,4 +470,5 @@ module.exports = {
 	client,
 	setPaidUsers,
 	setPhysicsUsers,
+	setPremiumGroups,
 }
