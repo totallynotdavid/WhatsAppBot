@@ -318,7 +318,7 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
 
 function getVideoFilename(stdout) {
 	// We look for the line that contains the video filename in the stdout (output of the command)
-  const regex = /Destination: (audio[\/\\](.{11})\.(webm|m4a|mp3))/;
+  const regex = /Destination: (audio[/\\](.{11})\.(webm|m4a|mp3))/;
   const match = stdout.match(regex);
   return match ? match[1] : null;
 }
