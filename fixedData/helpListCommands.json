@@ -51,7 +51,7 @@
 	},
 	{
 		"command": "doc",
-		"message": "Busca documentos de tu tema de interés en la biblioteca del CAE",
+		"message": "Busca documentos de tu tema de interés en la biblioteca del CAE. Si eres administrador puedes establecer tu propia carpeta de Drive. Contacta al bot para más información",
 		"usage": "doc quantum mechanics townsend"
 	},
 	{
