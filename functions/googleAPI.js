@@ -94,30 +94,49 @@ async function buildFolderTree(folderMap, folderId) {
   return folderIds;
 }
 
-async function searchFilesInFolders(authClient, folderIds, query/*, folderMap*/) {
+function chunkArray(array, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+function escapeSingleQuotes(str) {
+  return str.replace(/'/g, '\\\'');
+}
+
+async function searchFilesInFolders(authClient, folderIds, query) {
   const drive = google.drive({ version: 'v3', auth: authClient });
-  const parentQueries = folderIds.map((id) => `'${id}' in parents`).join(' or ');
   const files = [];
-  let pageToken;
+  const escapedQuery = escapeSingleQuotes(query);
+  const folderIdChunks = chunkArray(folderIds, 5); // Adjust the chunk size to ensure the query string is within the limit
 
-  do {
-    const res = await drive.files.list({
-      pageSize: 1000,
-      pageToken,
-      q: `(${parentQueries}) and mimeType != 'application/vnd.google-apps.folder' and fullText contains '${query}' and trashed = false`,
-      fields: 'nextPageToken, files(id, name, parents, webViewLink)',
-    });
+  for (const chunk of folderIdChunks) {
+    const parentQueries = chunk.map((id) => `'${id}' in parents`).join(' or ');
 
-    files.push(...res.data.files);
-    pageToken = res.data.nextPageToken;
-  } while (pageToken);
+    let pageToken;
+    do {
+      const queryString = `(${parentQueries}) and mimeType != 'application/vnd.google-apps.folder' and fullText contains '${escapedQuery}' and trashed = false`;
+
+      const res = await drive.files.list({
+        pageSize: 1000,
+        pageToken,
+        q: queryString,
+        fields: 'nextPageToken, files(id, name, parents, webViewLink)',
+      });
+
+      files.push(...res.data.files);
+      pageToken = res.data.nextPageToken;
+    } while (pageToken);
+  }
 
   if (files.length === 0) {
     console.log('No se encontraron archivos.');
     return;
   }
 
-	return files;
+  return files;
 }
 
 class FolderCache {

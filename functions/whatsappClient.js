@@ -1,6 +1,6 @@
 /* Import */
 // Packages
-const { Client, LocalAuth, MessageMedia, /*Buttons,*/ List } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
@@ -170,12 +170,12 @@ client.on('message_create', async message => {
     let stringifyMessage = message.body.trim().split(/\s+/);
 
     const command = stringifyMessage[0].split(prefix)[1];
+		let chat = await message.getChat();
+		if (!chat.isGroup) return;
     if (!(command in commands)) return;
 
     /* Get all the text after the command (yt & wiki) */
     const query = message.body.split(' ').slice(1).join(' ');
-
-    let chat = await message.getChat();
 
     switch (command) {
       case commands.help:
@@ -292,6 +292,10 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.play: {
+				if (!paidUsers.includes(senderNumber)) {
+					return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+				}
+
 				const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
 		
 				if (notice) {
@@ -338,31 +342,39 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.doc:
+				/*
 				if (!physicsUsers.includes(senderNumber)) {
 					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
 				}
+				*/
 				if (stringifyMessage.length >= 2) {
 					functions.getDocumentsFromGoogleDrive(query)
 						.then((results) => {
-							let messageText = `${robotEmoji} Resultados:\n\n`;
-							const limit = Math.min(5, results.length);
-							for (let i = 0; i < limit; i++) {
-								const file = results[i];
-								messageText += `${i+1}. ${file.name} (${file.webViewLink})\n`;
-							}
-							message.reply(messageText);
+								if (results && results.length > 0) {
+										let messageText = `${robotEmoji} Resultados:\n\n`;
+										const limit = Math.min(5, results.length);
+										for (let i = 0; i < limit; i++) {
+												const file = results[i];
+												messageText += `${i+1}. ${file.name} (${file.webViewLink})\n`;
+										}
+										message.reply(messageText);
+								} else {
+										message.reply(`${robotEmoji} No se encontraron resultados.`);
+								}
 						})
 						.catch((error) => {
-							console.error('Error searching folder cache:', error);
+								console.error('Error searching folder cache:', error);
 						});
 				} else {
 					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres buscar?`);
 				}
 				break;
 			case commands.drive:
+				/*
 				if (!physicsUsers.includes(senderNumber)) {
 					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
 				}
+				*/
 				if (stringifyMessage.length === 2) {
 					try {
 						const filePath = await functions.downloadFilesFromGoogleDrive(query);
