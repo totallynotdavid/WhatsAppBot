@@ -1,22 +1,18 @@
 /* Import */
-// Packages
 const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
-// Function Locations
-const general = require('../commands/general');
-const admin = require('../commands/admin');
-const sciHub = require('../commands/sciHub');
-const boTeX = require('../commands/boTeX');
+const { general, admin, sciHub, boTeX } = require('../commands/index.js');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('./spotifyAPI');
 const driveAPI = require('./googleAPI');
 const database = require('../database/connectToDatabase');
 const { monitorFacebookPage } = require('./checkNewPosts');
+const newFunctions = require('../lib/functions/index.js');
 
 /* Global Variables */ 
-let { prefix, prefix_admin, robotEmoji, mediaSticker, originalQuotedMessage, song, languageCode, youtubeType, paidUsers, physicsUsers, premiumGroups } = require('./globals');
+let { prefix, prefix_admin, robotEmoji, mediaSticker, originalQuotedMessage, song, languageCode, youtubeType, paidUsers, physicsUsers, premiumGroups, commandsYoutubeDownload, commands, adminCommands } = require('./globals');
 
 /* Paid users */
 function setPaidUsers(users) {
@@ -29,68 +25,16 @@ function setPremiumGroups(groups) {
 	premiumGroups = groups;
 }
 
-// User and admin commands
-const commands  = {
-  help: 'help',
-  sticker: 'sticker',
-  url: 'url',
-  spot: 'spot',
-  cae: 'cae',
-  fromis: 'fromis',
-  w: 'w',
-  yt: 'yt',
-  play: 'play',
-  doi: 'doi',
-	tex: 'tex',
-	paper: 'paper',
-	author: 'author',
-	doc: 'doc',
-	drive: 'drive',
-}
-
-const adminCommands = {
-	todos: 'todos',
-	ban: 'ban',
-};
-
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 const subreddit = general.capitalizeText(fromisCommand); // Subreddit for the command "fromis"
 
-/* Youtube */
-// Youtube variables to be passed to yt-dlp
-const commandsYoutubeDownload = {
-  1: {
-    notice: `${robotEmoji} Adjunta un enlace de YouTube, no seas tan tímido.`,
-    commandMode: null,
-  },
-  2: {
-    commandMode: 'fullVideo',
-  },
-  3: {
-    commandMode: 'cutAtStart',
-  },
-  4: {
-    commandMode: 'cutVideo',
-  },
-  default: {
-    notice: `${robotEmoji} Sintaxis incorrecta. Solo envía el comando y el enlace de YouTube.`,
-    commandMode: null,
-  },
-};
-
-/* Regex */
+// Regex
 const { urlRegex, imageOrVideoRegex, websiteAllowedRegex, youtubeTypes } = require('./regex');
-console.log('urlRegex', urlRegex);
 
 /* whatsapp-web.js components */
-// Client instance
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: true,
-    // executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
-    executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
-  },
+  puppeteer: newFunctions.launchPuppeteer(),
 });
   
 // Generate a QR code for the user to scan with their device
