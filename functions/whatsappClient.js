@@ -16,13 +16,7 @@ const database = require('../database/connectToDatabase');
 const { monitorFacebookPage } = require('./checkNewPosts');
 
 /* Global Variables */ 
-let prefix = '!';
-let prefix_admin = '@';
-let robotEmoji = '🤖';
-let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
-let paidUsers = [];
-let physicsUsers = [];
-let premiumGroups = [];
+let { prefix, prefix_admin, robotEmoji, mediaSticker, originalQuotedMessage, song, languageCode, youtubeType, paidUsers, physicsUsers, premiumGroups } = require('./globals');
 
 /* Paid users */
 function setPaidUsers(users) {
@@ -85,20 +79,8 @@ const commandsYoutubeDownload = {
 };
 
 /* Regex */
-
-// Used when converting external media to stickers. GIFs are not supported because they are not animated stickers
-const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.%]+(\.(jpg|jpeg|gifv|png|mp4))$/;
-const imageOrVideoRegex = /\.(jpg|jpeg|gifv|png|mp4)$/i;
-const websiteAllowedRegex = /^https?:\/\/(?:www\.)?reddit\.com\/r\/[\w-]+\/comments\/[\w-]+\/[\w-]+\/?$/i;
-
-// Types of youtube links
-const youtubeTypes = {
-	videos: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)(\/watch\?v=|\/)([A-Za-z0-9-_]{11}).*$/,
-	users: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(user\/|c\/|@)?[A-Za-z0-9-_]+$/,
-  channels: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/channel\/[A-Za-z0-9-_]+$/,
-  playlists: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/playlist\?list=[A-Za-z0-9-_]+$/,
-  search: null,
-}
+const { urlRegex, imageOrVideoRegex, websiteAllowedRegex, youtubeTypes } = require('./regex');
+console.log('urlRegex', urlRegex);
 
 /* whatsapp-web.js components */
 // Client instance
@@ -106,8 +88,8 @@ const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
     headless: true,
-    executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
-    // executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
+    // executablePath: './node_modules/puppeteer/.local-chromium/linux-982053/chrome-linux/chrome', // Path to the Chrome executable on Linux
+    executablePath: './node_modules/puppeteer/.local-chromium/win64-982053/chrome-win/chrome.exe', // Path to the Chrome executable on Windows
   },
 });
   
@@ -352,11 +334,9 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.doc:
-				/*
 				if (!physicsUsers.includes(senderNumber)) {
 					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
 				}
-				*/
 				if (stringifyMessage.length >= 2) {
 					functions.getDocumentsFromGoogleDrive(query)
 						.then((results) => {
