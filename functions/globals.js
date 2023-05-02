@@ -1,5 +1,5 @@
-let prefix = '/';
-let prefix_admin = '-';
+let prefix = '!';
+let prefix_admin = '@';
 let robotEmoji = '🤖';
 let mediaSticker, originalQuotedMessage, song, languageCode, youtubeType;
 let paidUsers = [];
@@ -50,6 +50,7 @@ const commands  = {
 const adminCommands = {
 	todos: 'todos',
 	ban: 'ban',
+	id: 'id',
 };
 
 module.exports = {

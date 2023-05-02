@@ -375,6 +375,12 @@ client.on('message_create', async message => {
 							message.reply(`${robotEmoji} Responde a un mensaje para banear a esa persona.`);
 						}
 						break;
+					case adminCommands.id:
+						if (!paidUsers.includes(senderNumber)) {
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+						}
+						message.reply(`${robotEmoji} El ID de este chat es ${chat.id._serialized}.`);
+						break;
 					default:
 						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 						break;
