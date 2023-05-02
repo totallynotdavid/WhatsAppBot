@@ -2,14 +2,12 @@
 const path = require('path');
 const fs = require('fs');
 const fetch = require('node-fetch');
-const axios = require('axios').default;
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const SpotifyWebApi = require('spotify-web-api-node');
+const spotifyWebApi = require('spotify-web-api-node');
 
 /* Define the environment variables */
-const spotify_client_id = process.env.spotify_client_id;
-const spotify_client_secret = process.env.spotify_client_secret;
-const spotifyApi = new SpotifyWebApi({
+const { spotify_client_id, spotify_client_secret } = process.env;
+const spotifyApi = new spotifyWebApi({
   clientId: spotify_client_id,
   clientSecret: spotify_client_secret,
   redirectUri: 'http://localhost:3000',
@@ -18,7 +16,6 @@ const spotifyApi = new SpotifyWebApi({
 /* Keep a timeline of the accessToken */
 let accessToken = null;
 
-// Function to refresh the access token every 30 minutes
 async function refreshAccessToken() {
   // Fetch a new access token
   try {
@@ -49,15 +46,10 @@ async function getSongData(url) {
 // Function to download and save the audio file
 async function downloadSpotifyAudio(song) {
   try {
-    // download and save audio as 'audio.mp3' with requests
-    const audio2 = await axios({
-      method: 'get',
-      url: song.preview_url,
-      responseType: 'stream',
-    });
-
-    audio2.data.pipe(fs.createWriteStream(`./audio/${song.id}.mp3`));
-    return new Promise((resolve) => audio2.data.on('end', () => resolve(true)));
+    const audioStream = await fetch(song.preview_url);
+    const fileWriter = fs.createWriteStream(`./audio/${song.id}.mp3`);
+    audioStream.body.pipe(fileWriter);
+    return new Promise((resolve) => fileWriter.on('finish', () => resolve(true)));
   } catch (error) {
     console.error('Error downloading audio file:', error);
     return false;
