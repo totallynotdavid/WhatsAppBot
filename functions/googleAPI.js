@@ -7,8 +7,8 @@ const { authenticate } = require('@google-cloud/local-auth');
 const { google } = require('googleapis');
 
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
-const TOKEN_PATH = path.join(process.cwd(), 'data', 'DRIVE_token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'data', 'DRIVE_credenciales.json');
+const TOKEN_PATH = path.join(process.cwd(), 'data', 'DRIVE_token.json'); // driveToken
+const CREDENTIALS_PATH = path.join(process.cwd(), 'data', 'DRIVE_credenciales.json'); // driveCredentials
 
 const folderId = process.env.folder_id;
 
