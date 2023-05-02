@@ -9,8 +9,8 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const youtube_api_key = process.env.youtube_api_key;
 
 /* Commands stored as JSON files for better readability */
-const helpListCommands = require('../fixedData/helpListCommands.json');
-const CAEListCommands = require('../fixedData/CAEListCommands.json');
+const helpListCommands = require('../data/helpListCommands.json');
+const CAEListCommands = require('../data/caeListCommands.json');
 
 function codeWrapper(message) {
   return '```' + message + '```';

@@ -12,4 +12,4 @@
 
 # Sensitive data
 .env
-/fixedData/**.json
+/data/**.json
