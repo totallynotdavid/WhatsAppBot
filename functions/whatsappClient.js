@@ -34,6 +34,12 @@ const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGro
   premiumGroups = fetchedPremiumGroups;
 };
 
+// Update data when called
+let refreshDataCallback;
+const setRefreshDataCallback = (callback) => {
+  refreshDataCallback = callback;
+};
+
 // Import regular expressions
 const { 
 	urlRegex, 
@@ -396,6 +402,14 @@ client.on('message_create', async message => {
 						}
 						message.reply(`${robotEmoji} El ID de este chat es ${chat.id._serialized}.`);
 						break;
+					case adminCommands.refresh:
+						if (!paidUsers.includes(senderNumber)) {
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+						}
+						message.reply(`${robotEmoji} Actualizando datos...`);
+						await refreshDataCallback();
+						message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
+						break;
 					default:
 						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 						break;
@@ -414,4 +428,5 @@ client.on('message_create', async message => {
 module.exports = {
 	client,
 	setFetchedData,
+	setRefreshDataCallback,
 }

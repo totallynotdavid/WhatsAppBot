@@ -43,3 +43,4 @@ spotifyAPI.refreshAccessToken();
 
 /* WHATSAPP CLIENT */
 whatsappClient.client.initialize();
+whatsappClient.setRefreshDataCallback(refreshData); // refresh data when a new user is added

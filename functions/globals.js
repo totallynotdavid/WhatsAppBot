@@ -51,6 +51,7 @@ const adminCommands = {
 	todos: 'todos',
 	ban: 'ban',
 	id: 'id',
+	refresh: 'refresh',
 };
 
 module.exports = {
