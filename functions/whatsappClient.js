@@ -44,7 +44,7 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-	client.setStatus('¿Por qué estamos aquí?\n');
+	newFunctions.starter.setBotStatus(client);
 	monitorFacebookPage(client, 10000);
 });
 
