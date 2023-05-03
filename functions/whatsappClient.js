@@ -1,29 +1,50 @@
-/* Import */
+// Packages
 const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
+// Import commands and utility functions
 const { general, admin, sciHub, boTeX } = require('../commands/index.js');
-const logFunctionCall = require('./logFunctionCall');
-const spotifyAPI = require('../lib/api/spotifyUtils.js');
-const driveAPI = require('../lib/api/gdrive.js');
-const database = require('../lib/api/supabaseCommunicationModule.js');
 const newFunctions = require('../lib/functions/index.js');
 
-/* Global Variables */ 
-let { prefix, prefix_admin, robotEmoji, mediaSticker, originalQuotedMessage, song, languageCode, youtubeType, paidUsers, physicsUsers, premiumGroups, commandsYoutubeDownload, commands, adminCommands } = require('./globals');
+// Import APIs
+const { spotifyUtils, gdrive, supabaseCommunicationModule} = require('../lib/api/index.js');
+
+// Import logging utility
+const logFunctionCall = require('./logFunctionCall');
+
+// Import logging utility
+let { 
+	prefix, prefix_admin, robotEmoji,
+	mediaSticker, originalQuotedMessage, song,
+	languageCode, youtubeType,
+	paidUsers, physicsUsers, premiumGroups, 
+	commandsYoutubeDownload, commands, adminCommands,
+} = require('./globals');
+
+// Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
-const subreddit = general.capitalizeText(fromisCommand); // Subreddit for the command "fromis"
+// Set subreddit for the "fromis" command
+const subreddit = general.capitalizeText(fromisCommand);
+
+// Set function to update premium groups and users
 const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {
   paidUsers = fetchedPaidUsers;
   physicsUsers = fetchedPhysicsUsers;
   premiumGroups = fetchedPremiumGroups;
 };
 
-// Regex
-const { urlRegex, imageOrVideoRegex, websiteAllowedRegex, youtubeTypes } = require('./regex');
+// Import regular expressions
+const { 
+	urlRegex, 
+	imageOrVideoRegex, 
+	websiteAllowedRegex, 
+	youtubeTypes,
+} = require('./regex');
 
-/* WhatsApp components */
+/* 
+	WhatsApp components 
+*/
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: newFunctions.launchPuppeteer(),
@@ -73,8 +94,8 @@ client.on('message_create', async message => {
 		banUser: admin.banUser,
     mentionEveryone: admin.mentionEveryone,
 		transformLatexToImage: boTeX.transformLatexToImage,
-		getDocumentsFromGoogleDrive: driveAPI.searchFolderCache,
-		downloadFilesFromGoogleDrive: driveAPI.downloadFilesFromGoogleDrive,
+		getDocumentsFromGoogleDrive: gdrive.searchFolderCache,
+		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
@@ -87,7 +108,7 @@ client.on('message_create', async message => {
     getSciHubArticle: sciHub.getPdfLink,
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
-		sendSpotifyAudio: spotifyAPI.sendSpotifyAudio,
+		sendSpotifyAudio: spotifyUtils.sendSpotifyAudio,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -104,7 +125,7 @@ client.on('message_create', async message => {
 		if (!isPremiumGroup(chat.id._serialized)) return;
 
 		/* Logging all messages received to Supabase */
-		database.insertMessage(senderNumber, message.body, message.to);
+		supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
 
     if (!(command in commands)) return;
 
@@ -176,13 +197,13 @@ client.on('message_create', async message => {
 				}
         break;
       case commands.spot:
-        song = await spotifyAPI.getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`);
+        song = await spotifyUtils.getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`);
 
         if(stringifyMessage.length === 1) {
           message.reply(`${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`);
           message.react('⚠️');
         } else {
-          const audioDownloaded = await spotifyAPI.downloadSpotifyAudio(song);
+          const audioDownloaded = await spotifyUtils.downloadSpotifyAudio(song);
 
 					if (audioDownloaded) {
 						await functions.sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji);
