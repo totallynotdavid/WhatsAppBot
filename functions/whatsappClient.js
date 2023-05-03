@@ -13,20 +13,13 @@ const newFunctions = require('../lib/functions/index.js');
 
 /* Global Variables */ 
 let { prefix, prefix_admin, robotEmoji, mediaSticker, originalQuotedMessage, song, languageCode, youtubeType, paidUsers, physicsUsers, premiumGroups, commandsYoutubeDownload, commands, adminCommands } = require('./globals');
-
-/* Paid users */
-function setPaidUsers(users) {
-  paidUsers = users;
-}
-function setPhysicsUsers(users) {
-	physicsUsers = users;
-}
-function setPremiumGroups(groups) {
-	premiumGroups = groups;
-}
-
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 const subreddit = general.capitalizeText(fromisCommand); // Subreddit for the command "fromis"
+const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {
+  paidUsers = fetchedPaidUsers;
+  physicsUsers = fetchedPhysicsUsers;
+  premiumGroups = fetchedPremiumGroups;
+};
 
 // Regex
 const { urlRegex, imageOrVideoRegex, websiteAllowedRegex, youtubeTypes } = require('./regex');
@@ -51,7 +44,7 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-
+	client.setStatus('¿Por qué estamos aquí?\n');
 	monitorFacebookPage(client, 10000);
 });
 
@@ -398,7 +391,5 @@ client.on('message_create', async message => {
 
 module.exports = {
 	client,
-	setPaidUsers,
-	setPhysicsUsers,
-	setPremiumGroups,
+	setFetchedData,
 }

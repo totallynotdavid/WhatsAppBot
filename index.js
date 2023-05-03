@@ -18,20 +18,28 @@ checkStructure.cleanFolderStructure();
 setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 0.1); // Clean every 15 minutes
 
 /* SUPABASE API */
-database.loadPaidUsers().then(() => {
-  // Pass the paidUsers array to the whatsappClient
-  whatsappClient.setPaidUsers(database.getPaidUsers());
-});
-database.loadPhysicsUsers().then(() => {
-	whatsappClient.setPhysicsUsers(database.getPhysicsUsers());
-});
-database.loadPremiumGroups().then(() => {
-	whatsappClient.setPremiumGroups(database.getPremiumGroups());
-});
+const refreshData = async () => {
+  const paidUsers = await database.fetchDataFromTable('paid_users', 'phone_number');
+  const physicsUsers = await database.fetchDataFromTable('physics_users', 'phone_number');
+  const premiumGroups = await database.fetchDataFromTable('premium_groups', 'group_id');
+
+  // Pass the arrays to the whatsappClient
+  whatsappClient.setFetchedData(paidUsers, physicsUsers, premiumGroups);
+};
+
+refreshData();
+
+// Refresh data at midnight
+const now = new Date();
+const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+const timeToMidnight = tomorrow - now;
+
+setTimeout(() => {
+  setInterval(refreshData, 86400000); // 24 hours
+}, timeToMidnight);
 
 /* SPOTIFY API */
 spotifyAPI.refreshAccessToken();
-setInterval(spotifyAPI.refreshAccessToken, 1000 * 60 * 30); // Refresh every 30 minutes
 
 /* WHATSAPP CLIENT */
 whatsappClient.client.initialize();
