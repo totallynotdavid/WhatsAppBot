@@ -7,7 +7,7 @@ const { general, admin, sciHub, boTeX } = require('../commands/index.js');
 const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('../lib/api/spotifyUtils.js');
 const driveAPI = require('../lib/api/gdrive.js');
-const database = require('../database/connectToDatabase');
+const database = require('../lib/api/supabaseCommunicationModule.js');
 const { monitorFacebookPage } = require('./checkNewPosts');
 const newFunctions = require('../lib/functions/index.js');
 
