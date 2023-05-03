@@ -96,7 +96,7 @@ client.on('message_create', async message => {
 		banUser: admin.banUser,
     mentionEveryone: admin.mentionEveryone,
 		transformLatexToImage: boTeX.transformLatexToImage,
-		getDocumentsFromGoogleDrive: gdrive.searchFolderCache,
+		getDocumentsFromGoogleDrive: gdrive.searchFolderDatabase,
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,

@@ -6,6 +6,7 @@
 **/video/
 *.mp4
 *.txt
+*.sqlite
 
 # Logs
 /commands/**.json
