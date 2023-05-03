@@ -8,7 +8,6 @@ const logFunctionCall = require('./logFunctionCall');
 const spotifyAPI = require('../lib/api/spotifyUtils.js');
 const driveAPI = require('../lib/api/gdrive.js');
 const database = require('../lib/api/supabaseCommunicationModule.js');
-const { monitorFacebookPage } = require('./checkNewPosts');
 const newFunctions = require('../lib/functions/index.js');
 
 /* Global Variables */ 
@@ -24,7 +23,7 @@ const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGro
 // Regex
 const { urlRegex, imageOrVideoRegex, websiteAllowedRegex, youtubeTypes } = require('./regex');
 
-/* whatsapp-web.js components */
+/* WhatsApp components */
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: newFunctions.launchPuppeteer(),
@@ -42,10 +41,11 @@ client.on('auth_failure', authFailureMessage => {
   console.error('Error de autenticación', authFailureMessage);
 })
 
+// Bot is ready and connected to WhatsApp
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
 	// Function starter to check for new posts in the Facebook page
-	monitorFacebookPage(client, 10000);
+	newFunctions.facebookMonitor.monitorFacebookPage(client, 10000);
 	// Check uptime
 	newFunctions.starter.setBotStatus(client);
 	setInterval(() => {
