@@ -74,10 +74,6 @@ client.on('ready', () => {
 	}, 300000);
 });
 
-function isPremiumGroup(groupId) {
-  return premiumGroups.includes(groupId);
-}
-
 /* Commands */
 
 client.on('message_create', async message => {
@@ -122,7 +118,7 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
 		let chat = await message.getChat();
 		if (!chat.isGroup) return;
-		if (!isPremiumGroup(chat.id._serialized)) return;
+		if (!((groupId) => premiumGroups.includes(groupId))(chat.id._serialized)) return;
 
 		/* Logging all messages received to Supabase */
 		supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
