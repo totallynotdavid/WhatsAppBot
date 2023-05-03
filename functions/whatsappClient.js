@@ -249,9 +249,11 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.play: {
+				/*
 				if (!paidUsers.includes(senderNumber)) {
-					return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+					return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 				}
+				*/
 
 				const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
 		
@@ -382,7 +384,7 @@ client.on('message_create', async message => {
 						break;
 					case adminCommands.ban:
 						if (!paidUsers.includes(senderNumber)) {
-							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 						}
 
 						if (quotedMessage) {
@@ -398,13 +400,13 @@ client.on('message_create', async message => {
 						break;
 					case adminCommands.id:
 						if (!paidUsers.includes(senderNumber)) {
-							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 						}
 						message.reply(`${robotEmoji} El ID de este chat es ${chat.id._serialized}.`);
 						break;
 					case adminCommands.refresh:
 						if (!paidUsers.includes(senderNumber)) {
-							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo estará disponible para usuarios premium.`);
+							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 						}
 						message.reply(`${robotEmoji} Actualizando datos...`);
 						await refreshDataCallback();
