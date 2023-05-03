@@ -44,8 +44,13 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-	newFunctions.starter.setBotStatus(client);
+	// Function starter to check for new posts in the Facebook page
 	monitorFacebookPage(client, 10000);
+	// Check uptime
+	newFunctions.starter.setBotStatus(client);
+	setInterval(() => {
+		newFunctions.starter.setBotStatus(client);
+	}, 300000);
 });
 
 function isPremiumGroup(groupId) {
