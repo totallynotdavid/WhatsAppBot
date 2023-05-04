@@ -77,6 +77,7 @@ client.on('ready', () => {
 	newFunctions.starter.setBotStatus(client);
 	setInterval(() => {
 		newFunctions.starter.setBotStatus(client);
+		console.log('Bot status updated');
 	}, 300000);
 });
 
