@@ -3,15 +3,34 @@
 # Update package list
 sudo apt update -y
 
-# Install Node.js
+# Determine the user who invoked sudo
+ORIGINAL_USER=$SUDO_USER
+
+# Execute all commands as the original user in a single invocation
+su -l $ORIGINAL_USER << 'EOF'
+# Check if NVM is installed
+if ! command -v nvm &> /dev/null; then
+  echo "NVM is not installed. Installing..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  # Source NVM
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+else
+  echo "NVM is already installed. Skipping."
+fi
+
+# Check if Node.js is installed
 if ! command -v node &> /dev/null; then
   echo "Node.js is not installed. Installing..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-  source ~/.bashrc
   nvm install node --no-progress
 else
   echo "Node.js is already installed. Skipping."
 fi
+EOF
+
+# Source bashrc after the process
+su -l $ORIGINAL_USER -c 'source ~/.bashrc'
 
 # Install ffmpeg
 if ! command -v ffmpeg &> /dev/null; then
@@ -54,7 +73,9 @@ if ! command -v pdflatex &> /dev/null; then
   wget -q --show-progress https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
   tar -xf install-tl-unx.tar.gz > /dev/null
   cd install-tl-*/
-  sudo perl install-tl --no-interaction > /dev/null
+
+  sudo perl install-tl --no-interaction
+
   echo 'export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$PATH"' >> ~/.bashrc
   source ~/.bashrc
   echo "TeXLive installed successfully."
