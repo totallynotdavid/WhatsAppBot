@@ -99,6 +99,7 @@ client.on('message_create', async message => {
 		transformLatexToImage: boTeX.transformLatexToImage,
 		getDocumentsFromGoogleDrive: gdrive.searchFolderDatabase,
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
+		refreshDatabase: gdrive.refreshDatabase,
     getHelpMessage: general.getHelpMessage,
     getCAEMessage: general.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
@@ -333,29 +334,35 @@ client.on('message_create', async message => {
 					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
 				}
 				*/
-				if (stringifyMessage.length === 2) {
-					try {
-						const filePath = await functions.downloadFilesFromGoogleDrive(query);
-						const maxSize = 200 * 1024 * 1024;
-						const fileStats = await fs.stat(filePath);
-				
-						if (fileStats.size > maxSize) {
-							await fs.promises.unlink(filePath);
-							return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`);
-						}
 
-						const media = await MessageMedia.fromFilePath(filePath);
-						await client.sendMessage(message.id.remote, media, {
-							caption: 'PDF file',
-						});
-				
-						await fs.unlink(filePath);
-					} catch (error) {
-						console.error('Error sending file:', error);
-						message.reply(`${robotEmoji} ¿Seguro de que ese archivo existe?`);
-					}
-				} else {
-					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres descargar?`);
+				switch (stringifyMessage.length) {
+					case 2:
+						try {
+							const filePath = await functions.downloadFilesFromGoogleDrive(query);
+							const maxSize = 200 * 1024 * 1024;
+							const fileStats = await fs.stat(filePath);
+					
+							if (fileStats.size > maxSize) {
+								await fs.unlink(filePath);
+								return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`);
+							}
+	
+							const media = await MessageMedia.fromFilePath(filePath);
+							await client.sendMessage(message.id.remote, media, {
+								caption: 'PDF file',
+							});
+					
+							await fs.unlink(filePath);
+						} catch (error) {
+							console.error('Error sending file:', error);
+							message.reply(`${robotEmoji} ¿Seguro de que ese archivo existe?`);
+						}
+						break;
+					case 1:
+						message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres descargar?`);
+						break;
+					default:
+						message.reply(`${robotEmoji} Envía solo un enlace de Google Drive.`);
 				}
 				break;
       default:
@@ -409,7 +416,15 @@ client.on('message_create', async message => {
 						if (!paidUsers.includes(senderNumber)) {
 							return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 						}
-						message.reply(`${robotEmoji} Actualizando datos...`);
+						message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 5 minutos.`);
+
+						try {
+							const refreshMessage = await functions.refreshDatabase();
+							message.reply(refreshMessage);
+						} catch (error) {
+							message.reply(`${robotEmoji} Error actualizando la base de datos: ${error.message}`);
+						}
+
 						await refreshDataCallback();
 						message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
 						break;
