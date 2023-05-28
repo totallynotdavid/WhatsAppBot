@@ -121,9 +121,10 @@ client.on('message_create', async message => {
 
 	let chat = await message.getChat();
 	if (!chat.isGroup) return;
-	if (!((groupId) => premiumGroups.includes(groupId))(chat.id._serialized)) return;
 
   if (message.body.startsWith(prefix)) {
+		if (!((groupId) => premiumGroups.includes(groupId))(chat.id._serialized)) return;
+
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
     let stringifyMessage = message.body.trim().split(/\s+/);
 
@@ -440,8 +441,18 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Envía el enlace de invitación del grupo.`);
 					}
 					break;
-				case adminCommands.id:
-					message.reply(`${robotEmoji} El ID de este chat es ${chat.id._serialized}.`);
+				case adminCommands.register:
+					const chatExists = await supabaseCommunicationModule.searchPremiumGroup(chat.id._serialized);
+					if (chatExists) {
+						message.reply(`${robotEmoji} Este chat ya está registrado.`);
+					} else {
+						try {
+							await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
+							message.reply(`${robotEmoji} Chat registrado.`);
+						} catch (error) {
+							message.reply(`${robotEmoji} Error registrando el chat: ${error.message}`);
+						}
+					}
 					break;
 				case adminCommands.userid:
 					if (quotedMessage && stringifyMessage.length === 1) {
@@ -453,17 +464,25 @@ client.on('message_create', async message => {
 					}
 					break;
 				case adminCommands.refresh:
-					message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 5 minutos.`);
-
-					try {
-						const refreshMessage = await functions.refreshDatabase();
-						message.reply(refreshMessage);
-					} catch (error) {
-						message.reply(`${robotEmoji} Error actualizando la base de datos: ${error.message}`);
+					// Only the owner can refresh the database
+					const ownerNumber = client.info.wid.user;
+					if (senderNumber !== `${ownerNumber}@c.us`) {
+						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
 					}
-
-					await refreshDataCallback();
-					message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
+					if (stringifyMessage[1] === 'users') {
+						await refreshDataCallback();
+						message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
+					} else if (stringifyMessage[1] === 'db') {
+						message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 3 minutos.`);
+						try {
+							const refreshMessage = await functions.refreshDatabase();
+							message.reply(refreshMessage);
+						} catch (error) {
+							message.reply(`${robotEmoji} Error actualizando la base de datos: ${error.message}`);
+						}
+					} else {
+						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+					}
 					break;
 				default:
 					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);

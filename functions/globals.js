@@ -51,11 +51,11 @@ const commands  = {
 const adminCommands = {
 	todos: 'todos',
 	ban: 'ban',
-	id: 'id',
-	refresh: 'refresh',
-	userid: 'userid',
 	delete: 'delete',
 	join: 'join',
+	register: 'register',
+	userid: 'userid',
+	refresh: 'refresh',
 };
 
 module.exports = {
