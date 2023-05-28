@@ -412,7 +412,7 @@ client.on('message_create', async message => {
 						} else {
 							functions.banMultipleUsers(client, chat, [quotedAuthor], message, robotEmoji);
 						}
-					} else if (stringifyMessage.length > 2) {
+					} else if (stringifyMessage.length > 1) {
 						functions.banMultipleUsers(client, chat, message.mentionedIds, message, robotEmoji);
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para eliminarlo del grupo.`);
