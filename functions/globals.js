@@ -32,6 +32,7 @@ const commandsYoutubeDownload = {
 const commands  = {
   help: 'help',
   sticker: 'sticker',
+	toimage: 'toimage',
   url: 'url',
   spot: 'spot',
   cae: 'cae',
@@ -52,6 +53,9 @@ const adminCommands = {
 	ban: 'ban',
 	id: 'id',
 	refresh: 'refresh',
+	userid: 'userid',
+	delete: 'delete',
+	join: 'join',
 };
 
 module.exports = {
