@@ -433,6 +433,7 @@ client.on('message_create', async message => {
 
 		if (isAdmin) {
 			const quotedMessage = await message.getQuotedMessage();
+			const ownerNumber = client.info.wid.user;
 			switch (command) {
 				case adminCommands.todos:
 					functions.mentionEveryone(chat, client, message, senderName);
@@ -481,6 +482,7 @@ client.on('message_create', async message => {
 
 						try {
 							await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
+							await refreshDataCallback();
 							message.reply(`${robotEmoji} Chat registrado.`);
 						} catch (error) {
 							message.reply(`${robotEmoji} Error registrando el chat: ${error.message}`);
@@ -490,6 +492,10 @@ client.on('message_create', async message => {
 					}
 					break;
 				case adminCommands.newuser:
+					if (senderNumber !== `${ownerNumber}@c.us`) {
+						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
+					}
+
 					if (quotedMessage && stringifyMessage.length === 2) {
 						try {
 							supabaseCommunicationModule.addPremiumUser(quotedMessage.author, stringifyMessage[1]);
@@ -508,12 +514,11 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID.`);
 					}
 					break;
-				case adminCommands.refresh:
-					// Only the owner can refresh the database
-					const ownerNumber = client.info.wid.user;
+				case adminCommands.refresh:					
 					if (senderNumber !== `${ownerNumber}@c.us`) {
 						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
 					}
+
 					if (stringifyMessage[1] === 'users') {
 						await refreshDataCallback();
 						message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
