@@ -54,7 +54,7 @@ const adminCommands = {
 	delete: 'delete',
 	join: 'join',
 	register: 'register',
-	userid: 'userid',
+	newuser: 'newuser',
 	refresh: 'refresh',
 };
 

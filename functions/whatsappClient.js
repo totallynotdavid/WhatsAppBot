@@ -454,11 +454,13 @@ client.on('message_create', async message => {
 						}
 					}
 					break;
-				case adminCommands.userid:
-					if (quotedMessage && stringifyMessage.length === 1) {
-						message.reply(`${robotEmoji} El ID es ${quotedMessage.author}`);
-					} else if (stringifyMessage.length === 2) {
-						message.reply(`${robotEmoji} El ID es ${message.mentionedIds[0]}.`);
+				case adminCommands.newuser:
+					if (quotedMessage && stringifyMessage.length === 2) {
+						supabaseCommunicationModule.addPremiumUser(quotedMessage.author, stringifyMessage[1]);
+						message.reply(`${robotEmoji} Usuario premium añadido.`);
+					} else if (stringifyMessage.length === 3 && message.mentionedIds.length === 1) {
+						supabaseCommunicationModule.addPremiumUser(message.mentionedIds[0], stringifyMessage[2]);
+						message.reply(`${robotEmoji} Usuario premium añadido.`);
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID.`);
 					}
