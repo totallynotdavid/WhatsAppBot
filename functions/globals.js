@@ -53,7 +53,7 @@ const adminCommands = {
 	ban: 'ban',
 	delete: 'delete',
 	join: 'join',
-	register: 'register',
+	newgroup: 'newgroup',
 	newuser: 'newuser',
 	refresh: 'refresh',
 };

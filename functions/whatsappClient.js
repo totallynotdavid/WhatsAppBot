@@ -441,26 +441,36 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Envía el enlace de invitación del grupo.`);
 					}
 					break;
-				case adminCommands.register:
-					const chatExists = await supabaseCommunicationModule.searchPremiumGroup(chat.id._serialized);
-					if (chatExists) {
-						message.reply(`${robotEmoji} Este chat ya está registrado.`);
-					} else {
+				case adminCommands.newgroup:
+					if (!chat.id || !chat.name) return message.reply(`${robotEmoji} Una de las variables es undefined.`);
+
+					if (stringifyMessage.length === 1) {
+
 						try {
 							await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
 							message.reply(`${robotEmoji} Chat registrado.`);
 						} catch (error) {
 							message.reply(`${robotEmoji} Error registrando el chat: ${error.message}`);
 						}
+					} else {
+						message.reply(`${robotEmoji} Solo envía el comando.`);
 					}
 					break;
 				case adminCommands.newuser:
 					if (quotedMessage && stringifyMessage.length === 2) {
-						supabaseCommunicationModule.addPremiumUser(quotedMessage.author, stringifyMessage[1]);
-						message.reply(`${robotEmoji} Usuario premium añadido.`);
+						try {
+							supabaseCommunicationModule.addPremiumUser(quotedMessage.author, stringifyMessage[1]);
+							message.reply(`${robotEmoji} Usuario premium añadido.`);
+						} catch (error) {
+							message.reply(`${robotEmoji} Error añadiendo el usuario.`);
+						}
 					} else if (stringifyMessage.length === 3 && message.mentionedIds.length === 1) {
-						supabaseCommunicationModule.addPremiumUser(message.mentionedIds[0], stringifyMessage[2]);
-						message.reply(`${robotEmoji} Usuario premium añadido.`);
+						try {
+							supabaseCommunicationModule.addPremiumUser(message.mentionedIds[0], stringifyMessage[2]);
+							message.reply(`${robotEmoji} Usuario premium añadido.`);
+						} catch (error) {
+							message.reply(`${robotEmoji} Error añadiendo el usuario.`);
+						}
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID.`);
 					}
