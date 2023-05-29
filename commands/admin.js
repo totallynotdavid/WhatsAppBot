@@ -3,7 +3,6 @@
 
 async function mentionEveryone(chat, client, message, senderName) {
   try {
-
     const og = await message.getQuotedMessage();
 
     let text = '';
@@ -35,6 +34,7 @@ async function mentionEveryone(chat, client, message, senderName) {
 
 /* https://github.com/pedroslopez/whatsapp-web.js/issues/2067 */
 async function banUser(chat, participantId) {
+	// eslint-disable-next-line
 	try {	
 		await chat.removeParticipants([participantId]);
 	} catch (error) {

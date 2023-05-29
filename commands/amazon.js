@@ -11,7 +11,7 @@ async function synthesizeSpeech(text, songId) {
 		let params = {
 			'Text': text,
 			'OutputFormat': 'mp3',
-			'VoiceId': 'Ricardo'
+			'VoiceId': 'Ricardo',
 		}
 
 		Polly.synthesizeSpeech(params, (err, data) => {
@@ -34,5 +34,5 @@ async function synthesizeSpeech(text, songId) {
 }
 
 module.exports = {
-	synthesizeSpeech
+	synthesizeSpeech,
 };

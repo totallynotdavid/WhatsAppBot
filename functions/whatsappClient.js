@@ -479,7 +479,6 @@ client.on('message_create', async message => {
 					if (!chat.id || !chat.name) return message.reply(`${robotEmoji} Una de las variables es undefined.`);
 
 					if (stringifyMessage.length === 1) {
-
 						try {
 							await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
 							await refreshDataCallback();

@@ -11,5 +11,5 @@ module.exports = {
 	sciHub,
 	boTeX,
 	lyrics,
-	amazon
+	amazon,
 };
