@@ -164,14 +164,14 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.toimage:
-				if (!message.hasQuotedMsg) {
-					message.reply(`${robotEmoji} Tarao, te olvidaste de adjuntar el sticker.`);
+				if (stringifyMessage.length === 1 && message.hasQuotedMsg) {
+					originalQuotedMessage = await message.getQuotedMessage();
+					mediaSticker = await originalQuotedMessage.downloadMedia();
+					await chat.sendMessage(mediaSticker, { sendMediaAsSticker: false, caption: '🤖' });
+				} else {
+					message.reply(`${robotEmoji} Tarao, solo se puede convertir stickers.`);
 					message.react('⚠️');
-					return;
 				}
-				originalQuotedMessage = await message.getQuotedMessage();
-				mediaSticker = await originalQuotedMessage.downloadMedia();
-				await chat.sendMessage(mediaSticker, { sendMediaAsSticker: false, caption: '🤖' });
 				break;
       case commands.url:
 				/*

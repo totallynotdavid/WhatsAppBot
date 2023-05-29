@@ -4,11 +4,21 @@
     "message": "Busca y reproduce tu música favorita de Spotify. Para mayor precisión, pon primero el nombre de tu artista",
     "usage": "spot fromis airplane mode"
   },
+	{
+		"command": "letra",
+		"message": "Obten la letra de tu canción favorita",
+		"usage": "letra fromis airplane mode"
+	},
   {
     "command": "sticker",
     "message": "Transforma una imagen, video o gif (Tenor) en un sticker. Necesitas adjuntar el archivo al mensaje",
     "usage": "sticker"
   },
+	{
+		"command": "toimage",
+		"message": "Transforma un sticker en una imagen. Necesitas adjuntar el sticker al mensaje",
+		"usage": "toimage"
+	},
 	{
 		"command": "url",
 		"message": "Transforma una imagen o video en un sticker. Necesitas adjuntar la URL al mensaje",
@@ -24,6 +34,11 @@
     "message": "Reproduce tu música favorita en el chat, solo acepta URLs de YouTube",
     "usage": "play https://youtu.be/f0FDOw3zvGo"
   },
+	{
+		"command": "say",
+		"message": "Haz que el bot diga lo que quieras",
+		"usage": "say Hola, soy un bot"
+	},
   {
     "command": "w",
     "message": "Obten definiciones de Wikipedia",
