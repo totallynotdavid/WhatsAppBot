@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -113,6 +113,7 @@ client.on('message_create', async message => {
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
 		sendSpotifyAudio: spotifyUtils.sendSpotifyAudio,
+		fetchSongLyrics: lyrics.fetchSongLyrics,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -228,6 +229,20 @@ client.on('message_create', async message => {
 					}
         }
         break;
+			case commands.letra:
+				if (stringifyMessage.length === 1) {
+					message.reply(`${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`);
+					message.react('⚠️');
+				} else {
+					const songName = stringifyMessage.slice(1).join(' ');
+					const songLyrics = await functions.fetchSongLyrics(songName);
+					if (songLyrics) {
+						message.reply(songLyrics);
+					} else {
+						message.reply(`${robotEmoji} No encontré la letra de esa canción.`);
+					}
+				}
+				break;
       case commands.cae:
         functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/);
         break;

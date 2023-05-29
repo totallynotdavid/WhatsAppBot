@@ -35,6 +35,7 @@ const commands  = {
 	toimage: 'toimage',
   url: 'url',
   spot: 'spot',
+	letra: 'letra',
   cae: 'cae',
   fromis: 'fromis',
   w: 'w',
