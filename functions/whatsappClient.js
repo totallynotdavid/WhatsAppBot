@@ -71,14 +71,18 @@ client.on('auth_failure', authFailureMessage => {
 // Bot is ready and connected to WhatsApp
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
+
 	// Function starter to check for new posts in the Facebook page
 	newFunctions.facebookMonitor.monitorFacebookPage(client, 10000);
+
+	/* For some reason, this only works sometimes
 	// Check uptime
 	newFunctions.starter.setBotStatus(client);
 	setInterval(() => {
 		newFunctions.starter.setBotStatus(client);
 		console.log('Bot status updated');
 	}, 300000);
+	*/
 });
 
 /* Commands */
@@ -499,23 +503,41 @@ client.on('message_create', async message => {
 					if (senderNumber !== `${ownerNumber}@c.us`) {
 						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
 					}
-
-					if (quotedMessage && stringifyMessage.length === 2) {
+				
+					const isValidNumber = (numStr) => {
+						const num = Number(numStr);
+						if (!Number.isInteger(num)) {
+							throw new Error('Invalid number');
+						}
+						return num;
+					};
+				
+					const handleAddUser = async (userId, customerName, days) => {
+						console.log(`Adding user ${userId} for ${days} days at ${new Date().toISOString()}`)
 						try {
-							supabaseCommunicationModule.addPremiumUser(quotedMessage.author, stringifyMessage[1]);
-							message.reply(`${robotEmoji} Usuario premium añadido.`);
+							await supabaseCommunicationModule.addPremiumUser(userId, customerName, days);
+							message.reply(`${robotEmoji} Se han añadido ${days} días de premium a ${customerName}.`);
 						} catch (error) {
+							console.error(`Error adding user at ${new Date().toISOString()}: ${error.message}`);
 							message.reply(`${robotEmoji} Error añadiendo el usuario.`);
 						}
-					} else if (stringifyMessage.length === 3 && message.mentionedIds.length === 1) {
-						try {
-							supabaseCommunicationModule.addPremiumUser(message.mentionedIds[0], stringifyMessage[2]);
-							message.reply(`${robotEmoji} Usuario premium añadido.`);
-						} catch (error) {
-							message.reply(`${robotEmoji} Error añadiendo el usuario.`);
+					};
+				
+					try {
+						if (quotedMessage && stringifyMessage.length === 3) {
+							const days = isValidNumber(stringifyMessage[2]);
+							const customerName = stringifyMessage[1];
+							handleAddUser(quotedMessage.author, customerName, days);
+						} else if (stringifyMessage.length === 4 && message.mentionedIds.length === 1) {
+							const days = isValidNumber(stringifyMessage[3]);
+							const customerName = stringifyMessage[2];
+							handleAddUser(message.mentionedIds[0], customerName, days);
+						} else {
+							message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID. Recuerda que el comando es:\n\n${prefix_admin}newuser <nombre> <días>\n\no\n\n${prefix_admin}newuser <mencion> <nombre> <días>.`);
 						}
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID.`);
+					} catch (error) {
+						console.error(`Error handling add user command at ${new Date().toISOString()}: ${error.message}`);
+						message.reply(`${robotEmoji} Por favor, proporciona un número válido de días.`);
 					}
 					break;
 				case adminCommands.refresh:					
