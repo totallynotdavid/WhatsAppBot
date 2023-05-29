@@ -96,7 +96,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 7. Usar pm2 para mantener el bot funcionando continuamente:
 	 ```
-	 pm2 start index.js --cron-restart="0 * * * *"
+	 pm2 start index.js --cron-restart="*/15 * * * *"
 	 ```
 
 ## Uso

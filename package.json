@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "clean": "npm run clean:mundane && npm run clean:packages && clean:session && npm i && npm start",
+    "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && clean:session && npm i && npm start",
+		"clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
     "clean:mundane": "shx rm -rf music logs.txt",
     "clean:packages": "shx rm -rf node_modules package-lock.json",
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
-    "lint:fix": "eslint commands functions lib index.js --fix"
+    "lint:fix": "eslint commands functions lib index.js --fix",
+		"logs": "nano ~/.pm2/logs/index-out.log"
   },
   "author": "totallynotdavid",
   "license": "MIT",
