@@ -80,13 +80,21 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 	npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
 	```
 
-5. Inicia el bot por primera vez:
+5. Necesitas añadir tus credenciales de Amazon. En Linux, Unix, y macOS: `~/.aws/credentials`. Para Windows: `\Users\USUARIO\.aws\credentials`.
+
+	```bash
+	[default]
+	aws_access_key_id =
+	aws_secret_access_key =
+	```
+
+6. Inicia el bot por primera vez:
 
 	```bash
 	node index.js
 	```
 
-6. Usar pm2 para mantener el bot funcionando continuamente:
+7. Usar pm2 para mantener el bot funcionando continuamente:
 	 ```
 	 pm2 start index.js --cron-restart="0 * * * *"
 	 ```
