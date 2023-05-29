@@ -4,6 +4,8 @@ const sciHub = require('./sciHub');
 const boTeX = require('./boTeX');
 const lyrics = require('./lyrics');
 const amazon = require('./amazon');
+const help = require('./help');
+const cae = require('./cae');
 
 module.exports = {
 	general,
@@ -12,4 +14,6 @@ module.exports = {
 	boTeX,
 	lyrics,
 	amazon,
+	help,
+	cae,
 };

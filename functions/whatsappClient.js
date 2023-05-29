@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -100,8 +100,8 @@ client.on('message_create', async message => {
 		getDocumentsFromGoogleDrive: gdrive.searchFolderDatabase,
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
 		refreshDatabase: gdrive.refreshDatabase,
-    getHelpMessage: general.getHelpMessage,
-    getCAEMessage: general.getCAEMessage,
+    getHelpMessage: help.getHelpMessage,
+    getCAEMessage: cae.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
 		validateAndConvertMedia: general.validateAndConvertMedia,
     getRedditImage: general.getRedditImage,
@@ -245,7 +245,7 @@ client.on('message_create', async message => {
 				}
 				break;
       case commands.cae:
-        functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/);
+        functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/, robotEmoji);
         break;
       case commands.fromis:
         functions.getRedditImage(message, subreddit, client, MessageMedia);
@@ -435,6 +435,11 @@ client.on('message_create', async message => {
 			const quotedMessage = await message.getQuotedMessage();
 			const ownerNumber = client.info.wid.user;
 			switch (command) {
+				/*
+				case adminCommands.help:
+					functions.helpAdmin(message, robotEmoji);
+					break;
+				*/
 				case adminCommands.todos:
 					functions.mentionEveryone(chat, client, message, senderName);
 					break;

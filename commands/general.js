@@ -8,35 +8,6 @@ const { exec } = require('child_process');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const youtube_api_key = process.env.youtube_api_key;
 
-/* Commands stored as JSON files for better readability */
-const helpListCommands = require('../data/helpListCommands.json');
-const CAEListCommands = require('../data/caeListCommands.json');
-
-function codeWrapper(message) {
-  return '```' + message + '```';
-}
-
-function commandGenerator(fixedDataCommand, message, stringifyMessage, prefix, robotEmoji) {
-  try {
-    let commandFound = false;
-
-    for (const command of fixedDataCommand) {
-      if (command.command === stringifyMessage[1]) {
-        commandFound = true;
-        const builtMessage = `${robotEmoji} ${command.message}. Ejemplo de uso:\n\n${prefix}${command.usage}`;
-        message.reply(builtMessage);
-        break;
-      }
-    }
-
-    if (!commandFound) {
-      message.reply(`${robotEmoji} Parece que ${codeWrapper(stringifyMessage[1])} no existe.`);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
 function capitalizeText(s) {
     return s && s[0].toUpperCase() + s.slice(1);
 }
@@ -62,77 +33,6 @@ function deleteFile(filePath) {
       console.log(`File ${filePath} deleted successfully`);
     }
   });
-}
-
-function getHelpMessage(prefix, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji) {
-  try {
-    switch (stringifyMessage.length) {
-      case 1:
-        sendHelpList(prefix, helpCommand, message, /*client, List,*/ robotEmoji);
-        break;
-      case 2:
-        commandGenerator(helpListCommands, message, stringifyMessage, prefix, robotEmoji);
-        break;
-      default:
-        message.reply(`🤖 Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`);
-    }
-
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function sendHelpList(prefix, helpCommand, message, /*client, List,*/ robotEmoji) {
-  try {
-		const commands = helpListCommands.map(command => `${prefix}${command.command}`);
-		/*
-    const helpList = new List(
-      `${robotEmoji} Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?`,
-      'Cómo usar los comandos',
-      [
-        {
-          title: `Usa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando`,
-          rows: examples.map(example => ({title: example})),
-        },
-    ]);
-    client.sendMessage(message.id.remote, helpList);
-		*/
-		message.reply(`${robotEmoji} Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(commands.join('\n'))}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(`${prefix}${helpCommand} <comando>`)} (sin los símbolos <>).\n\nLos comandos de administración son: todos, ban, delete, join, newgroup, newuser.`);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/) {
-  try {
-    //let buttonsMessage; // For now, we can't send buttons messages
-		const physicsResourcesMessage = '🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH';
-
-    switch (stringifyMessage.length) {
-      case 1:
-        /*
-        buttonsMessage = new Buttons(
-          '¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!', 
-          [
-            { body: '🔗 Recursos recomendados', url: 'https://linktr.ee/caefisica' },
-            { body: '📚 BiblioteCAE', url: 'https://bit.ly/cae_biblioteca'},
-          ], 
-          'Guías de Estudio', 
-          'Proporcionado por el equipo del Centro de Apoyo al Estudiante de Física'
-        );
-        client.sendMessage(message.id.remote, buttonsMessage);
-        */
-				message.reply(`🤖 ¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!\n\n${codeWrapper(physicsResourcesMessage)}\n\nProporcionado por el equipo del CAE-Física`);
-        break;
-      case 2:
-        commandGenerator(CAEListCommands, message, stringifyMessage);
-        break;
-      default:
-        message.reply(`🤖 Este comando no es válido. Usa ${prefix}${caeCommand} ayuda para ver los comandos disponibles.`);
-    }
-  } catch (err) {
-    console.error(err);
-  }
 }
 
 function getYoutubeVideoId(url) {
@@ -671,8 +571,6 @@ async function convertUrlImageToSticker (chat, message, sticker, senderName, sen
 
 module.exports = {
   capitalizeText,
-  getHelpMessage,
-  getCAEMessage,
   getRedditImage,
   getWikiArticle,
   getYoutubeInformation,
