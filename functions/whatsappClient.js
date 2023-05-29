@@ -298,7 +298,7 @@ client.on('message_create', async message => {
 				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji);
 				break;
 			}
-			case commands.tts:
+			case commands.say:
 				if (stringifyMessage.length === 1) {
 					message.reply(`${robotEmoji} Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`);
 				} else {
