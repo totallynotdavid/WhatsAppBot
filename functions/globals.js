@@ -36,6 +36,7 @@ const commands  = {
   url: 'url',
   spot: 'spot',
 	letra: 'letra',
+	tts: 'tts',
   cae: 'cae',
   fromis: 'fromis',
   w: 'w',

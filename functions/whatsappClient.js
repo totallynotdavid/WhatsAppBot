@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -114,6 +114,7 @@ client.on('message_create', async message => {
 		getAuthorInfo: sciHub.authorRecentPapers,
 		sendSpotifyAudio: spotifyUtils.sendSpotifyAudio,
 		fetchSongLyrics: lyrics.fetchSongLyrics,
+		synthesizeSpeech: amazon.synthesizeSpeech,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -297,6 +298,23 @@ client.on('message_create', async message => {
 				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji);
 				break;
 			}
+			case commands.tts:
+				if (stringifyMessage.length === 1) {
+					message.reply(`${robotEmoji} Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`);
+				} else {
+					const textToSpeak = stringifyMessage.slice(1).join(' ');
+					const songId = Math.floor(Math.random() * 1000000);
+
+					functions.synthesizeSpeech(textToSpeak, songId)
+						.then(filePath => {
+							const media = MessageMedia.fromFilePath(filePath);
+							client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true })
+								.then(() => fs.unlink(filePath))
+								.catch(console.error);
+						})
+						.catch(console.error);
+				}
+				break;
       case commands.doi:
         if (stringifyMessage.length === 2) {
           functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage, robotEmoji);
