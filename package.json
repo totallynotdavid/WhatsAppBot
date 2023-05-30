@@ -6,13 +6,13 @@
   "scripts": {
     "start": "node index.js",
     "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && clean:session && npm i && npm start",
-		"clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
+    "clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
     "clean:mundane": "shx rm -rf music logs.txt",
     "clean:packages": "shx rm -rf node_modules package-lock.json",
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
     "lint:fix": "eslint commands functions lib index.js --fix",
-		"logs": "nano ~/.pm2/logs/index-out.log"
+    "logs": "nano ~/.pm2/logs/index-out.log"
   },
   "author": "totallynotdavid",
   "license": "MIT",
@@ -27,6 +27,7 @@
     "googleapis": "^105.0.0",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
+    "openai": "^3.2.1",
     "qrcode-terminal": "^0.12.0",
     "shx": "^0.3.4",
     "spotify-web-api-node": "^5.0.2",

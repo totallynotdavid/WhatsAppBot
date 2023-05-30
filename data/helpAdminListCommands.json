@@ -43,5 +43,10 @@
 		"command": "demote",
 		"message": "Haz que administrador pase a ser un usuario promedio. Puedes mencionarles o responder a uno de sus mensajes.",
 		"usage": "demote <user>"
+	},
+	{
+		"command": "chat",
+		"message": "Habla de lo que quieras con el bot.",
+		"usage": "chat <tu mensaje>"
 	}
 ]

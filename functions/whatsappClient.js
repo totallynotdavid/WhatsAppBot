@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -124,6 +124,7 @@ client.on('message_create', async message => {
 		sendSpotifyAudio: spotifyUtils.sendSpotifyAudio,
 		fetchSongLyrics: lyrics.fetchSongLyrics,
 		synthesizeSpeech: amazon.synthesizeSpeech,
+		generateText: openai.generateText,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -607,6 +608,15 @@ client.on('message_create', async message => {
 						functions.processUser(message.mentionedIds, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se han eliminado', 'Ninguno de los usuarios mencionados es administrador.', chat, message, robotEmoji);
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para quitarle el admin.`);
+					}
+					break;
+				case adminCommands.chat:
+					if (stringifyMessage.length === 1) {
+						message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+					} else {
+						const chatMessage = stringifyMessage.slice(1).join(' ');
+						const chatResponse = await functions.generateText(chatMessage);
+						message.reply(`${robotEmoji} ${chatResponse}`);
 					}
 					break;
 				default:
