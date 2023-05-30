@@ -454,7 +454,7 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para eliminarlo del grupo.`);
 					}
 					break;
-				case adminCommands.delete:
+				case adminCommands.del:
 					if (quotedMessage && stringifyMessage.length === 1) {
 						const quotedAuthor = quotedMessage.author;
 						if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
@@ -479,7 +479,7 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Envía el enlace de invitación del grupo.`);
 					}
 					break;
-				case adminCommands.newgroup:
+				case adminCommands.addgroup:
 					if (!chat.id || !chat.name) return message.reply(`${robotEmoji} Una de las variables es undefined.`);
 
 					if (stringifyMessage.length === 1) {
@@ -494,7 +494,7 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} Solo envía el comando.`);
 					}
 					break;
-				case adminCommands.newuser:
+				case adminCommands.addpremium:
 					if (senderNumber !== `${ownerNumber}@c.us`) {
 						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
 					}
@@ -528,7 +528,7 @@ client.on('message_create', async message => {
 							const customerName = stringifyMessage[2];
 							handleAddUser(message.mentionedIds[0], customerName, days);
 						} else {
-							message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID. Recuerda que el comando es:\n\n${prefix_admin}newuser <nombre> <días>\n\no\n\n${prefix_admin}newuser <mencion> <nombre> <días>.`);
+							message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID. Recuerda que el comando es:\n\n${prefix_admin}addpremium <nombre> <días>\n\no\n\n${prefix_admin}addpremium <mencion> <nombre> <días>.`);
 						}
 					} catch (error) {
 						console.error(`Error handling add user command at ${new Date().toISOString()}: ${error.message}`);

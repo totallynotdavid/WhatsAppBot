@@ -13,4 +13,5 @@
 
 # Sensitive data
 .env
-/data/**.json
+/data/driveCredentials.json
+/data/driveToken.json

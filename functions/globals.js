@@ -54,10 +54,10 @@ const adminCommands = {
 	help: 'help',
 	todos: 'todos',
 	ban: 'ban',
-	delete: 'delete',
+	del: 'del',
 	join: 'join',
-	newgroup: 'newgroup',
-	newuser: 'newuser',
+	addgroup: 'addgroup',
+	addpremium: 'addpremium',
 	refresh: 'refresh',
 };
 

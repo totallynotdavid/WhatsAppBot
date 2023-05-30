@@ -41,7 +41,7 @@ function sendHelpList(prefix, helpCommand, message, /*client, List,*/ robotEmoji
     ]);
     client.sendMessage(message.id.remote, helpList);
 		*/
-		message.reply(`${robotEmoji} Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(commands.join('\n'))}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(`${prefix}${helpCommand} <comando>`)} (sin los símbolos <>).\n\nLos comandos de administración son: todos, ban, delete, join, newgroup, newuser.`);
+		message.reply(`${robotEmoji} Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(commands.join('\n'))}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(`${prefix}${helpCommand} <comando>`)} (sin los símbolos <>).`);
   } catch (err) {
     console.error(err);
   }
