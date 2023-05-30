@@ -319,10 +319,12 @@ client.on('message_create', async message => {
 						break;
 					}
 
+					/*
 					if (!/^[a-zA-Z0-9\s]*$/.test(textToSpeak)) {
 						message.reply(`${robotEmoji} Lo siento, sólo se permiten letras normales y números en el texto.`);
 						break;
 					}
+					*/
 					
 					const songId = Math.floor(Math.random() * 1000000);
 
