@@ -1,6 +1,7 @@
 # Generated files	and folders
 **/node_modules/
 **/.wwebjs_auth/
+**/.wwebjs_cache/
 **/audio/
 **/pdf/
 **/video/

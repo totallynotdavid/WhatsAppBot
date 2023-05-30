@@ -60,6 +60,7 @@ const adminCommands = {
 	addgroup: 'addgroup',
 	addpremium: 'addpremium',
 	refresh: 'refresh',
+	promote: 'promote',
 };
 
 module.exports = {

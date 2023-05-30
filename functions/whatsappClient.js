@@ -47,6 +47,7 @@ const {
 	websiteAllowedRegex, 
 	youtubeTypes,
 } = require('./regex');
+const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
 
 /* 
 	WhatsApp components 
@@ -578,6 +579,30 @@ client.on('message_create', async message => {
 						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 					}
 					break;
+				case adminCommands.promote:
+					if (stringifyMessage.length === 1 && quotedMessage) {
+						const quotedAuthor = quotedMessage.author;
+
+						if (!admins.some(admin => admin.id._serialized === quotedAuthor)) {
+							await chat.promoteParticipants([quotedAuthor]);
+							message.reply(`${robotEmoji} Se ha añadido 1 administrador.`);
+						} else {
+							message.reply(`${robotEmoji} Este usuario ya es administrador.`);
+						}
+					} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
+						const mentionedUsers = message.mentionedIds;
+						const notAdmins = mentionedUsers.filter(userId => !admins.some(admin => admin.id._serialized === userId));
+		
+						if (notAdmins.length > 0) {
+							await chat.promoteParticipants(notAdmins);
+							message.reply(`${robotEmoji} Se han añadido ${notAdmins.length} administrador(es).`);
+						} else {
+							message.reply(`${robotEmoji} Todos los usuarios mencionados ya son administradores.`);
+						}
+					} else {
+						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para hacerle admin.`);
+					}
+					break;				
 				default:
 					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 					break;

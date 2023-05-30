@@ -31,6 +31,6 @@
     "shx": "^0.3.4",
     "spotify-web-api-node": "^5.0.2",
     "sqlite3": "^5.1.6",
-    "whatsapp-web.js": "^1.20.0"
+    "whatsapp-web.js": "^1.21.0"
   }
 }

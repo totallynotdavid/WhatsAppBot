@@ -33,5 +33,10 @@
 		"command": "addpremium",
 		"message": "Registra un nuevo usuario para el bot. Disponible solo para el propietario.",
 		"usage": "addpremium <user> <nombre> <dias>"
+	},
+	{
+		"command": "promote",
+		"message": "Haz que un usuario sea administrador del grupo. Puedes mencionarles o responder a uno de sus mensajes.",
+		"usage": "promote <user>"
 	}
 ]
