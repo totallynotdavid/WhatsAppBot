@@ -105,6 +105,7 @@ client.on('message_create', async message => {
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
 		refreshDatabase: gdrive.refreshDatabase,
     getHelpMessage: help.getHelpMessage,
+		getAdminHelpMessage: help.getAdminHelpMessage,
     getCAEMessage: cae.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
 		validateAndConvertMedia: general.validateAndConvertMedia,
@@ -433,11 +434,9 @@ client.on('message_create', async message => {
 			const quotedMessage = await message.getQuotedMessage();
 			const ownerNumber = client.info.wid.user;
 			switch (command) {
-				/*
 				case adminCommands.help:
-					functions.helpAdmin(message, robotEmoji);
+					functions.getAdminHelpMessage(prefix_admin, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
 					break;
-				*/
 				case adminCommands.todos:
 					functions.mentionEveryone(chat, client, message, senderName);
 					break;
@@ -456,12 +455,14 @@ client.on('message_create', async message => {
 					}
 					break;
 				case adminCommands.delete:
-					if (quotedMessage) {
+					if (quotedMessage && stringifyMessage.length === 1) {
 						const quotedAuthor = quotedMessage.author;
 						if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
 							message.reply(`${robotEmoji} Cómo te atreves.`);
 						}
 						await quotedMessage.delete(true);
+					} else {
+						message.reply(`${robotEmoji} Responde a un mensaje para eliminarlo.`);
 					}
 					break;
 				case adminCommands.join:

@@ -51,6 +51,7 @@ const commands  = {
 }
 
 const adminCommands = {
+	help: 'help',
 	todos: 'todos',
 	ban: 'ban',
 	delete: 'delete',
