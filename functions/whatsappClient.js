@@ -312,6 +312,17 @@ client.on('message_create', async message => {
 					message.reply(`${robotEmoji} Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`);
 				} else {
 					const textToSpeak = stringifyMessage.slice(1).join(' ');
+					
+					if (textToSpeak.length > 1000) {
+						message.reply(`${robotEmoji} Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 200 caracteres.`);
+						break;
+					}
+
+					if (!/^[a-zA-Z0-9\s]*$/.test(textToSpeak)) {
+						message.reply(`${robotEmoji} Lo siento, sólo se permiten letras normales y números en el texto.`);
+						break;
+					}
+					
 					const songId = Math.floor(Math.random() * 1000000);
 
 					functions.synthesizeSpeech(textToSpeak, songId)
