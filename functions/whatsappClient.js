@@ -73,7 +73,7 @@ client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
 
 	// Function starter to check for new posts in the Facebook page
-	newFunctions.facebookMonitor.monitorFacebookPage(client, 10000);
+	// newFunctions.facebookMonitor.monitorFacebookPage(client, 10000);
 
 	/* For some reason, this only works sometimes
 	// Check uptime
@@ -129,7 +129,7 @@ client.on('message_create', async message => {
 	if (!chat.isGroup) return;
 
   if (message.body.startsWith(prefix)) {
-		if (!((groupId) => premiumGroups.includes(groupId))(chat.id._serialized)) return;
+		if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return message.reply(`${robotEmoji} Lo siento, este grupo no está registrado. Para más información, contacta a David.`);
 
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
     let stringifyMessage = message.body.trim().split(/\s+/);
@@ -284,7 +284,7 @@ client.on('message_create', async message => {
         break;
 			case commands.play: {
 				/*
-				if (!paidUsers.includes(senderNumber)) {
+				if (!paidUsers.some(user => user.phone_number === senderNumber)) {
 					return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 				}
 				*/
@@ -378,12 +378,6 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.drive:
-				/*
-				if (!physicsUsers.includes(senderNumber)) {
-					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
-				}
-				*/
-
 				switch (stringifyMessage.length) {
 					case 2:
 						try {
@@ -431,7 +425,7 @@ client.on('message_create', async message => {
 		const admins = participantsArray.filter(participant => participant.isAdmin);
 		const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
 
-		if (!paidUsers.includes(senderNumber)) {
+		if (!paidUsers.some(user => user.phone_number === senderNumber)) {
 			return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 		}
 
@@ -547,7 +541,7 @@ client.on('message_create', async message => {
 
 					if (stringifyMessage[1] === 'users') {
 						await refreshDataCallback();
-						message.reply(`${robotEmoji} Los usuarios premium ahora son: ${paidUsers.join(', ')}.`);
+						message.reply(`${robotEmoji} Genial, se han actualizado manualmente los usuarios.`);
 					} else if (stringifyMessage[1] === 'db') {
 						message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 3 minutos.`);
 						try {

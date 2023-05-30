@@ -19,24 +19,34 @@ setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 0.1); // Clean
 
 /* SUPABASE API */
 const refreshData = async () => {
-  const paidUsers = await database.fetchDataFromTable('paid_users', 'phone_number');
-  const physicsUsers = await database.fetchDataFromTable('physics_users', 'phone_number');
-  const premiumGroups = await database.fetchDataFromTable('premium_groups', 'group_id');
+  const [paidUsers, physicsUsers, premiumGroups] = await Promise.all([
+    database.fetchDataFromTable('paid_users', 'phone_number', 'premium_expiry'),
+    database.fetchDataFromTable('physics_users', 'phone_number'),
+    database.fetchDataFromTable('premium_groups', 'group_id', 'contact_number', 'isActive')
+  ]);
 
-  // Pass the arrays to the whatsappClient
+  const expiredPremiumUsers = paidUsers.filter(({ premium_expiry }) => new Date(premium_expiry) < Date.now())
+    .map(({ phone_number }) => phone_number);
+
+  if (expiredPremiumUsers.length > 0) {
+    await database.updateTable('premium_groups', { isActive: false }, 'contact_number', expiredPremiumUsers);
+  }
+
   whatsappClient.setFetchedData(paidUsers, physicsUsers, premiumGroups);
+
+  const lastCheck = new Date().toISOString();
+  await database.updateTable('app_metadata', { lastCheck }, null, null, { column: 'id', value: 1 });
 };
 
-refreshData();
+refreshData().then(() => {
+  const now = new Date();
+  const nextFifteenMinutes = new Date(now.getTime() + 15 * 60 * 1000);
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-// Refresh data at midnight
-const now = new Date();
-const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-const timeToMidnight = tomorrow - now;
-
-setTimeout(() => {
-  setInterval(refreshData, 86400000); // 24 hours
-}, timeToMidnight);
+  if (nextFifteenMinutes >= midnight) {
+    setTimeout(refreshData, midnight - now);
+  }
+}).catch(console.error);
 
 /* SPOTIFY API */
 spotifyAPI.refreshAccessToken();
