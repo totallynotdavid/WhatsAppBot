@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -117,6 +117,7 @@ client.on('message_create', async message => {
     getYoutubeInformation: general.getYoutubeInformation,
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,
+		processUser: group.processUser,
     getSciHubArticle: sciHub.getPdfLink,
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
@@ -581,28 +582,22 @@ client.on('message_create', async message => {
 					break;
 				case adminCommands.promote:
 					if (stringifyMessage.length === 1 && quotedMessage) {
-						const quotedAuthor = quotedMessage.author;
-
-						if (!admins.some(admin => admin.id._serialized === quotedAuthor)) {
-							await chat.promoteParticipants([quotedAuthor]);
-							message.reply(`${robotEmoji} Se ha añadido 1 administrador.`);
-						} else {
-							message.reply(`${robotEmoji} Este usuario ya es administrador.`);
-						}
+						functions.processUser(quotedMessage.author, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se ha añadido', 'Este usuario ya es administrador.');
 					} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
-						const mentionedUsers = message.mentionedIds;
-						const notAdmins = mentionedUsers.filter(userId => !admins.some(admin => admin.id._serialized === userId));
-		
-						if (notAdmins.length > 0) {
-							await chat.promoteParticipants(notAdmins);
-							message.reply(`${robotEmoji} Se han añadido ${notAdmins.length} administrador(es).`);
-						} else {
-							message.reply(`${robotEmoji} Todos los usuarios mencionados ya son administradores.`);
-						}
+						functions.processUser(message.mentionedIds, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se han añadido', 'Todos los usuarios mencionados ya son administradores.', chat, message, robotEmoji);
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para hacerle admin.`);
 					}
-					break;				
+					break;
+				case adminCommands.demote:
+					if (stringifyMessage.length === 1 && quotedMessage) {
+						functions.processUser(quotedMessage.author, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se ha eliminado', 'Este usuario no es administrador.');
+					} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
+						functions.processUser(message.mentionedIds, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se han eliminado', 'Ninguno de los usuarios mencionados es administrador.', chat, message, robotEmoji);
+					} else {
+						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para quitarle el admin.`);
+					}
+					break;
 				default:
 					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 					break;

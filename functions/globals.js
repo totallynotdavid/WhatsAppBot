@@ -61,6 +61,7 @@ const adminCommands = {
 	addpremium: 'addpremium',
 	refresh: 'refresh',
 	promote: 'promote',
+	demote: 'demote',
 };
 
 module.exports = {

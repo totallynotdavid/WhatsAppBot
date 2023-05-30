@@ -7,6 +7,7 @@ const amazon = require('./amazon');
 const help = require('./help');
 const cae = require('./cae');
 const bot = require('./bot');
+const group = require('./group');
 
 module.exports = {
 	general,
@@ -18,4 +19,5 @@ module.exports = {
 	help,
 	cae,
 	bot,
+	group,
 };
