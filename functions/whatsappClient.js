@@ -315,7 +315,7 @@ client.on('message_create', async message => {
 					const textToSpeak = stringifyMessage.slice(1).join(' ');
 					
 					if (textToSpeak.length > 1000) {
-						message.reply(`${robotEmoji} Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 200 caracteres.`);
+						message.reply(`${robotEmoji} Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.`);
 						break;
 					}
 
