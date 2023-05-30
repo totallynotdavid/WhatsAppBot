@@ -4,11 +4,11 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
-const { spotifyUtils, gdrive, supabaseCommunicationModule} = require('../lib/api/index.js');
+const { spotifyUtils, gdrive, supabaseCommunicationModule } = require('../lib/api/index.js');
 
 // Import logging utility
 const logFunctionCall = require('./logFunctionCall');
@@ -100,6 +100,8 @@ client.on('message_create', async message => {
   const functions = {
 		banMultipleUsers: admin.banMultipleUsers,
     mentionEveryone: admin.mentionEveryone,
+		enableBot: bot.enableBot,
+		disableBot: bot.disableBot,
 		transformLatexToImage: boTeX.transformLatexToImage,
 		getDocumentsFromGoogleDrive: gdrive.searchFolderDatabase,
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
@@ -452,6 +454,27 @@ client.on('message_create', async message => {
 						functions.banMultipleUsers(client, chat, message.mentionedIds, message, robotEmoji);
 					} else {
 						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para eliminarlo del grupo.`);
+					}
+					break;
+				case adminCommands.bot:
+					if (stringifyMessage.length === 2) {
+						const botCommand = stringifyMessage[1];
+
+						switch (botCommand) {
+							case 'on':
+								await functions.enableBot(message, chat.id._serialized, robotEmoji);
+								await refreshDataCallback();
+								break;
+							case 'off':
+								await functions.disableBot(message, chat.id._serialized, robotEmoji);
+								await refreshDataCallback();
+								break;
+							default:
+								message.reply(`${robotEmoji} Solo puedes habilitar o deshabilitar el bot.`);
+								break;
+						}
+					} else {
+						message.reply(`${robotEmoji} ¿Y qué quieres que haga?`);
 					}
 					break;
 				case adminCommands.del:

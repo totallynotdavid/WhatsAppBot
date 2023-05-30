@@ -6,6 +6,7 @@ const lyrics = require('./lyrics');
 const amazon = require('./amazon');
 const help = require('./help');
 const cae = require('./cae');
+const bot = require('./bot');
 
 module.exports = {
 	general,
@@ -16,4 +17,5 @@ module.exports = {
 	amazon,
 	help,
 	cae,
+	bot,
 };

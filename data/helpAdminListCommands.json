@@ -5,6 +5,11 @@
 		"usage": "ban <user>"
 	},
 	{
+		"command": "bot",
+		"message": "Activa o desactiva el bot en el grupo. Solo disponible para usuarios premium.",
+		"usage": "bot <on/off>"
+	},
+	{
 		"command": "todos",
 		"message": "Menciona a todos los usuarios del grupo.",
 		"usage": "todos"

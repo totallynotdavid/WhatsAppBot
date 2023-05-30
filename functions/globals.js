@@ -54,6 +54,7 @@ const adminCommands = {
 	help: 'help',
 	todos: 'todos',
 	ban: 'ban',
+	bot: 'bot',
 	del: 'del',
 	join: 'join',
 	addgroup: 'addgroup',
