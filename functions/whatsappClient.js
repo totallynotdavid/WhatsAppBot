@@ -116,7 +116,7 @@ client.on('message_create', async message => {
     getSciHubArticle: sciHub.getPdfLink,
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
-		sendSpotifyAudio: spotifyUtils.sendSpotifyAudio,
+		handleSpotifySongRequest: spotifyUtils.handleSpotifySongRequest,
 		fetchSongLyrics: lyrics.fetchSongLyrics,
 		synthesizeSpeech: amazon.synthesizeSpeech,
 		generateText: openai.generateText,
@@ -168,20 +168,7 @@ client.on('message_create', async message => {
 				functions.handleStickerURL(stringifyMessage, message, robotEmoji, reddit, chat, MessageMedia, senderName, senderNumber);
         break;
       case commands.spot:
-        song = await spotifyUtils.getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`);
-
-        if(stringifyMessage.length === 1) {
-          message.reply(`${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`);
-          message.react('⚠️');
-        } else {
-          const audioDownloaded = await spotifyUtils.downloadSpotifyAudio(song);
-
-					if (audioDownloaded) {
-						await functions.sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji);
-					} else {
-						message.reply(`${robotEmoji} Houston, tenemos un problema. Intenta de nuevo.`);
-					}
-        }
+				functions.handleSpotifySongRequest(client, message, MessageMedia, query, stringifyMessage, robotEmoji);
         break;
 			case commands.letra:
 				if (stringifyMessage.length === 1) {
