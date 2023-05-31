@@ -12,6 +12,7 @@ const openai = require('./openai');
 const wikipedia = require('./wikipedia');
 const reddit = require('./reddit');
 const utilities = require('./utilities');
+const stickers = require('./stickers');
 
 module.exports = {
 	general,
@@ -28,4 +29,5 @@ module.exports = {
 	wikipedia,
 	reddit,
 	utilities,
+	stickers,
 };

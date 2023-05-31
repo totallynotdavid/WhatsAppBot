@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -125,6 +125,7 @@ client.on('message_create', async message => {
 		fetchSongLyrics: lyrics.fetchSongLyrics,
 		synthesizeSpeech: amazon.synthesizeSpeech,
 		generateText: openai.generateText,
+		processQuotedStickerMessage: stickers.processQuotedStickerMessage,
   }
 
   Object.keys(functions).forEach(functionName => {
@@ -182,14 +183,7 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.toimage:
-				if (stringifyMessage.length === 1 && message._data.quotedMsg.type === 'sticker') {
-					originalQuotedMessage = await message.getQuotedMessage();
-					mediaSticker = await originalQuotedMessage.downloadMedia();
-					await chat.sendMessage(mediaSticker, { sendMediaAsSticker: false, caption: `${robotEmoji} Solicitado por ${senderName}.` });
-				} else {
-					message.reply(`${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`);
-					message.react('⚠️');
-				}
+				functions.processQuotedStickerMessage(stringifyMessage, message, chat);
 				break;
       case commands.url:
 				/*
