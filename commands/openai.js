@@ -30,7 +30,7 @@ const generateText = async (chatMessage) => {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
-      max_tokens: 50,
+      max_tokens: 75,
     });
     return completion.data.choices[0].message.content;
   } catch (error) {
