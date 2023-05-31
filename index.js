@@ -16,7 +16,7 @@ const refreshData = async () => {
   const [paidUsers, physicsUsers, premiumGroups] = await Promise.all([
     database.fetchDataFromTable('paid_users', 'phone_number', 'premium_expiry'),
     database.fetchDataFromTable('physics_users', 'phone_number'),
-    database.fetchDataFromTable('premium_groups', 'group_id', 'contact_number', 'isActive')
+    database.fetchDataFromTable('premium_groups', 'group_id', 'contact_number', 'isActive'),
   ]);
 
   const expiredPremiumUsers = paidUsers.filter(({ premium_expiry }) => new Date(premium_expiry) < Date.now())

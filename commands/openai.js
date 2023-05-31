@@ -1,6 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const { Configuration, OpenAIApi } = require("openai");
+const { Configuration, OpenAIApi } = require('openai');
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -12,7 +12,7 @@ function checkAndModifyUserMessage(userMessage) {
   const maxLength = 500;
 
   if (userMessage.length > maxLength) {
-    userMessage = userMessage.substring(0, maxLength) + "...";
+    userMessage = userMessage.substring(0, maxLength) + '...';
   }
 
   return userMessage;
@@ -37,7 +37,7 @@ const generateText = async (chatMessage) => {
     if (error.response) {
       if (error.response.status === 429) {
         console.error(`OpenAI API rate limit exceeded: ${error.response.data}`);
-        return "Lo siento, hemos alcanzado nuestro límite de capacidad para hoy. Por favor, intenta de nuevo más tarde.";
+        return 'Lo siento, hemos alcanzado nuestro límite de capacidad para hoy. Por favor, intenta de nuevo más tarde.';
       } else {
         console.error(error.response.status, error.response.data);
       }

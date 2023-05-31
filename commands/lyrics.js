@@ -58,5 +58,5 @@ async function handleSongLyricsRequest(stringifyMessage, message, robotEmoji) {
 }
 
 module.exports = {
-	handleSongLyricsRequest
+	handleSongLyricsRequest,
 };
