@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -113,7 +113,7 @@ client.on('message_create', async message => {
     convertImageToSticker: general.convertImageToSticker,
 		validateAndConvertMedia: general.validateAndConvertMedia,
     getRedditImage: general.getRedditImage,
-    getWikiArticle: general.getWikiArticle,
+    getWikiArticle: wikipedia.getWikiArticle,
     getYoutubeInformation: general.getYoutubeInformation,
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,

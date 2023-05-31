@@ -9,6 +9,7 @@ const cae = require('./cae');
 const bot = require('./bot');
 const group = require('./group');
 const openai = require('./openai');
+const wikipedia = require('./wikipedia');
 
 module.exports = {
 	general,
@@ -22,4 +23,5 @@ module.exports = {
 	bot,
 	group,
 	openai,
+	wikipedia,
 };
