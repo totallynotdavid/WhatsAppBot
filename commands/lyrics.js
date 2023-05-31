@@ -43,6 +43,20 @@ async function fetchSongLyrics(message) {
 	}
 }
 
+async function handleSongLyricsRequest(stringifyMessage, message, robotEmoji) {
+	if (stringifyMessage.length === 1) {
+		message.reply(`${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`);
+	} else {
+		const songName = stringifyMessage.slice(1).join(' ');
+		const songLyrics = await fetchSongLyrics(songName);
+		if (songLyrics) {
+			message.reply(songLyrics);
+		} else {
+			message.reply(`${robotEmoji} No encontré la letra de esa canción.`);
+		}
+	}
+}
+
 module.exports = {
-	fetchSongLyrics,
+	handleSongLyricsRequest
 };

@@ -15,8 +15,7 @@ const logFunctionCall = require('./logFunctionCall');
 
 // Import logging utility
 let { 
-	prefix, prefix_admin, robotEmoji, song,
-	languageCode, youtubeType,
+	prefix, prefix_admin, robotEmoji, youtubeType,
 	paidUsers, physicsUsers, premiumGroups, 
 	commandsYoutubeDownload, commands, adminCommands,
 } = require('./globals');
@@ -108,7 +107,7 @@ client.on('message_create', async message => {
 		validateAndConvertMedia: stickers.validateAndConvertMedia,
 		handleStickerURL: stickers.handleStickerURL,
     getRedditImage: reddit.getRedditImage,
-    getWikiArticle: wikipedia.getWikiArticle,
+    handleWikipediaRequest: wikipedia.handleWikipediaRequest,
     getYoutubeInformation: general.getYoutubeInformation,
     searchYoutubeVideo: general.searchYoutubeVideo,
     mp3FromYoutube: general.mp3FromYoutube,
@@ -117,7 +116,7 @@ client.on('message_create', async message => {
 		paperKeyword: sciHub.paperKeyword,
 		getAuthorInfo: sciHub.authorRecentPapers,
 		handleSpotifySongRequest: spotifyUtils.handleSpotifySongRequest,
-		fetchSongLyrics: lyrics.fetchSongLyrics,
+		handleSongLyricsRequest: lyrics.handleSongLyricsRequest,
 		synthesizeSpeech: amazon.synthesizeSpeech,
 		generateText: openai.generateText,
 		processQuotedStickerMessage: stickers.processQuotedStickerMessage,
@@ -171,18 +170,7 @@ client.on('message_create', async message => {
 				functions.handleSpotifySongRequest(client, message, MessageMedia, query, stringifyMessage, robotEmoji);
         break;
 			case commands.letra:
-				if (stringifyMessage.length === 1) {
-					message.reply(`${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`);
-					message.react('⚠️');
-				} else {
-					const songName = stringifyMessage.slice(1).join(' ');
-					const songLyrics = await functions.fetchSongLyrics(songName);
-					if (songLyrics) {
-						message.reply(songLyrics);
-					} else {
-						message.reply(`${robotEmoji} No encontré la letra de esa canción.`);
-					}
-				}
+				functions.handleSongLyricsRequest(stringifyMessage, message, robotEmoji)
 				break;
       case commands.cae:
         functions.getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/, robotEmoji);
@@ -191,12 +179,7 @@ client.on('message_create', async message => {
         functions.getRedditImage(message, subreddit, client, MessageMedia);
         break;
       case commands.w:
-        languageCode = stringifyMessage[0].substring(3) || 'es';
-        if (stringifyMessage.length < 2 || languageCode.length !== 2) {
-          message.reply(`${robotEmoji} ${stringifyMessage.length < 2 ? 'Adjunta un enlace o una búsqueda de Wikipedia.' : 'Asegúrate de usar un código de idioma válido de 2 letras.'}`);
-          return;
-        }
-        functions.getWikiArticle(message, query, languageCode, senderName, client, MessageMedia);
+				functions.handleWikipediaRequest(stringifyMessage, message, robotEmoji, query, senderName, client, MessageMedia)
         break;
       case commands.yt:
         if (stringifyMessage.length < 2) {

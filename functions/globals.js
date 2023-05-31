@@ -1,7 +1,7 @@
 let prefix = '!';
 let prefix_admin = '@';
 let robotEmoji = '🤖';
-let song, languageCode, youtubeType;
+let youtubeType;
 let paidUsers = [];
 let physicsUsers = [];
 let premiumGroups = [];
@@ -69,8 +69,6 @@ module.exports = {
 	prefix,
 	prefix_admin,
 	robotEmoji,
-	song,
-	languageCode,
 	youtubeType,
 	paidUsers,
 	physicsUsers,
