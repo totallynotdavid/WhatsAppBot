@@ -1,6 +1,10 @@
 // This file is only available to give support to other commands
 // These are not exposed on the bot
 
+function capitalizeText(s) {
+	return s && s[0].toUpperCase() + s.slice(1);
+}
+
 function codeWrapper(message) {
   return '```' + message + '```';
 }
@@ -30,8 +34,45 @@ function commandGenerator(fixedDataCommandDict, message, stringifyMessage, prefi
   }
 }
 
+function hasNonWhitespace(str) {
+  return /[^ \t\n\r\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/.test(str);
+}
+
+function containsVisibleChars(str) {
+  // Check if the string contains any alphanumeric or non-whitespace character
+  return /[a-zA-Z0-9]/.test(str) && hasNonWhitespace(str);
+}
+
+// used to format numbers with spaces
+function formatNumber(number) {
+  const parts = [];
+  let str = number.toString();
+  while (str.length > 3) {
+    parts.unshift(str.slice(-3));
+    str = str.slice(0, -3);
+  }
+  if (str.length > 0) {
+    parts.unshift(str);
+  }
+  return parts.join(' ');
+}
+
+function deleteFile(filePath) {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(`Error deleting file: ${err}`);
+    } else {
+      console.log(`File ${filePath} deleted successfully`);
+    }
+  });
+}
+
 module.exports = {
+	capitalizeText,
   commandGenerator,
   convertArrayToDict,
 	codeWrapper,
+	containsVisibleChars,
+	formatNumber,
+	deleteFile,
 };

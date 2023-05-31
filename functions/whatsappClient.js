@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -25,7 +25,7 @@ let {
 // Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 // Set subreddit for the "fromis" command
-const subreddit = general.capitalizeText(fromisCommand);
+const subreddit = utilities.capitalizeText(fromisCommand);
 
 // Set function to update premium groups and users
 const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {

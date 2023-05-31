@@ -7,32 +7,7 @@ const { exec } = require('child_process');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const youtube_api_key = process.env.youtube_api_key;
 
-function capitalizeText(s) {
-    return s && s[0].toUpperCase() + s.slice(1);
-}
-
-function formatNumber(number) {
-  const parts = [];
-  let str = number.toString();
-  while (str.length > 3) {
-    parts.unshift(str.slice(-3));
-    str = str.slice(0, -3);
-  }
-  if (str.length > 0) {
-    parts.unshift(str);
-  }
-  return parts.join(' ');
-}
-
-function deleteFile(filePath) {
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error(`Error deleting file: ${err}`);
-    } else {
-      console.log(`File ${filePath} deleted successfully`);
-    }
-  });
-}
+const utilities = require('./utilities');
 
 function getYoutubeVideoId(url) {
   // Grande, domi, https://stackoverflow.com/a/71006865/14035380
@@ -73,15 +48,6 @@ function getYoutubePlaylistId(url) {
   }
 
   return playlistId;
-}
-
-function hasNonWhitespace(str) {
-  return /[^ \t\n\r\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/.test(str);
-}
-
-function containsVisibleChars(str) {
-  // Check if the string contains any alphanumeric or non-whitespace character
-  return /[a-zA-Z0-9]/.test(str) && hasNonWhitespace(str);
 }
 
 async function getYoutubeChannelId(url) {
@@ -154,8 +120,8 @@ function convertMp3ToOgg(videoFilename, outputFilename, message, client, Message
     const media = MessageMedia.fromFilePath(outputFilename);
     client.sendMessage(message.id.remote, media, { sendAudioAsVoice : true })
     .then(() => {
-        deleteFile(videoFilename);
-        deleteFile(outputFilename);
+        utilities.deleteFile(videoFilename);
+        utilities.deleteFile(outputFilename);
     })
     .catch((err) => {
         console.error(`Error: ${err}`);
@@ -226,36 +192,6 @@ function getVideoFilename(stdout) {
   return match ? match[1] : null;
 }
 
-async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
-	try {
-		if (mediaURL.endsWith('.gifv')) {
-			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
-		}
-
-    const response = await fetch(mediaURL);
-    const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
-
-    if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
-      if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
-        message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
-      } else {
-        let sticker;
-        if (localFilePath) {
-          sticker = await MessageMedia.fromFilePath(localFilePath);
-        } else {
-          sticker = await MessageMedia.fromUrl(mediaURL);
-        }
-        convertUrlImageToSticker(chat, message, sticker, senderName, senderNumber);
-      }
-    } else {
-      message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`);
-    }
-  } catch (error) {
-    console.error(error);
-    message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
-  }
-}
-
 async function fetchYoutubeData(url) {
   const response = await fetch(url);
   const data = await response.json();
@@ -324,7 +260,7 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
 
     const media = await MessageMedia.fromUrl(thumbnailUrl, { unsafeMime: true });
 
-    const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${formatNumber(likeCount)} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
+    const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
 
     await client.sendMessage(message.id.remote, media, { caption: captionMediaYoutube });
   } catch (err) {
@@ -389,17 +325,51 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
 		unsafeMime: true,
 	});
 
-  const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
+  const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
 
   await client.sendMessage(message.id.remote, media, { 
 		caption: captionText,
 	});
 }
 
+/*
+ * These functions are used by the sticker and url commands to validate and convert the media
+*/
+
+async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
+	try {
+		if (mediaURL.endsWith('.gifv')) {
+			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
+		}
+
+    const response = await fetch(mediaURL);
+    const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
+
+    if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
+      if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
+        message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
+      } else {
+        let sticker;
+        if (localFilePath) {
+          sticker = await MessageMedia.fromFilePath(localFilePath);
+        } else {
+          sticker = await MessageMedia.fromUrl(mediaURL);
+        }
+        convertUrlImageToSticker(chat, message, sticker, senderName, senderNumber);
+      }
+    } else {
+      message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`);
+    }
+  } catch (error) {
+    console.error(error);
+    message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+  }
+}
+
 async function convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber) {
   try {
     senderName = senderName.trim();
-    if (!containsVisibleChars(senderName) || senderName.length < 2) {
+    if (!utilities.containsVisibleChars(senderName) || senderName.length < 2) {
       var match = senderNumber.match(/(^|[^])\d+/);
       senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
     }
@@ -419,7 +389,6 @@ async function convertUrlImageToSticker (chat, message, sticker, senderName, sen
 }
 
 module.exports = {
-  capitalizeText,
   getYoutubeInformation,
   searchYoutubeVideo,
   mp3FromYoutube,
