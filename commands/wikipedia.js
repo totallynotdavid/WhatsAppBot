@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 async function getWikiArticle(message, query, languageCode, senderName, client, MessageMedia) {
   try {
     const wikipediaApiUrl = `https://${languageCode}.wikipedia.org/api/rest_v1/page/summary/${query}`;
