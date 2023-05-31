@@ -15,8 +15,7 @@ const logFunctionCall = require('./logFunctionCall');
 
 // Import logging utility
 let { 
-	prefix, prefix_admin, robotEmoji,
-	mediaSticker, originalQuotedMessage, song,
+	prefix, prefix_admin, robotEmoji, song,
 	languageCode, youtubeType,
 	paidUsers, physicsUsers, premiumGroups, 
 	commandsYoutubeDownload, commands, adminCommands,
@@ -41,12 +40,7 @@ const setRefreshDataCallback = (callback) => {
 };
 
 // Import regular expressions
-const { 
-	urlRegex, 
-	imageOrVideoRegex, 
-	websiteAllowedRegex, 
-	youtubeTypes,
-} = require('./regex');
+const { youtubeTypes } = require('./regex');
 // const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
 
 /* 
@@ -110,8 +104,9 @@ client.on('message_create', async message => {
     getHelpMessage: help.getHelpMessage,
 		getAdminHelpMessage: help.getAdminHelpMessage,
     getCAEMessage: cae.getCAEMessage,
-    convertImageToSticker: general.convertImageToSticker,
-		validateAndConvertMedia: general.validateAndConvertMedia,
+    transformMediaToSticker: stickers.transformMediaToSticker,
+		validateAndConvertMedia: stickers.validateAndConvertMedia,
+		handleStickerURL: stickers.handleStickerURL,
     getRedditImage: reddit.getRedditImage,
     getWikiArticle: wikipedia.getWikiArticle,
     getYoutubeInformation: general.getYoutubeInformation,
@@ -164,67 +159,13 @@ client.on('message_create', async message => {
         functions.getHelpMessage(prefix, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
         break;
       case commands.sticker:
-        if (!message.hasQuotedMsg && !message.hasMedia) {
-          message.reply(`${robotEmoji} Tarao, te olvidaste de adjuntar la imagen.`);
-          message.react('⚠️');
-          return;
-        }
-
-        try {
-          if (message.hasQuotedMsg) {
-            originalQuotedMessage = await message.getQuotedMessage();
-            mediaSticker = await originalQuotedMessage.downloadMedia();
-          } else {
-            mediaSticker = await message.downloadMedia();
-          }
-          await functions.convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber);
-        } catch (error) {
-          console.log(error);
-        }
+				functions.transformMediaToSticker(chat, message, senderName, senderNumber, robotEmoji);
         break;
 			case commands.toimage:
-				functions.processQuotedStickerMessage(stringifyMessage, message, chat);
+				functions.processQuotedStickerMessage(stringifyMessage, message, chat, robotEmoji, senderName);
 				break;
       case commands.url:
-				/*
-				Test case:
-				Youtube: https://www.reddit.com/r/neverchangejapan/comments/12spx82/ningen_isu_ringo_no_namida_a_metal_song_about_an/
-				Imagen: https://www.reddit.com/r/unixporn/comments/12ruaq1/xperia_10_iii_w_sailfish_w_arch_my_mobile_office/
-				Video: https://www.reddit.com/r/blackmagicfuckery/comments/12sex2d/pool_black_magic/
-				*/
-        if (stringifyMessage.length !== 2) {
-					message.reply(`${robotEmoji} URL, solo la URL.`);
-					message.react('⚠️');
-				} else {
-					let stickerURL = stringifyMessage[1];
-
-					if (!(websiteAllowedRegex.test(stickerURL) || (urlRegex.test(stickerURL) || imageOrVideoRegex.test(stickerURL)))) {
-						message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
-						return;
-					}
-
-					stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
-
-					let mediaURL;
-
-					if (stickerURL.includes('reddit.com')) {
-						const { mediaURL: redditMediaURL, media } = await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
-						if (!redditMediaURL) {
-							return;
-						}
-						mediaURL = redditMediaURL;
-						
-						if (media.is_video) { // check if the media is a video
-							const localFilePath = await reddit.saveRedditVideo(media);
-							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
-						} else {
-							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
-						}
-					} else {
-						mediaURL = stickerURL;
-						await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
-					}
-				}
+				functions.handleStickerURL(stringifyMessage, message, robotEmoji, reddit, chat, MessageMedia, senderName, senderNumber);
         break;
       case commands.spot:
         song = await spotifyUtils.getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`);

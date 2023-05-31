@@ -331,67 +331,8 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
 	});
 }
 
-/*
- * These functions are used by the sticker and url commands to validate and convert the media
-*/
-
-async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
-	try {
-		if (mediaURL.endsWith('.gifv')) {
-			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
-		}
-
-    const response = await fetch(mediaURL);
-    const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
-
-    if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
-      if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
-        message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
-      } else {
-        let sticker;
-        if (localFilePath) {
-          sticker = await MessageMedia.fromFilePath(localFilePath);
-        } else {
-          sticker = await MessageMedia.fromUrl(mediaURL);
-        }
-        convertUrlImageToSticker(chat, message, sticker, senderName, senderNumber);
-      }
-    } else {
-      message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`);
-    }
-  } catch (error) {
-    console.error(error);
-    message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
-  }
-}
-
-async function convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber) {
-  try {
-    senderName = senderName.trim();
-    if (!utilities.containsVisibleChars(senderName) || senderName.length < 2) {
-      var match = senderNumber.match(/(^|[^])\d+/);
-      senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
-    }
-    chat.sendMessage(mediaSticker, {
-      sendMediaAsSticker: true,
-      stickerName: `${senderName}`,
-      stickerAuthor: 'davibot',
-    });
-    message.reply('🤖 ¡Sticker en camino!');
-  } catch (e) {
-    message.reply('🤖 Hubo un error al tratar de convertir esta imagen en sticker.');
-  }
-}
-
-async function convertUrlImageToSticker (chat, message, sticker, senderName, senderNumber) {
-  convertImageToSticker(chat, message, sticker, senderName, senderNumber);
-}
-
 module.exports = {
   getYoutubeInformation,
   searchYoutubeVideo,
   mp3FromYoutube,
-  convertImageToSticker,
-  convertUrlImageToSticker,
-	validateAndConvertMedia,
 };
