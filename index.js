@@ -1,9 +1,3 @@
-// MAIN WORKING STRUCTURE OF THE BOT
-// 0. Check all Environment Variables are set
-// 1. Generate an Access Token from Spotify API
-// 2. Connect to Database and load paid users
-// 3. Connect to WhatsApp
-
 /* IMPORTS */
 const whatsappClient = require('./functions/whatsappClient');
 const spotifyAPI = require('./lib/api/spotifyUtils.js');
@@ -15,7 +9,7 @@ const checkStructure = require('./functions/checkStructure');
 checkEnvironmentVariables(); // Check all envs are set before starting
 checkStructure.checkFolderStructure();
 checkStructure.cleanFolderStructure();
-setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 0.1); // Clean every 15 minutes
+// setInterval(checkStructure.cleanFolderStructure, 1000 * 60 * 60 * 0.1); // Clean every 15 minutes
 
 /* SUPABASE API */
 const refreshData = async () => {
