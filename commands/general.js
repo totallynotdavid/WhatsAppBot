@@ -2,7 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 const fetch = require('node-fetch');
-const axios = require('axios').default;
 const moment = require('moment');
 const { exec } = require('child_process');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
@@ -137,8 +136,12 @@ async function getChannel(username) {
 }
 
 async function fetchData(url) {
-  const res = await axios.get(url);
-  return res.data;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return data;
 }
 
 function convertMp3ToOgg(videoFilename, outputFilename, message, client, MessageMedia) {
