@@ -1,18 +1,19 @@
 {
   "name": "whatsapp-bot",
-  "version": "1.5",
-  "description": "",
+  "version": "1.9",
+  "description": "Un bot de WhatsApp multifuncional.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && clean:session && npm i && npm start",
+		"start:prod": "pm2 start index.js --cron-restart=\"*/12 * * * *\"",
+		"logs": "nano ~/.pm2/logs/index-out.log",
+    "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && npm run clean:session && npm i && npm start:prod",
     "clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
     "clean:mundane": "shx rm -rf music logs.txt",
     "clean:packages": "shx rm -rf node_modules package-lock.json",
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
-    "lint:fix": "eslint commands functions lib index.js --fix",
-    "logs": "nano ~/.pm2/logs/index-out.log"
+    "lint:fix": "eslint commands functions lib index.js --fix"
   },
   "author": "totallynotdavid",
   "license": "MIT",
