@@ -10,6 +10,7 @@ const bot = require('./bot');
 const group = require('./group');
 const openai = require('./openai');
 const wikipedia = require('./wikipedia');
+const reddit = require('./reddit');
 
 module.exports = {
 	general,
@@ -24,4 +25,5 @@ module.exports = {
 	group,
 	openai,
 	wikipedia,
+	reddit,
 };

@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -112,7 +112,7 @@ client.on('message_create', async message => {
     getCAEMessage: cae.getCAEMessage,
     convertImageToSticker: general.convertImageToSticker,
 		validateAndConvertMedia: general.validateAndConvertMedia,
-    getRedditImage: general.getRedditImage,
+    getRedditImage: reddit.getRedditImage,
     getWikiArticle: wikipedia.getWikiArticle,
     getYoutubeInformation: general.getYoutubeInformation,
     searchYoutubeVideo: general.searchYoutubeVideo,
@@ -214,14 +214,14 @@ client.on('message_create', async message => {
 					let mediaURL;
 
 					if (stickerURL.includes('reddit.com')) {
-						const { mediaURL: redditMediaURL, media } = await general.handleRedditMedia(stickerURL, message, robotEmoji);
+						const { mediaURL: redditMediaURL, media } = await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
 						if (!redditMediaURL) {
 							return;
 						}
 						mediaURL = redditMediaURL;
 						
 						if (media.is_video) { // check if the media is a video
-							const localFilePath = await general.saveRedditVideo(media);
+							const localFilePath = await reddit.saveRedditVideo(media);
 							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
 						} else {
 							await functions.validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
