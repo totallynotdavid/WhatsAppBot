@@ -117,7 +117,7 @@ client.on('message_create', async message => {
 		getAuthorInfo: sciHub.authorRecentPapers,
 		handleSpotifySongRequest: spotifyUtils.handleSpotifySongRequest,
 		handleSongLyricsRequest: lyrics.handleSongLyricsRequest,
-		synthesizeSpeech: amazon.synthesizeSpeech,
+		handleTextToAudio: amazon.handleTextToAudio,
 		generateText: openai.generateText,
 		processQuotedStickerMessage: stickers.processQuotedStickerMessage,
   }
@@ -222,34 +222,7 @@ client.on('message_create', async message => {
 				break;
 			}
 			case commands.say:
-				if (stringifyMessage.length === 1) {
-					message.reply(`${robotEmoji} Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`);
-				} else {
-					const textToSpeak = stringifyMessage.slice(1).join(' ');
-					
-					if (textToSpeak.length > 1000) {
-						message.reply(`${robotEmoji} Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.`);
-						break;
-					}
-
-					/*
-					if (!/^[a-zA-Z0-9\s]*$/.test(textToSpeak)) {
-						message.reply(`${robotEmoji} Lo siento, sólo se permiten letras normales y números en el texto.`);
-						break;
-					}
-					*/
-					
-					const songId = Math.floor(Math.random() * 1000000);
-
-					functions.synthesizeSpeech(textToSpeak, songId)
-						.then(filePath => {
-							const media = MessageMedia.fromFilePath(filePath);
-							client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true })
-								.then(() => fs.unlink(filePath))
-								.catch(console.error);
-						})
-						.catch(console.error);
-				}
+				functions.handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji);
 				break;
       case commands.doi:
         if (stringifyMessage.length === 2) {
