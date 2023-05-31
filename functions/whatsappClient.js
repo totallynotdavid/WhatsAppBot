@@ -47,7 +47,7 @@ const {
 	websiteAllowedRegex, 
 	youtubeTypes,
 } = require('./regex');
-const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
+// const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
 
 /* 
 	WhatsApp components 
@@ -92,7 +92,7 @@ client.on('message_create', async message => {
 
   /* Method to get the name and number of a user */
   const contactInfo = await message.getContact();
-  const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined in the contact list, so we use the notifyName
+  const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
 
   /* It is important to know who and why a function was called */
@@ -131,6 +131,14 @@ client.on('message_create', async message => {
     functions[functionName] = logFunctionCall(message, functions[functionName]);
   });
 
+	/*
+	The checks are done in order of importance
+	1. Check if the message is in a group
+	Here there is a divergence between the admin and the regular commands
+	1.a Regular: The message is in a premium group
+	1.b Admin: The message is from a user who is an paid user
+	*/
+
 	let chat = await message.getChat();
 	if (!chat.isGroup) return;
 
@@ -143,7 +151,7 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
 
 		/* Logging all messages received to Supabase */
-		supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
+		// supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
 
     if (!(command in commands)) return;
 
@@ -428,207 +436,228 @@ client.on('message_create', async message => {
 				}
 				break;
       default:
-        message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+        // message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
         break;
     }
 
   }
 
   if (message.body.startsWith(prefix_admin)) {
+		/*
+		The logic here is the following:
+		1. Check if string[1] is an actual command, this must be done because the user could send a message starting with the prefix but not being a command
+		2. Check if the user is a paid user
+		*/
+
 		let stringifyMessage = message.body.trim().split(/\s+/);
     const command = stringifyMessage[0].split(prefix_admin)[1];
     if (!(command in adminCommands)) return;
-
-		/* Admins only exist on groups */
-    const participantsArray = Object.values(chat.participants);
-		const admins = participantsArray.filter(participant => participant.isAdmin);
-		const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
 
 		if (!paidUsers.some(user => user.phone_number === senderNumber)) {
 			return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
 		}
 
-		if (isAdmin) {
-			const quotedMessage = await message.getQuotedMessage();
-			const ownerNumber = client.info.wid.user;
-			switch (command) {
-				case adminCommands.help:
-					functions.getAdminHelpMessage(prefix_admin, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
-					break;
-				case adminCommands.todos:
-					functions.mentionEveryone(chat, client, message, senderName);
-					break;
-				case adminCommands.ban:
-					if (quotedMessage && stringifyMessage.length === 1) {
-						const quotedAuthor = quotedMessage.author;
-						if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
-							message.reply(`${robotEmoji} Cómo te atreves.`);
-						} else {
-							functions.banMultipleUsers(client, chat, [quotedAuthor], message, robotEmoji);
-						}
-					} else if (stringifyMessage.length > 1) {
-						functions.banMultipleUsers(client, chat, message.mentionedIds, message, robotEmoji);
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para eliminarlo del grupo.`);
-					}
-					break;
-				case adminCommands.bot:
-					if (stringifyMessage.length === 2) {
-						const botCommand = stringifyMessage[1];
+		/* Check if the sender is an admin */
+    const participantsArray = Object.values(chat.participants);
+		const admins = participantsArray.filter(participant => participant.isAdmin);
+		// const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
 
-						switch (botCommand) {
-							case 'on':
-								await functions.enableBot(message, chat.id._serialized, robotEmoji);
-								await refreshDataCallback();
-								break;
-							case 'off':
-								await functions.disableBot(message, chat.id._serialized, robotEmoji);
-								await refreshDataCallback();
-								break;
-							default:
-								message.reply(`${robotEmoji} Solo puedes habilitar o deshabilitar el bot.`);
-								break;
-						}
-					} else {
-						message.reply(`${robotEmoji} ¿Y qué quieres que haga?`);
-					}
-					break;
-				case adminCommands.del:
-					if (quotedMessage && stringifyMessage.length === 1) {
-						const quotedAuthor = quotedMessage.author;
-						if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
-							message.reply(`${robotEmoji} Cómo te atreves.`);
-						}
-						await quotedMessage.delete(true);
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje para eliminarlo.`);
-					}
-					break;
-				case adminCommands.join:
-					if (stringifyMessage.length === 2) {
-						const inviteLink = stringifyMessage[1];
-						const inviteCode = inviteLink.split('https://chat.whatsapp.com/')[1];
-						try {
-							await client.acceptInvite(inviteCode);
-							message.reply(`${robotEmoji} ¡Unido!`);
-						} catch (error) {
-							message.reply(`${robotEmoji} No se pudo unir. ¿Está el enlace correcto?`);
-						}
-					} else {
-						message.reply(`${robotEmoji} Envía el enlace de invitación del grupo.`);
-					}
-					break;
-				case adminCommands.addgroup:
-					if (!chat.id || !chat.name) return message.reply(`${robotEmoji} Una de las variables es undefined.`);
+		// if (isAdmin) {
+		const quotedMessage = await message.getQuotedMessage();
+		const ownerNumber = client.info.wid.user;
+		switch (command) {
+			case adminCommands.help:
+				functions.getAdminHelpMessage(prefix_admin, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
+				break;
+			case adminCommands.todos:
+				functions.mentionEveryone(chat, client, message, senderName);
+				break;
+			case adminCommands.ban:
+				if (!admins.some(admin => admin.id._serialized === `${client.info.wid.user}@c.us`)) {
+					return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`);
+				}
 
-					if (stringifyMessage.length === 1) {
-						try {
-							await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
+				if (quotedMessage && stringifyMessage.length === 1) {
+					const quotedAuthor = quotedMessage.author;
+					if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
+						message.reply(`${robotEmoji} Cómo te atreves.`);
+					} else {
+						functions.banMultipleUsers(client, chat, [quotedAuthor], message, robotEmoji);
+					}
+				} else if (stringifyMessage.length > 1) {
+					functions.banMultipleUsers(client, chat, message.mentionedIds, message, robotEmoji);
+				} else {
+					message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para eliminarlo del grupo.`);
+				}
+				break;
+			case adminCommands.bot:
+				if (stringifyMessage.length === 2) {
+					const botCommand = stringifyMessage[1];
+
+					switch (botCommand) {
+						case 'on':
+							await functions.enableBot(message, chat.id._serialized, robotEmoji);
 							await refreshDataCallback();
-							message.reply(`${robotEmoji} Chat registrado.`);
-						} catch (error) {
-							message.reply(`${robotEmoji} Error registrando el chat: ${error.message}`);
-						}
-					} else {
-						message.reply(`${robotEmoji} Solo envía el comando.`);
+							break;
+						case 'off':
+							await functions.disableBot(message, chat.id._serialized, robotEmoji);
+							await refreshDataCallback();
+							break;
+						default:
+							message.reply(`${robotEmoji} Solo puedes habilitar o deshabilitar el bot.`);
+							break;
 					}
-					break;
-				case adminCommands.addpremium:
-					if (senderNumber !== `${ownerNumber}@c.us`) {
-						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
+				} else {
+					message.reply(`${robotEmoji} ¿Y qué quieres que haga?`);
+				}
+				break;
+			case adminCommands.del:
+				if (!admins.some(admin => admin.id._serialized === `${client.info.wid.user}@c.us`)) {
+					return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`);
+				}
+
+				if (quotedMessage && stringifyMessage.length === 1) {
+					const quotedAuthor = quotedMessage.author;
+					if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
+						message.reply(`${robotEmoji} Cómo te atreves.`);
 					}
-				
-					const isValidNumber = (numStr) => {
-						const num = Number(numStr);
-						if (!Number.isInteger(num)) {
-							throw new Error('Invalid number');
-						}
-						return num;
-					};
-				
-					const handleAddUser = async (userId, customerName, days) => {
-						console.log(`Adding user ${userId} for ${days} days at ${new Date().toISOString()}`)
-						try {
-							await supabaseCommunicationModule.addPremiumUser(userId, customerName, days);
-							message.reply(`${robotEmoji} Se han añadido ${days} días de premium a ${customerName}.`);
-						} catch (error) {
-							console.error(`Error adding user at ${new Date().toISOString()}: ${error.message}`);
-							message.reply(`${robotEmoji} Error añadiendo el usuario.`);
-						}
-					};
-				
+					await quotedMessage.delete(true);
+				} else {
+					message.reply(`${robotEmoji} Responde a un mensaje para eliminarlo.`);
+				}
+				break;
+			case adminCommands.join:
+				if (stringifyMessage.length === 2) {
+					const inviteLink = stringifyMessage[1];
+					const inviteCode = inviteLink.split('https://chat.whatsapp.com/')[1];
 					try {
-						if (quotedMessage && stringifyMessage.length === 3) {
-							const days = isValidNumber(stringifyMessage[2]);
-							const customerName = stringifyMessage[1];
-							handleAddUser(quotedMessage.author, customerName, days);
-						} else if (stringifyMessage.length === 4 && message.mentionedIds.length === 1) {
-							const days = isValidNumber(stringifyMessage[3]);
-							const customerName = stringifyMessage[2];
-							handleAddUser(message.mentionedIds[0], customerName, days);
-						} else {
-							message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID. Recuerda que el comando es:\n\n${prefix_admin}addpremium <nombre> <días>\n\no\n\n${prefix_admin}addpremium <mencion> <nombre> <días>.`);
-						}
+						await client.acceptInvite(inviteCode);
+						message.reply(`${robotEmoji} ¡Unido!`);
 					} catch (error) {
-						console.error(`Error handling add user command at ${new Date().toISOString()}: ${error.message}`);
-						message.reply(`${robotEmoji} Por favor, proporciona un número válido de días.`);
+						message.reply(`${robotEmoji} No se pudo unir. ¿Está el enlace correcto?`);
 					}
-					break;
-				case adminCommands.refresh:					
-					if (senderNumber !== `${ownerNumber}@c.us`) {
-						return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
-					}
+				} else {
+					message.reply(`${robotEmoji} Envía el enlace de invitación del grupo.`);
+				}
+				break;
+			case adminCommands.addgroup:
+				if (!chat.id || !chat.name) return message.reply(`${robotEmoji} Una de las variables es undefined.`);
 
-					if (stringifyMessage[1] === 'users') {
+				if (stringifyMessage.length === 1) {
+					try {
+						await supabaseCommunicationModule.addPremiumGroup(chat.id._serialized, chat.name, senderNumber);
 						await refreshDataCallback();
-						message.reply(`${robotEmoji} Genial, se han actualizado manualmente los usuarios.`);
-					} else if (stringifyMessage[1] === 'db') {
-						message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 3 minutos.`);
-						try {
-							const refreshMessage = await functions.refreshDatabase();
-							message.reply(refreshMessage);
-						} catch (error) {
-							message.reply(`${robotEmoji} Error actualizando la base de datos: ${error.message}`);
-						}
-					} else {
-						message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+						message.reply(`${robotEmoji} Chat registrado.`);
+					} catch (error) {
+						message.reply(`${robotEmoji} Error registrando el chat: ${error.message}`);
 					}
-					break;
-				case adminCommands.promote:
-					if (stringifyMessage.length === 1 && quotedMessage) {
-						functions.processUser(quotedMessage.author, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se ha añadido', 'Este usuario ya es administrador.');
-					} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
-						functions.processUser(message.mentionedIds, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se han añadido', 'Todos los usuarios mencionados ya son administradores.', chat, message, robotEmoji);
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para hacerle admin.`);
+				} else {
+					message.reply(`${robotEmoji} Solo envía el comando.`);
+				}
+				break;
+			case adminCommands.addpremium:
+				if (senderNumber !== `${ownerNumber}@c.us`) {
+					return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
+				}
+			
+				const isValidNumber = (numStr) => {
+					const num = Number(numStr);
+					if (!Number.isInteger(num)) {
+						throw new Error('Invalid number');
 					}
-					break;
-				case adminCommands.demote:
-					if (stringifyMessage.length === 1 && quotedMessage) {
-						functions.processUser(quotedMessage.author, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se ha eliminado', 'Este usuario no es administrador.');
-					} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
-						functions.processUser(message.mentionedIds, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se han eliminado', 'Ninguno de los usuarios mencionados es administrador.', chat, message, robotEmoji);
-					} else {
-						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para quitarle el admin.`);
+					return num;
+				};
+			
+				const handleAddUser = async (userId, customerName, days) => {
+					console.log(`Adding user ${userId} for ${days} days at ${new Date().toISOString()}`)
+					try {
+						await supabaseCommunicationModule.addPremiumUser(userId, customerName, days);
+						message.reply(`${robotEmoji} Se han añadido ${days} días de premium a ${customerName}.`);
+					} catch (error) {
+						console.error(`Error adding user at ${new Date().toISOString()}: ${error.message}`);
+						message.reply(`${robotEmoji} Error añadiendo el usuario.`);
 					}
-					break;
-				case adminCommands.chat:
-					if (stringifyMessage.length === 1) {
-						message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+				};
+			
+				try {
+					if (quotedMessage && stringifyMessage.length === 3) {
+						const days = isValidNumber(stringifyMessage[2]);
+						const customerName = stringifyMessage[1];
+						handleAddUser(quotedMessage.author, customerName, days);
+					} else if (stringifyMessage.length === 4 && message.mentionedIds.length === 1) {
+						const days = isValidNumber(stringifyMessage[3]);
+						const customerName = stringifyMessage[2];
+						handleAddUser(message.mentionedIds[0], customerName, days);
 					} else {
-						const chatMessage = stringifyMessage.slice(1).join(' ');
-						const chatResponse = await functions.generateText(chatMessage);
-						message.reply(`${robotEmoji} ${chatResponse}`);
+						message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para obtener su ID. Recuerda que el comando es:\n\n${prefix_admin}addpremium <nombre> <días>\n\no\n\n${prefix_admin}addpremium <mencion> <nombre> <días>.`);
 					}
-					break;
-				default:
-					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
-					break;
-			}
-		} else {
-			return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
-		}
+				} catch (error) {
+					console.error(`Error handling add user command at ${new Date().toISOString()}: ${error.message}`);
+					message.reply(`${robotEmoji} Por favor, proporciona un número válido de días.`);
+				}
+				break;
+			case adminCommands.refresh:					
+				if (senderNumber !== `${ownerNumber}@c.us`) {
+					return message.reply(`${robotEmoji} Este comando solo está disponible para el propietario.`);
+				}
 
+				if (stringifyMessage[1] === 'users') {
+					await refreshDataCallback();
+					message.reply(`${robotEmoji} Genial, se han actualizado manualmente los usuarios.`);
+				} else if (stringifyMessage[1] === 'db') {
+					message.reply(`${robotEmoji} Actualizando datos... Este proceso puede tardar unos 3 minutos.`);
+					try {
+						const refreshMessage = await functions.refreshDatabase();
+						message.reply(refreshMessage);
+					} catch (error) {
+						message.reply(`${robotEmoji} Error actualizando la base de datos: ${error.message}`);
+					}
+				} else {
+					message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+				}
+				break;
+			case adminCommands.promote:
+				if (!admins.some(admin => admin.id._serialized === `${client.info.wid.user}@c.us`)) {
+					return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`);
+				}
+
+				if (stringifyMessage.length === 1 && quotedMessage) {
+					functions.processUser(quotedMessage.author, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se ha añadido', 'Este usuario ya es administrador.');
+				} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
+					functions.processUser(message.mentionedIds, (userId) => !admins.some(admin => admin.id._serialized === userId), 'promoteParticipants', 'Se han añadido', 'Todos los usuarios mencionados ya son administradores.', chat, message, robotEmoji);
+				} else {
+					message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para hacerle admin.`);
+				}
+				break;
+			case adminCommands.demote:
+				if (!admins.some(admin => admin.id._serialized === `${client.info.wid.user}@c.us`)) {
+					return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`);
+				}
+
+				if (stringifyMessage.length === 1 && quotedMessage) {
+					functions.processUser(quotedMessage.author, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se ha eliminado', 'Este usuario no es administrador.');
+				} else if (stringifyMessage.length > 1 && message.mentionedIds && !quotedMessage) {
+					functions.processUser(message.mentionedIds, (userId) => admins.some(admin => admin.id._serialized === userId), 'demoteParticipants', 'Se han eliminado', 'Ninguno de los usuarios mencionados es administrador.', chat, message, robotEmoji);
+				} else {
+					message.reply(`${robotEmoji} Responde a un mensaje o menciona a alguien para quitarle el admin.`);
+				}
+				break;
+			case adminCommands.chat:
+				if (stringifyMessage.length === 1) {
+					message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+				} else {
+					const chatMessage = stringifyMessage.slice(1).join(' ');
+					const chatResponse = await functions.generateText(chatMessage);
+					message.reply(`${robotEmoji} ${chatResponse}`);
+				}
+				break;
+			default:
+				// message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
+				break;
+		}
+		// } else {
+		//	return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
+		// }
 	}
 
 });
