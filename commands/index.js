@@ -13,6 +13,7 @@ const wikipedia = require('./wikipedia');
 const reddit = require('./reddit');
 const utilities = require('./utilities');
 const stickers = require('./stickers');
+const docsearch = require('./docsearch');
 
 module.exports = {
 	general,
@@ -30,4 +31,5 @@ module.exports = {
 	reddit,
 	utilities,
 	stickers,
+	docsearch,
 };

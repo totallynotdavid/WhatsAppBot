@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -97,7 +97,7 @@ client.on('message_create', async message => {
 		enableBot: bot.enableBot,
 		disableBot: bot.disableBot,
 		transformLatexToImage: boTeX.transformLatexToImage,
-		getDocumentsFromGoogleDrive: gdrive.searchFolderDatabase,
+		searchDocuments: docsearch.searchDocuments,
 		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
 		refreshDatabase: gdrive.refreshDatabase,
     getHelpMessage: help.getHelpMessage,
@@ -202,12 +202,6 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.play: {
-				/*
-				if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-					return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
-				}
-				*/
-
 				const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
 		
 				if (notice) {
@@ -257,30 +251,7 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.doc:
-				if (!physicsUsers.includes(senderNumber)) {
-					return message.reply(`${robotEmoji} Necesitas ser un estudiante verificado de la FCF.`);
-				}
-				if (stringifyMessage.length >= 2) {
-					functions.getDocumentsFromGoogleDrive(query)
-						.then((results) => {
-								if (results && results.length > 0) {
-										let messageText = `${robotEmoji} Resultados:\n\n`;
-										const limit = Math.min(5, results.length);
-										for (let i = 0; i < limit; i++) {
-												const file = results[i];
-												messageText += `${i+1}. ${file.name} (${file.webViewLink})\n`;
-										}
-										message.reply(messageText);
-								} else {
-										message.reply(`${robotEmoji} No se encontraron resultados.`);
-								}
-						})
-						.catch((error) => {
-								console.error('Error searching folder cache:', error);
-						});
-				} else {
-					message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres buscar?`);
-				}
+				functions.searchDocuments(stringifyMessage, message, query, robotEmoji)
 				break;
 			case commands.drive:
 				switch (stringifyMessage.length) {
