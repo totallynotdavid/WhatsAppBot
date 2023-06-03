@@ -180,8 +180,26 @@ async function request(api, query) {
   return await response.json();
 }
 
+function handleSearchPapersByKeywords(stringifyMessage, message, query, robotEmoji) {
+	if (stringifyMessage.length >= 2) {
+		paperKeyword(message, query, robotEmoji);
+	} else {
+		message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
+	}
+}
+
+function handleSearchAuthor(stringifyMessage, message, query, robotEmoji) {
+	if (stringifyMessage.length >= 2) {
+		authorRecentPapers(message, query, robotEmoji);
+	} else {
+		message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
+	}
+}
+
 module.exports = {
   getPdfLink,
 	paperKeyword,
 	authorRecentPapers,
+	handleSearchPapersByKeywords,
+	handleSearchAuthor,
 };

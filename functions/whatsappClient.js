@@ -1,7 +1,6 @@
 // Packages
 const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const fs = require('fs').promises;
 
 // Import commands and utility functions
 const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch, docdown } = require('../commands/index.js');
@@ -113,8 +112,8 @@ client.on('message_create', async message => {
     mp3FromYoutube: general.mp3FromYoutube,
 		processUser: group.processUser,
     getSciHubArticle: sciHub.getPdfLink,
-		paperKeyword: sciHub.paperKeyword,
-		getAuthorInfo: sciHub.authorRecentPapers,
+		handleSearchPapersByKeywords: sciHub.handleSearchPapersByKeywords,
+		handleSearchAuthor: sciHub.handleSearchAuthor,
 		handleSpotifySongRequest: spotifyUtils.handleSpotifySongRequest,
 		handleSongLyricsRequest: lyrics.handleSongLyricsRequest,
 		handleTextToAudio: amazon.handleTextToAudio,
@@ -237,18 +236,10 @@ client.on('message_create', async message => {
 				}
 				break;
 			case commands.paper:
-				if (stringifyMessage.length >= 2) {
-					functions.paperKeyword(message, query, robotEmoji);
-				} else {
-					message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
-				}
+				functions.handleSearchPapersByKeywords(stringifyMessage, message, query, robotEmoji);
 				break;
 			case commands.author:
-				if (stringifyMessage.length >= 2) {
-					functions.getAuthorInfo(message, query, robotEmoji);
-				} else {
-					message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
-				}
+				functions.handleSearchAuthor(stringifyMessage, message, query, robotEmoji);
 				break;
 			case commands.doc:
 				functions.searchDocuments(stringifyMessage, message, query, robotEmoji)

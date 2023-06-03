@@ -1,5 +1,5 @@
-let prefix = '!';
-let prefix_admin = '@';
+let prefix = '.';
+let prefix_admin = ',';
 let robotEmoji = '🤖';
 let youtubeType;
 let paidUsers = [];
