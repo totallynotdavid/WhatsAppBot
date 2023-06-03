@@ -3,7 +3,7 @@ const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsa
 const qrcode = require('qrcode-terminal');
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch, docdown } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch, docdown, youtube } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -14,9 +14,9 @@ const logFunctionCall = require('./logFunctionCall');
 
 // Import logging utility
 let { 
-	prefix, prefix_admin, robotEmoji, youtubeType,
+	prefix, prefix_admin, robotEmoji,
 	paidUsers, physicsUsers, premiumGroups, 
-	commandsYoutubeDownload, commands, adminCommands,
+	commands, adminCommands,
 } = require('./globals');
 
 // Import specific commands
@@ -37,8 +37,6 @@ const setRefreshDataCallback = (callback) => {
   refreshDataCallback = callback;
 };
 
-// Import regular expressions
-const { youtubeTypes } = require('./regex');
 // const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
 
 /* 
@@ -103,15 +101,13 @@ client.on('message_create', async message => {
 		getAdminHelpMessage: help.getAdminHelpMessage,
     getCAEMessage: cae.getCAEMessage,
     transformMediaToSticker: stickers.transformMediaToSticker,
-		validateAndConvertMedia: stickers.validateAndConvertMedia,
 		handleStickerURL: stickers.handleStickerURL,
     getRedditImage: reddit.getRedditImage,
     handleWikipediaRequest: wikipedia.handleWikipediaRequest,
-    getYoutubeInformation: general.getYoutubeInformation,
-    searchYoutubeVideo: general.searchYoutubeVideo,
-    mp3FromYoutube: general.mp3FromYoutube,
+    handleYoutubeSearch: youtube.handleYoutubeSearch,
+    handleYoutubeAudio: youtube.handleYoutubeAudio,
 		processUser: group.processUser,
-    getSciHubArticle: sciHub.getPdfLink,
+    handleDoiRequest: sciHub.handleDoiRequest,
 		handleSearchPapersByKeywords: sciHub.handleSearchPapersByKeywords,
 		handleSearchAuthor: sciHub.handleSearchAuthor,
 		handleSpotifySongRequest: spotifyUtils.handleSpotifySongRequest,
@@ -181,49 +177,17 @@ client.on('message_create', async message => {
 				functions.handleWikipediaRequest(stringifyMessage, message, robotEmoji, query, senderName, client, MessageMedia)
         break;
       case commands.yt:
-        if (stringifyMessage.length < 2) {
-          message.reply(`${robotEmoji} Adjunta un enlace o una búsqueda de YouTube, no seas tan tímido.`);
-          return;
-        }
-
-        youtubeType = 'search';
-        for (const key in youtubeTypes) {
-          if (youtubeTypes[key] && query.match(youtubeTypes[key])) {
-            youtubeType = key;
-            break;
-          }
-        }
-        
-        if (youtubeType === 'search') {
-          functions.searchYoutubeVideo(message, client, MessageMedia, query);
-        } else {
-          functions.getYoutubeInformation(message, client, MessageMedia, query, youtubeType);
-        }
+				functions.handleYoutubeSearch(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
         break;
 			case commands.play: {
-				const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
-		
-				if (notice) {
-						message.reply(notice);
-						return;
-				}
-				if (stringifyMessage.length > 2 && (isNaN(Number(stringifyMessage[2])) || (stringifyMessage.length > 3 && isNaN(Number(stringifyMessage[3]))))) {
-						message.reply(`${robotEmoji} El formato del comando es incorrecto, los valores deben ser números.`);
-						return;
-				}
-				functions.mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji);
+				functions.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
 				break;
 			}
 			case commands.say:
 				functions.handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji);
 				break;
       case commands.doi:
-        if (stringifyMessage.length === 2) {
-          functions.getSciHubArticle(message, client, MessageMedia, stringifyMessage, robotEmoji);
-          return;
-        } else {
-          message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
-        }
+				functions.handleDoiRequest(message, client, MessageMedia, stringifyMessage, robotEmoji);
         break;
 			case commands.tex:
 				functions.handleLatexToImage(stringifyMessage, message, client, MessageMedia, robotEmoji);
@@ -241,7 +205,6 @@ client.on('message_create', async message => {
 				functions.handleGoogleDriveDownloads(stringifyMessage, message, query, client, MessageMedia, robotEmoji)
 				break;
       default:
-        // message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
         break;
     }
 
@@ -265,9 +228,8 @@ client.on('message_create', async message => {
 		/* Check if the sender is an admin */
     const participantsArray = Object.values(chat.participants);
 		const admins = participantsArray.filter(participant => participant.isAdmin);
-		// const isAdmin = admins.some(admin => admin.id._serialized === senderNumber);
+		// const isAdmin = admins.some(admin => admin.id._serialized === senderNumber); Use if (isAdmin)
 
-		// if (isAdmin) {
 		const quotedMessage = await message.getQuotedMessage();
 		const ownerNumber = client.info.wid.user;
 		switch (command) {
@@ -457,12 +419,8 @@ client.on('message_create', async message => {
 				}
 				break;
 			default:
-				// message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
 				break;
 		}
-		// } else {
-		//	return message.reply(`${robotEmoji} No tienes permisos para usar este comando.`);
-		// }
 	}
 
 });

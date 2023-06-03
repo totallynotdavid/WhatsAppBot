@@ -196,10 +196,20 @@ function handleSearchAuthor(stringifyMessage, message, query, robotEmoji) {
 	}
 }
 
+function handleDoiRequest(message, client, MessageMedia, stringifyMessage, robotEmoji) {
+	if (stringifyMessage.length === 2) {
+		getPdfLink(message, client, MessageMedia, stringifyMessage, robotEmoji);
+		return;
+	} else {
+		message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
+	}
+}
+
 module.exports = {
   getPdfLink,
 	paperKeyword,
 	authorRecentPapers,
 	handleSearchPapersByKeywords,
 	handleSearchAuthor,
+	handleDoiRequest,
 };

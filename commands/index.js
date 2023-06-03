@@ -15,6 +15,7 @@ const utilities = require('./utilities');
 const stickers = require('./stickers');
 const docsearch = require('./docsearch');
 const docdown = require('./docdown');
+const youtube = require('./youtube');
 
 module.exports = {
 	general,
@@ -34,4 +35,5 @@ module.exports = {
 	stickers,
 	docsearch,
 	docdown,
+	youtube,
 };
