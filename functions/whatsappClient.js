@@ -95,7 +95,7 @@ client.on('message_create', async message => {
     mentionEveryone: admin.mentionEveryone,
 		enableBot: bot.enableBot,
 		disableBot: bot.disableBot,
-		transformLatexToImage: boTeX.transformLatexToImage,
+		handleLatexToImage: boTeX.handleLatexToImage,
 		searchDocuments: docsearch.searchDocuments,
 		handleGoogleDriveDownloads: docdown.handleGoogleDriveDownloads,
 		refreshDatabase: gdrive.refreshDatabase,
@@ -226,14 +226,7 @@ client.on('message_create', async message => {
         }
         break;
 			case commands.tex:
-				if (stringifyMessage.length > 1) {
-					const query = stringifyMessage.slice(1).join(' ');
-					const beginRegex = /\\begin\{[a-z]*\}/g;
-					if (beginRegex.test(query)) {
-						message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
-					}
-					functions.transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
-				}
+				functions.handleLatexToImage(stringifyMessage, message, client, MessageMedia, robotEmoji);
 				break;
 			case commands.paper:
 				functions.handleSearchPapersByKeywords(stringifyMessage, message, query, robotEmoji);

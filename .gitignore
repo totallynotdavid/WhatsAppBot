@@ -8,6 +8,10 @@
 *.mp4
 *.txt
 *.sqlite
+*.tex
+*.pdf
+*.aux
+*.log
 
 # Logs
 /commands/**.json

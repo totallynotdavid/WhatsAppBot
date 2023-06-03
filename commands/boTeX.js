@@ -71,6 +71,18 @@ function executeCommand(command) {
   });
 }
 
+function handleLatexToImage(stringifyMessage, message, client, MessageMedia, robotEmoji) {
+	if (stringifyMessage.length > 1) {
+		const query = stringifyMessage.slice(1).join(' ');
+		const beginRegex = /\\begin\{[a-z]*\}/g;
+		if (beginRegex.test(query)) {
+			message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
+		}
+		transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
+	}
+}
+
 module.exports = {
   transformLatexToImage,
+	handleLatexToImage,
 };
