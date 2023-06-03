@@ -4,7 +4,7 @@ const qrcode = require('qrcode-terminal');
 const fs = require('fs').promises;
 
 // Import commands and utility functions
-const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch } = require('../commands/index.js');
+const { general, admin, sciHub, boTeX, lyrics, amazon, help, cae, bot, group, openai, wikipedia, reddit, utilities, stickers, docsearch, docdown } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import APIs
@@ -98,7 +98,7 @@ client.on('message_create', async message => {
 		disableBot: bot.disableBot,
 		transformLatexToImage: boTeX.transformLatexToImage,
 		searchDocuments: docsearch.searchDocuments,
-		downloadFilesFromGoogleDrive: gdrive.downloadFilesFromGoogleDrive,
+		handleGoogleDriveDownloads: docdown.handleGoogleDriveDownloads,
 		refreshDatabase: gdrive.refreshDatabase,
     getHelpMessage: help.getHelpMessage,
 		getAdminHelpMessage: help.getAdminHelpMessage,
@@ -254,35 +254,7 @@ client.on('message_create', async message => {
 				functions.searchDocuments(stringifyMessage, message, query, robotEmoji)
 				break;
 			case commands.drive:
-				switch (stringifyMessage.length) {
-					case 2:
-						try {
-							const filePath = await functions.downloadFilesFromGoogleDrive(query);
-							const maxSize = 200 * 1024 * 1024;
-							const fileStats = await fs.stat(filePath);
-					
-							if (fileStats.size > maxSize) {
-								await fs.unlink(filePath);
-								return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`);
-							}
-	
-							const media = await MessageMedia.fromFilePath(filePath);
-							await client.sendMessage(message.id.remote, media, {
-								caption: 'PDF file',
-							});
-					
-							await fs.unlink(filePath);
-						} catch (error) {
-							console.error('Error sending file:', error);
-							message.reply(`${robotEmoji} ¿Seguro de que ese archivo existe?`);
-						}
-						break;
-					case 1:
-						message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres descargar?`);
-						break;
-					default:
-						message.reply(`${robotEmoji} Envía solo un enlace de Google Drive.`);
-				}
+				functions.handleGoogleDriveDownloads(stringifyMessage, message, query, client, MessageMedia, robotEmoji)
 				break;
       default:
         // message.reply(`${robotEmoji} ¿Estás seguro de que ese comando existe?`);
