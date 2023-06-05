@@ -59,14 +59,14 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-	console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
+  console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
 });
 
 /* Commands */
 
 client.on('message_create', async message => {
   let [contactInfo, chat] = await Promise.all([message.getContact(), message.getChat()]);
-	if (!chat.isGroup) return;
+  if (!chat.isGroup) return;
 
   const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;

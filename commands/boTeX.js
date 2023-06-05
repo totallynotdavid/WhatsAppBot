@@ -40,11 +40,10 @@ async function transformLatexToImage(message, client, MessageMedia, query, robot
 
     await execPromise(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${writePath}`);
 
-		// Check if OS is Windows, and change command accordingly
+    // Check if OS is Windows, and change command accordingly
     const convertCommand = os.platform() === 'win32' ? 'magick convert' : 'convert';
 
-		await execPromise(`${convertCommand} -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`);
-		
+    await execPromise(`${convertCommand} -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`);
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
     await client.sendMessage(message.id.remote, media, {
