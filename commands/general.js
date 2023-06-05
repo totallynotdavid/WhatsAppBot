@@ -60,21 +60,21 @@ async function getYoutubeChannelId(url) {
   if (url.startsWith('https://www.youtube.com/channel/')) {
     match = channelRegex.exec(url);
     channelId = match[1];
-    console.log(`Channel ID (channel): ${channelId}`	)
+    console.log(`Channel ID (channel): ${channelId}`  )
   } else if (url.startsWith('https://www.youtube.com/user/')) {
     match = userRegex.exec(url);
     channelId = match[1];
-    console.log(`Channel ID (user): ${channelId}`	)
+    console.log(`Channel ID (user): ${channelId}`  )
   } else {
     match = usernameRegex.exec(url);
     if (match) {
-			const preChannelId = match[1];
-			channelId = await getChannel(preChannelId);
-			console.log(`Channel ID (custom): ${channelId}`);
-		} else {
-			throw new Error('Invalid YouTube URL');
-		}
-	}
+      const preChannelId = match[1];
+      channelId = await getChannel(preChannelId);
+      console.log(`Channel ID (custom): ${channelId}`);
+    } else {
+      throw new Error('Invalid YouTube URL');
+    }
+  }
 
   return channelId;
 }
@@ -152,20 +152,20 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
     cutVideo: `yt-dlp -v -f bestaudio -o "audio/%(id)s.%(ext)s" --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss ${startTime} -to ${endTime}" ${stringifyMessage[1]}`, // -t doesn't work for some reason
   };
   
-	const command = commands[commandMode];
+  const command = commands[commandMode];
 
   if (!command) {
     message.reply(`${robotEmoji} Comando no válido.`);
     return;
   }
 
-	if (!videoID) {
+  if (!videoID) {
     message.reply(`${robotEmoji} La URL no es válida.`);
     return;
   }
 
-	const videoLength = await getVideoLength(videoID);
-	const validationResult = validateParams(youtubeURL, startTime, endTime, videoLength);
+  const videoLength = await getVideoLength(videoID);
+  const validationResult = validateParams(youtubeURL, startTime, endTime, videoLength);
 
   if (validationResult) {
     message.reply(validationResult);
@@ -178,14 +178,14 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
       return;
     }
 
-		const videoFilename = getVideoFilename(stdout);
+    const videoFilename = getVideoFilename(stdout);
 
     convertMp3ToOgg(videoFilename, outputFilename, message, client, MessageMedia);
   });
 }
 
 function getVideoFilename(stdout) {
-	// We look for the line that contains the video filename in the stdout (output of the command)
+  // We look for the line that contains the video filename in the stdout (output of the command)
   const regex = /Destination: (audio[/\\](.{11})\.(webm|m4a|mp3))/;
   const match = stdout.match(regex);
   return match ? match[1] : null;
@@ -321,14 +321,14 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
   const { title, thumbnailUrl, channelTitle, viewCount, likeCount } = await fetchYoutubeData(detailsUrl);
 
   const media = await MessageMedia.fromUrl(thumbnailUrl, { 
-		unsafeMime: true,
-	});
+    unsafeMime: true,
+  });
 
   const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
 
   await client.sendMessage(message.id.remote, media, { 
-		caption: captionText,
-	});
+    caption: captionText,
+  });
 }
 
 module.exports = {

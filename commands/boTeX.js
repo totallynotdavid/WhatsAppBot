@@ -37,17 +37,17 @@ async function transformLatexToImage(message, client, MessageMedia, query, robot
     fs.writeFileSync(path.join(__dirname, '..', 'img', 'input.tex'), latexDocument);
 
     await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
-		// on Windows: we use "magick convert" instead of "convert"
+    // on Windows: we use "magick convert" instead of "convert"
     await executeCommand(
-			`convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
-		);
+      `convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
+    );
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
     await client.sendMessage(message.id.remote, media, {
       caption: `${robotEmoji} Generado por boTeX`,
     });
 
-		// Call the cleanUp function after sending the image
+    // Call the cleanUp function after sending the image
     await cleanUp();
   } catch (error) {
     console.error('Error:', error);
@@ -72,17 +72,17 @@ function executeCommand(command) {
 }
 
 function handleLatexToImage(stringifyMessage, message, client, MessageMedia, robotEmoji) {
-	if (stringifyMessage.length > 1) {
-		const query = stringifyMessage.slice(1).join(' ');
-		const beginRegex = /\\begin\{[a-z]*\}/g;
-		if (beginRegex.test(query)) {
-			message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
-		}
-		transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
-	}
+  if (stringifyMessage.length > 1) {
+    const query = stringifyMessage.slice(1).join(' ');
+    const beginRegex = /\\begin\{[a-z]*\}/g;
+    if (beginRegex.test(query)) {
+      message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`);
+    }
+    transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
+  }
 }
 
 module.exports = {
   transformLatexToImage,
-	handleLatexToImage,
+  handleLatexToImage,
 };

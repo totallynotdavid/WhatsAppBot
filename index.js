@@ -1,6 +1,6 @@
 /* IMPORTS */
 const whatsappClient = require('./functions/whatsappClient');
-const spotifyAPI = require('./lib/api/spotifyUtils.js');
+const spotifyAPI = require('./commands/spotify');
 const database = require('./lib/api/supabaseCommunicationModule.js');
 
 /* CHECKING */

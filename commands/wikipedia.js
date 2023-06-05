@@ -30,7 +30,7 @@ async function getWikiArticle(message, query, languageCode, senderName, client, 
       if (apiData.originalimage) {
         const imageMedia = await MessageMedia.fromUrl(apiData.originalimage.source);
         client.sendMessage(message.id.remote, imageMedia, { caption: summary })
-      } else {	
+      } else {  
       message.reply(summary);
       }
     }
@@ -52,14 +52,14 @@ async function getWikiArticle(message, query, languageCode, senderName, client, 
 }
 
 function handleWikipediaRequest(stringifyMessage, message, robotEmoji, query, senderName, client, MessageMedia) {
-	languageCode = stringifyMessage[0].substring(3) || 'es';
-	if (stringifyMessage.length < 2 || languageCode.length !== 2) {
-		message.reply(`${robotEmoji} ${stringifyMessage.length < 2 ? 'Adjunta un enlace o una búsqueda de Wikipedia.' : 'Asegúrate de usar un código de idioma válido de 2 letras.'}`);
-		return;
-	}
-	getWikiArticle(message, query, languageCode, senderName, client, MessageMedia);
+  languageCode = stringifyMessage[0].substring(3) || 'es';
+  if (stringifyMessage.length < 2 || languageCode.length !== 2) {
+    message.reply(`${robotEmoji} ${stringifyMessage.length < 2 ? 'Adjunta un enlace o una búsqueda de Wikipedia.' : 'Asegúrate de usar un código de idioma válido de 2 letras.'}`);
+    return;
+  }
+  getWikiArticle(message, query, languageCode, senderName, client, MessageMedia);
 }
 
 module.exports = {
-	handleWikipediaRequest,
+  handleWikipediaRequest,
 };

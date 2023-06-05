@@ -10,21 +10,21 @@ async function getPdfLink(message, client, MessageMedia, stringifyMessage, robot
   const link = stringifyMessage[1];
 
   const response = await fetch(`${sciHub_baseURL}${link}`);
-	const html = await response.text();
-	const match = iframeRegex.exec(html);
-	const pdfLink = match ? (match[1].startsWith('http') ? match[1] : `http:${match[1]}`) : null;
+  const html = await response.text();
+  const match = iframeRegex.exec(html);
+  const pdfLink = match ? (match[1].startsWith('http') ? match[1] : `http:${match[1]}`) : null;
 
-	if (pdfLink) {
-		const pdfFilename = await downloadPdf(pdfLink, link);
-		const media = await MessageMedia.fromFilePath(path.join(__dirname, '../pdf', pdfFilename));
-		await client.sendMessage(message.id.remote, media, {
-			caption: 'PDF file',
-		});
+  if (pdfLink) {
+    const pdfFilename = await downloadPdf(pdfLink, link);
+    const media = await MessageMedia.fromFilePath(path.join(__dirname, '../pdf', pdfFilename));
+    await client.sendMessage(message.id.remote, media, {
+      caption: 'PDF file',
+    });
 
-		fs.unlinkSync(path.join(__dirname, '../pdf', pdfFilename));
-	} else {
-		message.reply(`${robotEmoji} No hemos podido encontrar el PDF de este artículo.`);
-	}
+    fs.unlinkSync(path.join(__dirname, '../pdf', pdfFilename));
+  } else {
+    message.reply(`${robotEmoji} No hemos podido encontrar el PDF de este artículo.`);
+  }
 }
 
 async function downloadPdf(pdfLink, link) {
@@ -181,35 +181,35 @@ async function request(api, query) {
 }
 
 function handleSearchPapersByKeywords(stringifyMessage, message, query, robotEmoji) {
-	if (stringifyMessage.length >= 2) {
-		paperKeyword(message, query, robotEmoji);
-	} else {
-		message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
-	}
+  if (stringifyMessage.length >= 2) {
+    paperKeyword(message, query, robotEmoji);
+  } else {
+    message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
+  }
 }
 
 function handleSearchAuthor(stringifyMessage, message, query, robotEmoji) {
-	if (stringifyMessage.length >= 2) {
-		authorRecentPapers(message, query, robotEmoji);
-	} else {
-		message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
-	}
+  if (stringifyMessage.length >= 2) {
+    authorRecentPapers(message, query, robotEmoji);
+  } else {
+    message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
+  }
 }
 
 function handleDoiRequest(message, client, MessageMedia, stringifyMessage, robotEmoji) {
-	if (stringifyMessage.length === 2) {
-		getPdfLink(message, client, MessageMedia, stringifyMessage, robotEmoji);
-		return;
-	} else {
-		message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
-	}
+  if (stringifyMessage.length === 2) {
+    getPdfLink(message, client, MessageMedia, stringifyMessage, robotEmoji);
+    return;
+  } else {
+    message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`);
+  }
 }
 
 module.exports = {
   getPdfLink,
-	paperKeyword,
-	authorRecentPapers,
-	handleSearchPapersByKeywords,
-	handleSearchAuthor,
-	handleDoiRequest,
+  paperKeyword,
+  authorRecentPapers,
+  handleSearchPapersByKeywords,
+  handleSearchAuthor,
+  handleDoiRequest,
 };

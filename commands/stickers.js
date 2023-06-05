@@ -5,38 +5,38 @@ const regex = require('../functions/regex');
 let mediaSticker, originalQuotedMessage;
 
 async function processQuotedStickerMessage(stringifyMessage, message, chat, robotEmoji, senderName) {
-	if (stringifyMessage.length === 1 && message._data.quotedMsg && message._data.quotedMsg.type === 'sticker') {
-		originalQuotedMessage = await message.getQuotedMessage();
-		mediaSticker = await originalQuotedMessage.downloadMedia();
-		await chat.sendMessage(mediaSticker, { sendMediaAsSticker: false, caption: `${robotEmoji} Solicitado por ${senderName}.` });
-	} else {
-		message.reply(`${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`);
-	}
+  if (stringifyMessage.length === 1 && message._data.quotedMsg && message._data.quotedMsg.type === 'sticker') {
+    originalQuotedMessage = await message.getQuotedMessage();
+    mediaSticker = await originalQuotedMessage.downloadMedia();
+    await chat.sendMessage(mediaSticker, { sendMediaAsSticker: false, caption: `${robotEmoji} Solicitado por ${senderName}.` });
+  } else {
+    message.reply(`${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`);
+  }
 }
 
 async function transformMediaToSticker(chat, message, senderName, senderNumber, robotEmoji) {
-	if (!message.hasQuotedMsg && !message.hasMedia) {
-		message.reply(`${robotEmoji} Tarao, te olvidaste de adjuntar la imagen.`);
-		return;
-	}
+  if (!message.hasQuotedMsg && !message.hasMedia) {
+    message.reply(`${robotEmoji} Tarao, te olvidaste de adjuntar la imagen.`);
+    return;
+  }
 
-	try {
-		if (message.hasQuotedMsg) {
-			originalQuotedMessage = await message.getQuotedMessage();
+  try {
+    if (message.hasQuotedMsg) {
+      originalQuotedMessage = await message.getQuotedMessage();
 
-			if (!originalQuotedMessage.hasMedia) {
-				message.reply(`${robotEmoji} Este mensaje no contiene ninguna imagen.`);
-				return;
-			}
+      if (!originalQuotedMessage.hasMedia) {
+        message.reply(`${robotEmoji} Este mensaje no contiene ninguna imagen.`);
+        return;
+      }
 
-			mediaSticker = await originalQuotedMessage.downloadMedia();
-		} else {
-			mediaSticker = await message.downloadMedia();
-		}
-		await convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber);
-	} catch (error) {
-		console.log(error);
-	}
+      mediaSticker = await originalQuotedMessage.downloadMedia();
+    } else {
+      mediaSticker = await message.downloadMedia();
+    }
+    await convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function convertImageToSticker(chat, message, mediaSticker, senderName, senderNumber) {
@@ -62,10 +62,10 @@ async function convertUrlImageToSticker (chat, message, sticker, senderName, sen
 }
 
 async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath = null) {
-	try {
-		if (mediaURL.endsWith('.gifv')) {
-			mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
-		}
+  try {
+    if (mediaURL.endsWith('.gifv')) {
+      mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
+    }
 
     const response = await fetch(mediaURL);
     const [contentType, contentLength] = (response.headers.get('content-type') || '').split(';');
@@ -98,45 +98,45 @@ Imagen: https://www.reddit.com/r/unixporn/comments/12ruaq1/xperia_10_iii_w_sailf
 Video: https://www.reddit.com/r/blackmagicfuckery/comments/12sex2d/pool_black_magic/
 */
 async function handleStickerURL(stringifyMessage, message, robotEmoji, reddit, chat, MessageMedia, senderName, senderNumber) {
-	if (stringifyMessage.length !== 2) {
-		message.reply(`${robotEmoji} URL, solo la URL.`);
-		message.react('⚠️');
-	} else {
-		let stickerURL = stringifyMessage[1];
+  if (stringifyMessage.length !== 2) {
+    message.reply(`${robotEmoji} URL, solo la URL.`);
+    message.react('⚠️');
+  } else {
+    let stickerURL = stringifyMessage[1];
 
-		if (!(regex.websiteAllowedRegex.test(stickerURL) || (regex.urlRegex.test(stickerURL) || regex.imageOrVideoRegex.test(stickerURL)))) {
-			message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
-			return;
-		}
+    if (!(regex.websiteAllowedRegex.test(stickerURL) || (regex.urlRegex.test(stickerURL) || regex.imageOrVideoRegex.test(stickerURL)))) {
+      message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`);
+      return;
+    }
 
-		stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
+    stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
 
-		let mediaURL;
+    let mediaURL;
 
-		if (stickerURL.includes('reddit.com')) {
-			const { mediaURL: redditMediaURL, media } = await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
-			if (!redditMediaURL) {
-				return;
-			}
-			mediaURL = redditMediaURL;
-			
-			if (media.is_video) {
-				const localFilePath = await reddit.saveRedditVideo(media);
-				await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
-			} else {
-				await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
-			}
-		} else {
-			mediaURL = stickerURL;
-			await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
-		}
-	}
+    if (stickerURL.includes('reddit.com')) {
+      const { mediaURL: redditMediaURL, media } = await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
+      if (!redditMediaURL) {
+        return;
+      }
+      mediaURL = redditMediaURL;
+      
+      if (media.is_video) {
+        const localFilePath = await reddit.saveRedditVideo(media);
+        await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji, localFilePath);
+      } else {
+        await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
+      }
+    } else {
+      mediaURL = stickerURL;
+      await validateAndConvertMedia(chat, mediaURL, message, MessageMedia, senderName, senderNumber, robotEmoji);
+    }
+  }
 }
 
 module.exports = {
-	processQuotedStickerMessage,
-	transformMediaToSticker,
-	convertUrlImageToSticker,
-	validateAndConvertMedia,
-	handleStickerURL,
+  processQuotedStickerMessage,
+  transformMediaToSticker,
+  convertUrlImageToSticker,
+  validateAndConvertMedia,
+  handleStickerURL,
 };

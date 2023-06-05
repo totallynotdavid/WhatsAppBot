@@ -6,8 +6,6 @@ const lyrics = require('./lyrics');
 const amazon = require('./amazon');
 const help = require('./help');
 const cae = require('./cae');
-const bot = require('./bot');
-const group = require('./group');
 const openai = require('./openai');
 const wikipedia = require('./wikipedia');
 const reddit = require('./reddit');
@@ -16,24 +14,24 @@ const stickers = require('./stickers');
 const docsearch = require('./docsearch');
 const docdown = require('./docdown');
 const youtube = require('./youtube');
+const spotify = require('./spotify');
 
 module.exports = {
-	general,
-	admin,
-	sciHub,
-	boTeX,
-	lyrics,
-	amazon,
-	help,
-	cae,
-	bot,
-	group,
-	openai,
-	wikipedia,
-	reddit,
-	utilities,
-	stickers,
-	docsearch,
-	docdown,
-	youtube,
+  general,
+  admin,
+  sciHub,
+  boTeX,
+  lyrics,
+  amazon,
+  help,
+  cae,
+  openai,
+  wikipedia,
+  reddit,
+  utilities,
+  stickers,
+  docsearch,
+  docdown,
+  youtube,
+  spotify,
 };

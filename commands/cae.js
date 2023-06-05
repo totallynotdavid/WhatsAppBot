@@ -9,7 +9,7 @@ function codeWrapper(message) {
 function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, Buttons*/, robotEmoji) {
   try {
     //let buttonsMessage; // For now, we can't send buttons messages
-		const physicsResourcesMessage = '🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH';
+    const physicsResourcesMessage = '🔗 Recursos recomendados: https://linktr.ee/caefisica\n📚 BiblioteCAE: https://bit.ly/cae_biblioteca\n📄 Guías de Estudio: https://bit.ly/41EN8CH';
 
     switch (stringifyMessage.length) {
       case 1:
@@ -25,7 +25,7 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, 
         );
         client.sendMessage(message.id.remote, buttonsMessage);
         */
-				message.reply(`🤖 ¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!\n\n${codeWrapper(physicsResourcesMessage)}\n\nProporcionado por el equipo del CAE-Física`);
+        message.reply(`🤖 ¡Aquí tienes algunos recursos adicionales para ayudarte en el estudio de la Física!\n\n${codeWrapper(physicsResourcesMessage)}\n\nProporcionado por el equipo del CAE-Física`);
         break;
       case 2:
         commandGenerator(CAEListCommandsDict, message, stringifyMessage, prefix, robotEmoji);
@@ -39,5 +39,5 @@ function getCAEMessage(prefix, stringifyMessage, caeCommand, message/*, client, 
 }
 
 module.exports = {
-	getCAEMessage,
+  getCAEMessage,
 };

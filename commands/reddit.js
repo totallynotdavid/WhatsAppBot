@@ -84,9 +84,9 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
         localFilePath: localFilePath,
       };
     } else if (media.url.startsWith('https://v.redd.it/') || media.url.startsWith('https://i.imgur.com/')) {
-			mediaURL = media.url;
-		} else if (media.preview && media.preview.images && media.preview.images.length > 0) {
-			mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
+      mediaURL = media.url;
+    } else if (media.preview && media.preview.images && media.preview.images.length > 0) {
+      mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
     } else if (media.url) {
       mediaURL = media.url;
     } else {
@@ -108,8 +108,8 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
 }
 
 module.exports = {
-	getRedditImage,
-	getRedditVideo,
-	saveRedditVideo,
-	handleRedditMedia,
+  getRedditImage,
+  getRedditVideo,
+  saveRedditVideo,
+  handleRedditMedia,
 };

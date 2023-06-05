@@ -3,7 +3,7 @@
 const fs = require('fs').promises;
 
 function capitalizeText(s) {
-	return s && s[0].toUpperCase() + s.slice(1);
+  return s && s[0].toUpperCase() + s.slice(1);
 }
 
 function codeWrapper(message) {
@@ -69,11 +69,11 @@ function deleteFile(filePath) {
 }
 
 module.exports = {
-	capitalizeText,
+  capitalizeText,
   commandGenerator,
   convertArrayToDict,
-	codeWrapper,
-	containsVisibleChars,
-	formatNumber,
-	deleteFile,
+  codeWrapper,
+  containsVisibleChars,
+  formatNumber,
+  deleteFile,
 };

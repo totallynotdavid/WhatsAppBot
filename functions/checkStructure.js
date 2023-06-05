@@ -26,16 +26,16 @@ function cleanFolder(directory, purpose) {
 
 function checkFolderStructure() {
   checkAndCreateFolder(audioDirectory, 'audio');
-	checkAndCreateFolder(videoDirectory, 'video')
+  checkAndCreateFolder(videoDirectory, 'video')
   checkAndCreateFolder(pdfDirectory, 'PDF');
-	checkAndCreateFolder(imgDirectory, 'images');
+  checkAndCreateFolder(imgDirectory, 'images');
 }
 
 function cleanFolderStructure() {
   cleanFolder(audioDirectory, 'audio');
-	cleanFolder(videoDirectory, 'video')
+  cleanFolder(videoDirectory, 'video')
   cleanFolder(pdfDirectory, 'PDF');
-	cleanFolder(imgDirectory, 'images');
+  cleanFolder(imgDirectory, 'images');
 }
 
 module.exports = {

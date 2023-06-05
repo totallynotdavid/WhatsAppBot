@@ -86,5 +86,5 @@ async function handleSpotifySongRequest(client, message, MessageMedia, query, st
 
 module.exports = {
   refreshAccessToken,
-	handleSpotifySongRequest,
+  handleSpotifySongRequest,
 };

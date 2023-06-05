@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { Configuration, OpenAIApi } = require('openai');
 
 const configuration = new Configuration({
@@ -30,7 +30,7 @@ const generateText = async (chatMessage) => {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
-      max_tokens: 100,
+      max_tokens: 75,
     });
     return completion.data.choices[0].message.content;
   } catch (error) {
@@ -47,6 +47,16 @@ const generateText = async (chatMessage) => {
   }
 }
 
+async function handleChatWithGPT(stringifyMessage, message, robotEmoji) {
+  if (stringifyMessage.length === 1) {
+    message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+  } else {
+    const chatMessage = stringifyMessage.slice(1).join(' ');
+    const chatResponse = await generateText(chatMessage);
+    message.reply(`${robotEmoji} ${chatResponse}`);
+  }
+}
+
 module.exports = {
-  generateText,
-};
+  handleChatWithGPT,
+}
