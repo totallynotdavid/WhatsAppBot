@@ -22,29 +22,38 @@ async function synthesizeSpeech(text, songId) {
       return filePath;
     }
   } catch (err) {
-    throw err.code;
+    console.error(err);
+    throw err;
   }
 }
 
+async function sendReply(message, replyText, robotEmoji) {
+  return message.reply(`${robotEmoji} ${replyText}`);
+}
+
 async function handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji) {
-  if (stringifyMessage.length === 1) {
-    message.reply(`${robotEmoji} Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`);
-  } else {
-    const textToSpeak = stringifyMessage.slice(1).join(' ');
+  if (stringifyMessage.length <= 1) {
+    return sendReply(message, "Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.", robotEmoji);
+  }
 
-    if (textToSpeak.length > 1000) {
-      return message.reply(`${robotEmoji} Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.`);
-    }
+  const textToSpeak = stringifyMessage.slice(1).join(' ');
 
-    const songId = Math.floor(Math.random() * 1000000);
+  if (textToSpeak.length > 1000) {
+    return sendReply(message, "Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.", robotEmoji);
+  }
 
-    try {
-      const filePath = await synthesizeSpeech(textToSpeak, songId)
-      const media = MessageMedia.fromFilePath(filePath);
-      await client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
+  const songId = Math.floor(Math.random() * 1000000);
+  let filePath;
+
+  try {
+    filePath = await synthesizeSpeech(textToSpeak, songId)
+    const media = MessageMedia.fromFilePath(filePath);
+    await client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
+  } catch (err) {
+    console.error(err);
+  } finally {
+    if(filePath) {
       await fs.unlink(filePath);
-    } catch (err) {
-      console.error(err);
     }
   }
 }
