@@ -35,8 +35,8 @@ async function handleTextToAudio(stringifyMessage, message, MessageMedia, client
   let textToSpeak = '';
 
   if (stringifyMessage.length <= 1) {
-    if (message.quotedMessage) {
-      textToSpeak = message.quotedMessage;
+    if (message.hasQuotedMsg) {
+      textToSpeak = message._data.quotedMsg.body;
     } else {
       return sendReply(message, 'Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.', robotEmoji);
     }
