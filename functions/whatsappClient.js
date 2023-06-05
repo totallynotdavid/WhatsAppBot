@@ -217,7 +217,6 @@ client.on('message_create', async message => {
     /* Check if the sender is an admin */
     const participantsArray = Object.values(chat.participants);
     const admins = participantsArray.filter(participant => participant.isAdmin);
-    // const isAdmin = admins.some(admin => admin.id._serialized === senderNumber); Use if (isAdmin)
 
     const quotedMessage = await message.getQuotedMessage();
     const ownerNumber = client.info.wid.user;
