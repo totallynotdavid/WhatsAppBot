@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-		"start:prod": "pm2 start index.js --cron-restart=\"*/12 * * * *\" && npm run logs",
+		"start:prod": "npm run clean:logs && pm2 start index.js --cron-restart=\"*/12 * * * *\" && npm run logs",
 		"logs": "nano ~/.pm2/logs/index-out.log",
     "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && npm run clean:session && npm i && npm run start:prod",
     "clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
