@@ -16,7 +16,7 @@ async function handleGoogleDriveDownloads(stringifyMessage, message, query, clie
 
         const media = await MessageMedia.fromFilePath(filePath);
         await client.sendMessage(message.id.remote, media, {
-          caption: 'PDF file',
+          caption: `${robotEmoji} Aquí tienes tu archivo.`,
         });
     
         await fs.unlink(filePath);
