@@ -32,14 +32,20 @@ async function sendReply(message, replyText, robotEmoji) {
 }
 
 async function handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji) {
+  let textToSpeak = '';
+
   if (stringifyMessage.length <= 1) {
-    return sendReply(message, "Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.", robotEmoji);
+    if (message.quotedMessage) {
+      textToSpeak = message.quotedMessage;
+    } else {
+      return sendReply(message, 'Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.', robotEmoji);
+    }
+  } else {
+    textToSpeak = stringifyMessage.slice(1).join(' ');
   }
 
-  const textToSpeak = stringifyMessage.slice(1).join(' ');
-
   if (textToSpeak.length > 1000) {
-    return sendReply(message, "Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.", robotEmoji);
+    return sendReply(message, 'Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.', robotEmoji);
   }
 
   const songId = Math.floor(Math.random() * 1000000);
