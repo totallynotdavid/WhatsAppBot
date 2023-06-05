@@ -1,6 +1,9 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const { exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
+const os = require('os');
 
 const latexTemplate = `
 \\documentclass[preview,border=2pt,convert={density=300,outext=.png}]{standalone}
@@ -16,14 +19,12 @@ const latexTemplate = `
 `;
 
 async function cleanUp() {
+  const folderPath = path.join(__dirname, '..', 'img');
+
   try {
-    const folderPath = path.join(__dirname, '..', 'img');
-    const files = fs.readdirSync(folderPath);
+    const files = await fs.readdir(folderPath);
 
-    for (const file of files) {
-      fs.unlinkSync(path.join(folderPath, file));
-    }
-
+    await Promise.all(files.map(file => fs.unlink(path.join(folderPath, file))));
   } catch (error) {
     console.error('Error cleaning up /img/ folder:', error);
   }
@@ -34,41 +35,27 @@ async function transformLatexToImage(message, client, MessageMedia, query, robot
 
   try {
     const latexDocument = latexTemplate.replace('%s', latexCode);
-    fs.writeFileSync(path.join(__dirname, '..', 'img', 'input.tex'), latexDocument);
+    const writePath = path.join(__dirname, '..', 'img', 'input.tex');
+    await fs.writeFile(writePath, latexDocument);
 
-    await executeCommand(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${path.join(__dirname, '..', 'img', 'input.tex')}`);
-    // on Windows: we use "magick convert" instead of "convert"
-    await executeCommand(
-      `convert -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`
-    );
+    await execPromise(`pdflatex -output-directory=${path.join(__dirname, '..', 'img')} -jobname=latex ${writePath}`);
+
+		// Check if OS is Windows, and change command accordingly
+    const convertCommand = os.platform() === 'win32' ? 'magick convert' : 'convert';
+
+		await execPromise(`${convertCommand} -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(__dirname, '../img/latex.pdf')} -quality 100 -define png:color-type=2 ${path.join(__dirname, '../img/latex.png')}`);
+		
 
     const media = MessageMedia.fromFilePath(path.join(__dirname, '..', 'img', 'latex.png'));
     await client.sendMessage(message.id.remote, media, {
       caption: `${robotEmoji} Generado por boTeX`,
     });
 
-    // Call the cleanUp function after sending the image
     await cleanUp();
   } catch (error) {
     console.error('Error:', error);
     message.reply(`${robotEmoji} Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.`);
   }
-}
-
-function executeCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error('Error executing command:', command);
-        console.error('Error:', error);
-        console.error('Output:', stdout);
-        console.error('Error output:', stderr);
-        reject(error);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
 }
 
 function handleLatexToImage(stringifyMessage, message, client, MessageMedia, robotEmoji) {
@@ -83,6 +70,5 @@ function handleLatexToImage(stringifyMessage, message, client, MessageMedia, rob
 }
 
 module.exports = {
-  transformLatexToImage,
   handleLatexToImage,
 };
