@@ -15,7 +15,7 @@ const logFunctionCall = require('./logFunctionCall');
 // Import logging utility
 let { 
   prefix, prefix_admin, robotEmoji,
-  paidUsers, /*physicsUsers,*/ premiumGroups, 
+  paidUsers, physicsUsers, premiumGroups, 
   commands, adminCommands,
 } = require('./globals');
 
@@ -25,9 +25,9 @@ const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 const subreddit = utilities.capitalizeText(fromisCommand);
 
 // Set function to update premium groups and users
-const setFetchedData = (fetchedPaidUsers, /*fetchedPhysicsUsers,*/ fetchedPremiumGroups) => {
+const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {
   paidUsers = fetchedPaidUsers;
-  // physicsUsers = fetchedPhysicsUsers;
+  physicsUsers = fetchedPhysicsUsers;
   premiumGroups = fetchedPremiumGroups;
 };
 
@@ -59,14 +59,15 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
+	console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
 });
 
 /* Commands */
 
 client.on('message_create', async message => {
+  let [contactInfo, chat] = await Promise.all([message.getContact(), message.getChat()]);
+	if (!chat.isGroup) return;
 
-  /* Method to get the name and number of a user */
-  const contactInfo = await message.getContact();
   const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
 
@@ -118,9 +119,6 @@ client.on('message_create', async message => {
   1.b Admin: The message is from a user who is a paid user
   */
 
-  let chat = await message.getChat();
-  if (!chat.isGroup) return;
-
   if (message.body.startsWith(prefix)) {
     if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return message.reply(`${robotEmoji} Lo siento, este grupo no está registrado. Para más información, contacta a David.`);
 
@@ -135,7 +133,8 @@ client.on('message_create', async message => {
     if (!(command in commands)) return;
 
     /* Get all the text after the command (yt & wiki) */
-    const query = message.body.split(' ').slice(1).join(' ');
+    const parts = message.body.split(' ').slice(1);
+    const query = parts.join(' ');
 
     switch (command) {
       case commands.help:
@@ -168,10 +167,9 @@ client.on('message_create', async message => {
       case commands.yt:
         functions.handleYoutubeSearch(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
         break;
-      case commands.play: {
+      case commands.play:
         functions.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
         break;
-      }
       case commands.say:
         functions.handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji);
         break;
@@ -220,6 +218,7 @@ client.on('message_create', async message => {
 
     const quotedMessage = await message.getQuotedMessage();
     const ownerNumber = client.info.wid.user;
+
     switch (command) {
       case adminCommands.help:
         functions.getAdminHelpMessage(prefix_admin, stringifyMessage, helpCommand, message, /*client, List,*/ robotEmoji);
