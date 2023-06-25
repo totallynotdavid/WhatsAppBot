@@ -86,7 +86,7 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
 
     /* Logging all messages received to Supabase */
-    // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
+    supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
 
     if (!(command in commands)) return;
 
