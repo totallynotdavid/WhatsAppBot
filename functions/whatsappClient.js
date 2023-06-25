@@ -77,7 +77,7 @@ client.on('message_create', async message => {
   */
 
   if (message.body.startsWith(prefix)) {
-		// Bug: this also gets triggered if a user sends a location
+    // Bug: this also gets triggered if a user sends a location
     if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return;
 
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
@@ -86,7 +86,7 @@ client.on('message_create', async message => {
     const command = stringifyMessage[0].split(prefix)[1];
 
     /* Logging all messages received to Supabase */
-    supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
+    // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
 
     if (!(command in commands)) return;
 

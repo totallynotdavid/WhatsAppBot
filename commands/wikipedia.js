@@ -31,7 +31,7 @@ async function getWikiArticle(message, query, languageCode, senderName, client, 
       const linksMessage = filteredLinks.map(link => `• ${link.title} - https://${languageCode}.wikipedia.org/wiki/${link.title.replace(/ /g, '_')}`).join('\n');
       
       message.reply(`🤖 ${senderName}, tu búsqueda dio resultados ambiguos, aquí están los posibles artículos que puedes considerar:\n${linksMessage}`);
-      message.reply(`🤖 Te mandaremos el primer resultado en unos momentos.`)
+      message.reply('🤖 Te mandaremos el primer resultado en unos momentos.')
 
       const firstResultQuery = filteredLinks[0].title;
       const firstResultUrl = BASE_WIKI_API_URL.replace('{lang}', languageCode).replace('{query}', firstResultQuery);
@@ -41,18 +41,18 @@ async function getWikiArticle(message, query, languageCode, senderName, client, 
     };
 
     const handleNotFound = async () => {
-			if (searchData.query.searchinfo.totalhits === 0) {
-				message.reply(`🤖 ${senderName}, tu búsqueda no dió resultados.`);
-			} else {
-				const similarArticles = searchData.query.search;
-				const firstSimilarArticleTitle = similarArticles[0].title.replace(/ /g, '_');
-				
-				const similarArticleUrl = BASE_WIKI_API_URL.replace('{lang}', languageCode).replace('{query}', firstSimilarArticleTitle);
-				const similarArticleData = await fetchJson(similarArticleUrl);
-		
-				await handleSuccess(similarArticleData);
-			}
-		};
+      if (searchData.query.searchinfo.totalhits === 0) {
+        message.reply(`🤖 ${senderName}, tu búsqueda no dió resultados.`);
+      } else {
+        const similarArticles = searchData.query.search;
+        const firstSimilarArticleTitle = similarArticles[0].title.replace(/ /g, '_');
+
+        const similarArticleUrl = BASE_WIKI_API_URL.replace('{lang}', languageCode).replace('{query}', firstSimilarArticleTitle);
+        const similarArticleData = await fetchJson(similarArticleUrl);
+
+        await handleSuccess(similarArticleData);
+      }
+    };
 
     const handleSuccess = async (data) => {
       const summary = `🤖 *${data.title}*: ${data.extract}`;
