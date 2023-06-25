@@ -77,7 +77,8 @@ client.on('message_create', async message => {
   */
 
   if (message.body.startsWith(prefix)) {
-    if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return message.reply(`${robotEmoji} Lo siento, este grupo no está registrado. Para más información, contacta a David.`);
+		// Bug: this also gets triggered if a user sends a location
+    if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return;
 
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
     let stringifyMessage = message.body.trim().split(/\s+/);
