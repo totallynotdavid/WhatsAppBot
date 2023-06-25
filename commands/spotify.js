@@ -36,7 +36,7 @@ async function getSongData(url) {
       },
     });
     const data = await res.json();
-    return data.tracks.items[0];
+    return data.tracks.items;
   } catch (error) {
     console.error('Error getting song data:', error);
     return null;
@@ -69,17 +69,29 @@ async function sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji)
 }
 
 async function handleSpotifySongRequest(client, message, MessageMedia, query, stringifyMessage, robotEmoji) {
-  const song = await getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`);
+  const songs = await getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=5`);
 
   if (stringifyMessage.length === 1) {
     message.reply(`${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`);
   } else {
-    const audioDownloaded = await downloadSpotifyAudio(song);
+    let audioDownloaded = false;
+    let selectedSong = null;
+    let tries = 0;
 
-    if (audioDownloaded) {
-      await sendSpotifyAudio(MessageMedia, client, message, song, robotEmoji);
+    for (const song of songs) {
+      tries++;
+      audioDownloaded = await downloadSpotifyAudio(song);
+      if (audioDownloaded) {
+        selectedSong = song;
+        break;
+      } 
+    }
+
+    if (audioDownloaded && selectedSong) {
+      message.reply(`${robotEmoji} Oh, encontramos tu canción después de ${tries} intentos. Spotify no tenía una vista previa para las primeras ${tries-1} canciones. ¿Quizás esta sea la canción? Puede que no sea exacta: ${selectedSong.name} - ${selectedSong.artists[0].name}`);
+      await sendSpotifyAudio(MessageMedia, client, message, selectedSong, robotEmoji);
     } else {
-      message.reply(`${robotEmoji} Houston, tenemos un problema. Intenta de nuevo.`);
+      message.reply(`${robotEmoji} Oh, encontramos tu canción y lo intentamos ${tries} veces, pero Spotify no tenía una vista previa disponible.`);
     }
   }
 }
