@@ -176,6 +176,20 @@ async function disableBot(message, groupId, robotEmoji) {
   return Promise.resolve();
 }
 
+async function hasValidSpecialDay(groupId) {
+  const groupData = await supabaseCommunicationModule.searchSpecialDay(groupId);
+
+  if (groupData && groupData.special_day_expiry) {
+    const now = new Date();
+    const specialDayExpiry = new Date(groupData.special_day_expiry);
+    const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const expiryUtc = Date.UTC(specialDayExpiry.getUTCFullYear(), specialDayExpiry.getUTCMonth(), specialDayExpiry.getUTCDate());
+
+    return nowUtc <= expiryUtc;
+  }
+  return false;
+}
+
 module.exports = {
   handleBanUserFromGroup,
   handlePromoteUsersToAdmins,
@@ -183,4 +197,5 @@ module.exports = {
   handleJoinGroupRequest,
   handleDeleteMessage,
   handleToggleBotActivation,
+	hasValidSpecialDay,
 };
