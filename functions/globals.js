@@ -25,7 +25,7 @@ const commands  = {
   author: 'author',
   doc: 'doc',
   drive: 'drive',
-	chat: 'chat',
+  chat: 'chat',
 }
 
 const adminCommands = {

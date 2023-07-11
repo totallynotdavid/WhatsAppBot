@@ -149,13 +149,13 @@ client.on('message_create', async message => {
       case commands.drive:
         docdown.handleGoogleDriveDownloads(stringifyMessage, message, query, client, MessageMedia, robotEmoji)
         break;
-			case commands.chat:
-				if (await groups.hasValidSpecialDay(chat.id._serialized)) {
-					openai.handleChatWithGPT(stringifyMessage, message, robotEmoji);
-				} else {
-					message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
-				}
-				break;
+      case commands.chat:
+        if (await groups.hasValidSpecialDay(chat.id._serialized)) {
+          openai.handleChatWithGPT(stringifyMessage, message, robotEmoji);
+        } else {
+          message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
+        }
+        break;
       default:
         break;
     }

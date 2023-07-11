@@ -197,5 +197,5 @@ module.exports = {
   handleJoinGroupRequest,
   handleDeleteMessage,
   handleToggleBotActivation,
-	hasValidSpecialDay,
+  hasValidSpecialDay,
 };
