@@ -88,7 +88,7 @@ async function handleSpotifySongRequest(client, message, MessageMedia, query, st
     }
 
     if (audioDownloaded && selectedSong) {
-      message.reply(`${robotEmoji} Oh, encontramos tu canción después de ${tries} intentos. Spotify no tenía una vista previa para las primeras ${tries-1} canciones. ¿Quizás esta sea la canción? Puede que no sea exacta: ${selectedSong.name} - ${selectedSong.artists[0].name}`);
+      message.reply(`${robotEmoji} La canción que encontramos es: *${selectedSong.name}* - *${selectedSong.artists[0].name}*`);
       await sendSpotifyAudio(MessageMedia, client, message, selectedSong, robotEmoji);
     } else {
       message.reply(`${robotEmoji} Oh, encontramos tu canción y lo intentamos ${tries} veces, pero Spotify no tenía una vista previa disponible.`);
