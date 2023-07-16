@@ -19,6 +19,8 @@ const refreshData = async () => {
     database.fetchDataFromTable('premium_groups', 'group_id', 'contact_number', 'isActive'),
   ]);
 
+  const validPremiumUsers = paidUsers.filter(({ premium_expiry }) => new Date(premium_expiry) > Date.now());
+
   const expiredPremiumUsers = paidUsers.filter(({ premium_expiry }) => new Date(premium_expiry) < Date.now())
     .map(({ phone_number }) => phone_number);
 
@@ -26,7 +28,7 @@ const refreshData = async () => {
     await database.updateTable('premium_groups', { isActive: false }, 'contact_number', expiredPremiumUsers);
   }
 
-  whatsappClient.setFetchedData(paidUsers, physicsUsers, premiumGroups);
+  whatsappClient.setFetchedData(validPremiumUsers, physicsUsers, premiumGroups);
 
   const lastCheck = new Date().toISOString();
   await database.updateTable('app_metadata', { lastCheck }, null, null, { column: 'id', value: 1 });

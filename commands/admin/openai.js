@@ -1,6 +1,7 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { Configuration, OpenAIApi } = require('openai');
+const supabaseCommunicationModule = require('../../lib/api/supabaseCommunicationModule.js');
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,7 +10,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 function checkAndModifyUserMessage(userMessage) {
-  const maxLength = 500;
+  const maxLength = 550;
 
   if (userMessage.length > maxLength) {
     userMessage = userMessage.substring(0, maxLength) + '...';
@@ -18,11 +19,12 @@ function checkAndModifyUserMessage(userMessage) {
   return userMessage;
 }
 
-const generateText = async (chatMessage) => {
+const generateText = async (chatMessage, previousMessages) => {
   const userMessageContent = checkAndModifyUserMessage(chatMessage);
 
   const messages = [
-    { role: 'system', content: 'You are a helpful assistant. Use Spanish. Avoid generating inappropriate content.' },
+    { role: 'system', content: 'You are a helpful and concise assistant. Use Spanish. Avoid generating inappropriate content.' },
+    ...previousMessages,
     { role: 'user', content: userMessageContent },
   ];
 
@@ -30,7 +32,7 @@ const generateText = async (chatMessage) => {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
-      max_tokens: 75,
+      max_tokens: 280,
     });
     return completion.data.choices[0].message.content;
   } catch (error) {
@@ -47,14 +49,29 @@ const generateText = async (chatMessage) => {
   }
 }
 
-async function handleChatWithGPT(stringifyMessage, message, robotEmoji) {
-  if (stringifyMessage.length === 1) {
-    message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
-  } else {
+async function handleChatWithGPT(stringifyMessage, message, senderNumber, group, query) {
+  let previousMessages = [];
+  let chatResponse = '';
+
+  try {
+    previousMessages = await supabaseCommunicationModule.fetchLastNMessages(
+      senderNumber,
+      group,
+      3 * 2 - 1, // Decrease by 1 as the new message from the user will be added later
+    );
+
     const chatMessage = stringifyMessage.slice(1).join(' ');
-    const chatResponse = await generateText(chatMessage);
-    message.reply(`${robotEmoji} ${chatResponse}`);
+    chatResponse = await generateText(chatMessage, previousMessages);
+
+    await Promise.all([
+      supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
+      supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant'), // Assistant's response
+    ]);
+  } catch (error) {
+    console.error(`Error in handleChatWithGPT: ${error.message}`);
   }
+
+  return chatResponse;
 }
 
 module.exports = {

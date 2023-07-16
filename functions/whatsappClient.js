@@ -85,10 +85,10 @@ client.on('message_create', async message => {
 
     const command = stringifyMessage[0].split(prefix)[1];
 
-    /* Logging all messages received to Supabase */
-    // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to);
-
     if (!(command in commands)) return;
+
+    /* Logging all commands received to Supabase */
+    // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to, 'users');
 
     /* Get all the text after the command (yt & wiki) */
     const parts = message.body.split(' ').slice(1);
@@ -178,12 +178,18 @@ client.on('message_create', async message => {
       return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
     }
 
-    /* Check if the sender is an admin */
+    /* Check if the sender is an admin of the group */
     const participantsArray = Object.values(chat.participants);
     const admins = participantsArray.filter(participant => participant.isAdmin);
 
     const quotedMessage = await message.getQuotedMessage();
     const ownerNumber = client.info.wid.user;
+
+    /* Get all the text after the command */
+    const parts = message.body.split(' ').slice(1);
+    const query = parts.join(' ') || '';
+    // Group number is used to identify the chat in the database
+    const groupNumber = chat.id._serialized;
 
     switch (command) {
       case adminCommands.help:
@@ -220,7 +226,12 @@ client.on('message_create', async message => {
         groups.handleDemoteUsersToParticipants(admins, message, stringifyMessage, quotedMessage, chat, client, robotEmoji);
         break;
       case adminCommands.chat:
-        openai.handleChatWithGPT(stringifyMessage, message, robotEmoji);
+        if (query.length > 1) {
+          const chatResponse = await openai.handleChatWithGPT(stringifyMessage, message, senderNumber, groupNumber, query);
+          message.reply(`${robotEmoji} ${chatResponse}`);
+        } else {
+          message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+        }
         break;
       default:
         break;

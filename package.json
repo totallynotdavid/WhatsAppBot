@@ -1,6 +1,6 @@
 {
   "name": "whatsapp-bot",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "description": "Un bot de WhatsApp multifuncional.",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "clean:packages": "shx rm -rf node_modules package-lock.json",
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
-    "lint:fix": "eslint commands functions lib index.js --fix",
+    "lint:fix": "eslint --fix commands functions lib index.js",
     "postinstall": "npm i shx -g"
   },
   "author": "totallynotdavid",
@@ -21,21 +21,23 @@
 	"engines": {
 		"node": ">=16.0.0"
 	},
-  "devDependencies": {
-    "@google-cloud/local-auth": "^2.1.0",
+	"dependencies": {
+		"@google-cloud/local-auth": "^2.1.0",
     "@supabase/supabase-js": "^2.7.1",
     "aws-sdk": "^2.1386.0",
     "dotenv": "^16.0.3",
-    "eslint": "^8.42.0",
-    "facebook-nodejs-business-sdk": "^16.0.2",
-    "googleapis": "^105.0.0",
-    "moment": "^2.29.4",
+		"googleapis": "^105.0.0",
+		"moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "openai": "^3.2.1",
     "qrcode-terminal": "^0.12.0",
-    "shx": "^0.3.4",
-    "spotify-web-api-node": "^5.0.2",
+		"spotify-web-api-node": "^5.0.2",
     "sqlite3": "^5.1.6",
     "whatsapp-web.js": "^1.21.0"
+	},
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "facebook-nodejs-business-sdk": "^16.0.2",
+    "shx": "^0.3.4"
   }
 }
