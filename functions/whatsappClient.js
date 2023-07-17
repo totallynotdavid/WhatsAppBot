@@ -239,7 +239,7 @@ client.on('message_create', async message => {
         break;
     }
 
-    message.react('🔱');
+    message.react('✅');
   }
 
 });
