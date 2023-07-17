@@ -80,7 +80,10 @@ async function handleChatWithGPT(stringifyMessage, message, senderNumber, group,
         supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant'), // Assistant's response
       ]);
     } else {
-      await supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'); // Only User's message
+      await Promise.all([
+        supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
+        supabaseCommunicationModule.addGPTConversations(senderNumber, 'Assistant did not have a response.', group, 'gpt_messages', 'assistant'), // Placeholder response
+      ]);
     }
   } catch (error) {
     console.error(`Error in handleChatWithGPT: ${error.message}`);
