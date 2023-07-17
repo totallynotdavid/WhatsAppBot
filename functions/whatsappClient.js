@@ -67,6 +67,11 @@ client.on('message_create', async message => {
 
   const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
+	const groupNumber = chat.id._serialized;
+
+	/* Get all the text after the command (yt & wiki & chat) */
+	const parts = message.body.split(' ').slice(1);
+	const query = parts.join(' ');
 
   /*
   The checks are done in order of importance
@@ -78,7 +83,7 @@ client.on('message_create', async message => {
 
   if (message.body.startsWith(prefix)) {
     // Bug: this also gets triggered if a user sends a location
-    if (!premiumGroups.some(group => group.group_id === chat.id._serialized && group.isActive)) return;
+    if (!premiumGroups.some(group => group.group_id === groupNumber && group.isActive)) return;
 
     /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
     let stringifyMessage = message.body.trim().split(/\s+/);
@@ -89,10 +94,6 @@ client.on('message_create', async message => {
 
     /* Logging all commands received to Supabase */
     // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to, 'users');
-
-    /* Get all the text after the command (yt & wiki) */
-    const parts = message.body.split(' ').slice(1);
-    const query = parts.join(' ');
 
     switch (command) {
       case commands.help:
@@ -150,11 +151,18 @@ client.on('message_create', async message => {
         docdown.handleGoogleDriveDownloads(stringifyMessage, message, query, client, MessageMedia, robotEmoji)
         break;
       case commands.chat:
-        if (await groups.hasValidSpecialDay(chat.id._serialized)) {
-          openai.handleChatWithGPT(stringifyMessage, message, robotEmoji);
-        } else {
-          message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
-        }
+				if (query.length <= 1) {
+					message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+					return;
+				}
+
+				if (!await groups.hasValidSpecialDay(groupNumber)) {
+					message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
+					return;
+				}
+
+				const chatResponse = await openai.handleChatWithGPT(senderNumber, groupNumber, query);
+				message.reply(`${robotEmoji} ${chatResponse}`);				
         break;
       default:
         break;
@@ -184,12 +192,6 @@ client.on('message_create', async message => {
 
     const quotedMessage = await message.getQuotedMessage();
     const ownerNumber = client.info.wid.user;
-
-    /* Get all the text after the command */
-    const parts = message.body.split(' ').slice(1);
-    const query = parts.join(' ') || '';
-    // Group number is used to identify the chat in the database
-    const groupNumber = chat.id._serialized;
 
     switch (command) {
       case adminCommands.help:
@@ -227,7 +229,7 @@ client.on('message_create', async message => {
         break;
       case adminCommands.chat:
         if (query.length > 1) {
-          const chatResponse = await openai.handleChatWithGPT(stringifyMessage, message, senderNumber, groupNumber, query);
+          const chatResponse = await openai.handleChatWithGPT(senderNumber, groupNumber, query);
           message.reply(`${robotEmoji} ${chatResponse}`);
         } else {
           message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);

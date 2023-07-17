@@ -1,4 +1,5 @@
 const path = require('path');
+const { get } = require('lodash');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const { Configuration, OpenAIApi } = require('openai');
 const supabaseCommunicationModule = require('../../lib/api/supabaseCommunicationModule.js');
@@ -9,87 +10,97 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-function checkAndModifyUserMessage(userMessage) {
-  const maxLength = 550;
+const MAX_USER_MSG_LENGTH = 250;
+const MAX_TOKENS = 200;
+const MAX_CONVERSATION_LENGTH = 1250;
 
-  if (userMessage.length > maxLength) {
-    userMessage = userMessage.substring(0, maxLength) + '...';
-  }
-
-  return userMessage;
+function trimUserMessage(userMessage, maxLength = MAX_USER_MSG_LENGTH) {
+  return userMessage.length > maxLength
+    ? `${userMessage.substring(0, maxLength)}...`
+    : userMessage;
 }
 
-const generateText = async (chatMessage, previousMessages) => {
-  const userMessageContent = checkAndModifyUserMessage(chatMessage);
-
-  const messages = [
-    { role: 'system', content: 'You are a helpful and concise assistant. Use Spanish. Avoid generating inappropriate content.' },
-    ...previousMessages,
-    { role: 'user', content: userMessageContent },
-  ];
-
+async function callOpenAI(apiMethod, options) {
   try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages,
-      max_tokens: 250,
-    });
+    const result = await openai[apiMethod](options);
+    const contentPath = apiMethod === 'createCompletion' ? 'choices[0].text' : 'choices[0].message.content';
 
-    // Return null if the API call returns an unexpected response
-    if (completion.data.choices && completion.data.choices[0] && completion.data.choices[0].message) {
-      return completion.data.choices[0].message.content;
-    } else {
+    if (!result.data || !get(result.data, contentPath)) {
+      console.error('OpenAI response does not contain expected data');
       return null;
     }
+    return get(result, `data.${contentPath}`);
   } catch (error) {
-    if (error.response) {
-      if (error.response.status === 429) {
-        console.error(`OpenAI API rate limit exceeded: ${error.response.data}`);
-        return 'Lo siento, hemos alcanzado nuestro límite de capacidad para hoy. Por favor, intenta de nuevo más tarde.';
-      } else {
-        console.error(error.response.status, error.response.data);
-      }
-    } else {
-      console.error(`Error with OpenAI API request: ${error.message}`);
-    }
+    console.error(`Error with OpenAI API request: ${error.message}`);
     return null;
   }
 }
 
-async function handleChatWithGPT(stringifyMessage, message, senderNumber, group, query) {
-  let previousMessages = [];
-  let chatResponse = '';
-
+const handleChatWithGPT = async (senderNumber, group, query) => {
   try {
-    previousMessages = await supabaseCommunicationModule.fetchLastNMessages(
+    let previousMessages = await supabaseCommunicationModule.fetchLastNMessages(
       senderNumber,
       group,
-      3 * 2 - 1, // Decrease by 1 as the new message from the user will be added later
+      3 * 2 - 1, // Fetch 5 messages from the database + 1 sent by the user
     );
 
-    // Filter out previous messages that have null content (retrocompatibility)
-    previousMessages = previousMessages.filter(m => m.content !== null);
+    const flattenedMessages = previousMessages.flat();
+    const totalLength = flattenedMessages.reduce((total, msg) => total + msg.content.length, 0);
 
-    const chatMessage = stringifyMessage.slice(1).join(' ');
-    chatResponse = await generateText(chatMessage, previousMessages);
+    if (totalLength > MAX_CONVERSATION_LENGTH) {
+      const promptForSummary = flattenedMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+      const summary = await callOpenAI('createCompletion', {
+        model: 'text-davinci-003',
+        prompt: `Summarize 🗣️ in > 15 words:\n${promptForSummary}`,
+        max_tokens: 50,
+      });
 
-    // Fix: If response is null, don't add it to the database
-    if (chatResponse !== null) {
-      await Promise.all([
-        supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
-        supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant'), // Assistant's response
-      ]);
-    } else {
-      await Promise.all([
-        supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
-        supabaseCommunicationModule.addGPTConversations(senderNumber, 'Assistant did not have a response.', group, 'gpt_messages', 'assistant'), // Placeholder response
-      ]);
+      if (summary) {
+        await supabaseCommunicationModule.addGPTConversations(senderNumber, summary, group, 'gpt_messages', 'system');
+        previousMessages = [{ role: 'system', content: summary }];
+      }
     }
+
+    let nonSummaryMessages;
+    let summaryMessage;
+
+    if (Array.isArray(previousMessages[previousMessages.length - 1])) {
+      nonSummaryMessages = previousMessages.slice(0, -1).flat(Infinity);
+      summaryMessage = previousMessages[previousMessages.length - 1].flat(Infinity);
+    } else {
+      nonSummaryMessages = previousMessages.slice(0, -1).flat(Infinity);
+      summaryMessage = [previousMessages[previousMessages.length - 1]];
+    }
+
+    const chatMessage = trimUserMessage(query);
+
+    const messages = [
+      { role: 'system', content: 'Act as a succinct assistant. Talk in Spanish. No inappropriate content. 🗣️: ' },
+      ...nonSummaryMessages,
+      ...summaryMessage,
+      { role: 'user', content: chatMessage },
+    ];
+
+    let chatResponse = await callOpenAI('createChatCompletion', {
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+      max_tokens: MAX_TOKENS,
+    });
+
+    if (chatResponse !== null) {
+      await supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages');
+      await supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant');
+    } else {
+      await supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages');
+      await supabaseCommunicationModule.addGPTConversations(senderNumber, 'Assistant did not have a response.', group, 'gpt_messages', 'assistant');
+    }
+
+    return chatResponse;
   } catch (error) {
     console.error(`Error in handleChatWithGPT: ${error.message}`);
+    console.error(error.stack);
+    return null;
   }
-
-  return chatResponse;
 }
 
 module.exports = {
