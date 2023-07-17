@@ -22,10 +22,10 @@ function trimUserMessage(userMessage, maxLength = MAX_USER_MSG_LENGTH, trimFromS
   let trimmedMessage;
 
   if (trimFromStart) { // example: "Hello world" -> "llo world..."
-		trimmedMessage = userMessage.substring(userMessage.length - maxLength);
+    trimmedMessage = userMessage.substring(userMessage.length - maxLength);
   } else { // example: "Hello world" -> "Hello wo..."
     trimmedMessage = userMessage.substring(0, maxLength);
-		trimmedMessage = trimmedMessage+'...';
+    trimmedMessage = trimmedMessage+'...';
   }
 
   return `${trimmedMessage}`;
@@ -60,7 +60,7 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
 
     if (totalLength > MAX_CONVERSATION_LENGTH) {
       const promptForSummary = flattenedMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
-			const trimmedMessage = trimUserMessage(promptForSummary, 500, true);
+      const trimmedMessage = trimUserMessage(promptForSummary, 500, true);
       const summary = await callOpenAI('createCompletion', {
         model: 'text-davinci-003',
         prompt: `Summarize 🗣️ in > 15 words:\n${trimmedMessage}`,

@@ -56,7 +56,7 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-  // console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
+  console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
 });
 
 /* Commands */
@@ -67,11 +67,11 @@ client.on('message_create', async message => {
 
   const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
   const senderNumber = message.id.participant || message.id.remote;
-	const groupNumber = chat.id._serialized;
+  const groupNumber = chat.id._serialized;
 
-	/* Get all the text after the command (yt & wiki & chat) */
-	const parts = message.body.split(' ').slice(1);
-	const query = parts.join(' ');
+  /* Get all the text after the command (yt & wiki & chat) */
+  const parts = message.body.split(' ').slice(1);
+  const query = parts.join(' ');
 
   /*
   The checks are done in order of importance
@@ -151,18 +151,18 @@ client.on('message_create', async message => {
         docdown.handleGoogleDriveDownloads(stringifyMessage, message, query, client, MessageMedia, robotEmoji)
         break;
       case commands.chat:
-				if (query.length <= 1) {
-					message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
-					return;
-				}
+        if (query.length <= 1) {
+          message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+          return;
+        }
 
-				if (!await groups.hasValidSpecialDay(groupNumber)) {
-					message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
-					return;
-				}
-
-				const chatResponse = await openai.handleChatWithGPT(senderNumber, groupNumber, query);
-				message.reply(`${robotEmoji} ${chatResponse}`);				
+        if (!await groups.hasValidSpecialDay(groupNumber)) {
+          message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`);
+          return;
+        }
+        /* eslint-disable no-case-declarations */ 
+        const chatResponse = await openai.handleChatWithGPT(senderNumber, groupNumber, query);
+        message.reply(`${robotEmoji} ${chatResponse}`);
         break;
       default:
         break;
