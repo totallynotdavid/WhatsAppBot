@@ -6,7 +6,6 @@ const lyrics = require('./lyrics');
 const amazon = require('./amazon');
 const help = require('./help');
 const cae = require('./cae');
-const openai = require('./openai');
 const wikipedia = require('./wikipedia');
 const reddit = require('./reddit');
 const utilities = require('./utilities');
@@ -25,7 +24,6 @@ module.exports = {
   amazon,
   help,
   cae,
-  openai,
   wikipedia,
   reddit,
   utilities,
