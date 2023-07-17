@@ -36,7 +36,7 @@
   },
 	{
 		"command": "say",
-		"message": "Haz que el bot diga lo que quieras",
+		"message": "Haz que el bot diga lo que quieras. Las voces disponibles son: 'Ricardo', 'Conchita', 'Lucia', 'Enrique', 'Sergio', 'Mia', 'Andres', 'Lupe', 'Penelope', 'Miguel', 'Pedro'. Ricardo es la voz en portugués.",
 		"usage": "say Hola, soy un bot"
 	},
   {
