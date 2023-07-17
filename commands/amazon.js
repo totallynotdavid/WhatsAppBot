@@ -1,24 +1,24 @@
-const AWS = require('aws-sdk')
-const fs = require('fs').promises;
-const path = require('path')
+const { PollyClient, SynthesizeSpeechCommand } = require("@aws-sdk/client-polly");
+const fs = require("fs");
+const path = require("path");
 
-AWS.config.update({region: 'us-east-1'})
-
-const Polly = new AWS.Polly({apiVersion: '2016-06-10'})
+const REGION = "us-east-1";
+const client = new PollyClient({ region: REGION });
 
 async function synthesizeSpeech(text, songId) {
-  let params = {
-    'Text': text,
-    'OutputFormat': 'mp3',
-    'VoiceId': 'Ricardo',
-  }
+  const params = {
+    Text: text,
+    OutputFormat: 'mp3',
+    VoiceId: 'Ricardo',
+  };
 
   try {
-    const data = await Polly.synthesizeSpeech(params).promise();
-    
-    if (data && data.AudioStream instanceof Buffer) {
+    const command = new SynthesizeSpeechCommand(params);
+    const data = await client.send(command);
+
+    if (data.AudioStream) {
       const filePath = path.join(__dirname, `../audio/${songId}.mp3`);
-      await fs.writeFile(filePath, data.AudioStream, 'binary');
+      await fs.promises.writeFile(filePath, data.AudioStream);
       return filePath;
     }
   } catch (err) {
@@ -59,7 +59,7 @@ async function handleTextToAudio(stringifyMessage, message, MessageMedia, client
     console.error(err);
   } finally {
     if(filePath) {
-      await fs.unlink(filePath);
+      await fs.promises.unlink(filePath);
     }
   }
 }
