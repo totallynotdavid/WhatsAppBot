@@ -32,9 +32,15 @@ const generateText = async (chatMessage, previousMessages) => {
     const completion = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
-      max_tokens: 280,
+      max_tokens: 250,
     });
-    return completion.data.choices[0].message.content;
+
+    // Return null if the API call returns an unexpected response
+    if (completion.data.choices && completion.data.choices[0] && completion.data.choices[0].message) {
+      return completion.data.choices[0].message.content;
+    } else {
+      return null;
+    }
   } catch (error) {
     if (error.response) {
       if (error.response.status === 429) {
@@ -46,6 +52,7 @@ const generateText = async (chatMessage, previousMessages) => {
     } else {
       console.error(`Error with OpenAI API request: ${error.message}`);
     }
+    return null;
   }
 }
 
@@ -60,13 +67,21 @@ async function handleChatWithGPT(stringifyMessage, message, senderNumber, group,
       3 * 2 - 1, // Decrease by 1 as the new message from the user will be added later
     );
 
+    // Filter out previous messages that have null content (retrocompatibility)
+    previousMessages = previousMessages.filter(m => m.content !== null);
+
     const chatMessage = stringifyMessage.slice(1).join(' ');
     chatResponse = await generateText(chatMessage, previousMessages);
 
-    await Promise.all([
-      supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
-      supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant'), // Assistant's response
-    ]);
+    // Fix: If response is null, don't add it to the database
+    if (chatResponse !== null) {
+      await Promise.all([
+        supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'), // User's message
+        supabaseCommunicationModule.addGPTConversations(senderNumber, chatResponse, group, 'gpt_messages', 'assistant'), // Assistant's response
+      ]);
+    } else {
+      await supabaseCommunicationModule.addGPTConversations(senderNumber, query, group, 'gpt_messages'); // Only User's message
+    }
   } catch (error) {
     console.error(`Error in handleChatWithGPT: ${error.message}`);
   }
