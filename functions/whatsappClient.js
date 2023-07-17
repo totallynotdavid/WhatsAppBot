@@ -10,9 +10,9 @@ const newFunctions = require('../lib/functions/index.js');
 const { groups, db, mentions, openai } = require('../commands/admin/index.js')
 
 // Import global variables
-let { 
+let {
   prefix, prefix_admin, robotEmoji,
-  paidUsers, physicsUsers, premiumGroups, 
+  paidUsers, physicsUsers, premiumGroups,
   commands, adminCommands,
 } = require('./globals');
 
@@ -56,7 +56,7 @@ client.on('auth_failure', authFailureMessage => {
 
 client.on('ready', () => {
   console.log('Estamos listos, ¡el bot está en linea!');
-  console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
+  // console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`);
 });
 
 /* Commands */

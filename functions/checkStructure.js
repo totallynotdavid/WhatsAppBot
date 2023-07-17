@@ -18,7 +18,7 @@ function checkAndCreateFolder(directory, purpose) {
 function cleanFolder(directory, purpose) {
   try {
     readdirSync(directory).forEach(f => rmSync(`${directory}/${f}`));
-    console.log(`Cleaned [${directory}] folder. This is to avoid accumulating ${purpose} files.`);
+    // console.log(`Cleaned [${directory}] folder. This is to avoid accumulating ${purpose} files.`);
   } catch (error) {
     console.error(`Error cleaning ${purpose} folder:`, error);
   }
