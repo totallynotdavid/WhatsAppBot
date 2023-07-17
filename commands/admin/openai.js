@@ -10,14 +10,25 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const MAX_USER_MSG_LENGTH = 250;
-const MAX_TOKENS = 200;
-const MAX_CONVERSATION_LENGTH = 1250;
+const MAX_USER_MSG_LENGTH = 200;
+const MAX_TOKENS = 250;
+const MAX_CONVERSATION_LENGTH = 1350;
 
-function trimUserMessage(userMessage, maxLength = MAX_USER_MSG_LENGTH) {
-  return userMessage.length > maxLength
-    ? `${userMessage.substring(0, maxLength)}...`
-    : userMessage;
+function trimUserMessage(userMessage, maxLength = MAX_USER_MSG_LENGTH, trimFromStart = false) {
+  if (userMessage.length <= maxLength) {
+    return userMessage;
+  }
+
+  let trimmedMessage;
+
+  if (trimFromStart) { // example: "Hello world" -> "llo world..."
+		trimmedMessage = userMessage.substring(userMessage.length - maxLength);
+  } else { // example: "Hello world" -> "Hello wo..."
+    trimmedMessage = userMessage.substring(0, maxLength);
+		trimmedMessage = trimmedMessage+'...';
+  }
+
+  return `${trimmedMessage}`;
 }
 
 async function callOpenAI(apiMethod, options) {
@@ -49,9 +60,10 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
 
     if (totalLength > MAX_CONVERSATION_LENGTH) {
       const promptForSummary = flattenedMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n');
+			const trimmedMessage = trimUserMessage(promptForSummary, 500, true);
       const summary = await callOpenAI('createCompletion', {
         model: 'text-davinci-003',
-        prompt: `Summarize 🗣️ in > 15 words:\n${promptForSummary}`,
+        prompt: `Summarize 🗣️ in > 15 words:\n${trimmedMessage}`,
         max_tokens: 50,
       });
 
