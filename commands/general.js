@@ -191,6 +191,12 @@ function getVideoFilename(stdout) {
   return match ? match[1] : null;
 }
 
+/**
+ * Fetches data from the YouTube API for a given URL.
+ * 
+ * @param {string} url - The URL to fetch data from.
+ * @returns {Object} - An object containing title, thumbnailUrl, channelTitle, viewCount, and likeCount.
+ */
 async function fetchYoutubeData(url) {
   const response = await fetch(url);
   const data = await response.json();
@@ -206,6 +212,16 @@ async function fetchYoutubeData(url) {
   return { title, thumbnailUrl, channelTitle, viewCount, likeCount };
 }
 
+/**
+ * Retrieves and sends YouTube information as a media message.
+ * 
+ * @param {Object} message - The message object from the chat client.
+ * @param {Object} client - The client instance for interacting with the chat API.
+ * @param {Object} MessageMedia - The MessageMedia instance for sending media messages.
+ * @param {string} query - The YouTube query (could be a video, playlist, channel, or user).
+ * @param {string} youtubeType - The type of YouTube entity (could be "videos", "playlists", "channels", or "users").
+ * @returns {Array} - Array containing media, caption text, link.
+ */
 async function getYoutubeInformation(message, client, MessageMedia, query, youtubeType) {
   try {
     let mediaId, baseYoutubeUrl, requiredFields, searchApiType;
@@ -261,60 +277,59 @@ async function getYoutubeInformation(message, client, MessageMedia, query, youtu
 
     const captionMediaYoutube = `🎬: ${title}${channelTitle ? `\n📺: ${channelTitle}` : ''}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${baseYoutubeUrl}${mediaId}`;
 
-    await client.sendMessage(message.id.remote, media, { caption: captionMediaYoutube });
+    const link = baseYoutubeUrl+mediaId;
+
+    return [media, captionMediaYoutube, link];
   } catch (err) {
     console.error(err);
-    message.reply('🤖 Houston, tenemos un problema. Intenta de nuevo.');
+    return;
   }
 }
 
+/**
+ * Searches for a YouTube video, playlist, or channel based on the provided query.
+ * 
+ * @param {Object} message - The message object from the chat client.
+ * @param {Object} client - The client instance for interacting with the chat API.
+ * @param {Object} MessageMedia - The MessageMedia instance for sending media messages.
+ * @param {string} query - The search query.
+ * @returns {Array} - Array containing media, caption text, link and title.
+ */
 async function searchYoutubeVideo(message, client, MessageMedia, query) {
-  // Build the search URL with the query and youtube_api_key
   const searchURL = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=${query}&key=${youtube_api_key}`;
 
-  // Make the search request and get response
   const response = await fetch(searchURL);
   const data = await response.json();
 
-  // Check if there are any results
   if (data.items && data.items.length > 0) {
-    // Get the video, playlist, and channel IDs from the response
     const { videoId, playlistId, channelId } = data.items[0].id;
 
-    switch (data.items[0].id.kind) 
-    {
+    switch (data.items[0].id.kind) {
       case 'youtube#video':
-        // Send the media message for a video
-        sendMediaMessage(videoId, '🎬', 'https://youtu.be/', message, client, MessageMedia);
-        break;
+        return sendMediaMessage(videoId, '🎬', 'https://youtu.be/', message, client, MessageMedia);
       case 'youtube#playlist':
-        // Send the media message for a playlist
-        sendMediaMessage(playlistId, '🎵', 'https://www.youtube.com/playlist?list=', message, client, MessageMedia);
-        break;
+        return sendMediaMessage(playlistId, '🎵', 'https://www.youtube.com/playlist?list=', message, client, MessageMedia);
       case 'youtube#channel':
-        // Send the media message for a channel
-        sendMediaMessage(channelId, '📺', 'https://www.youtube.com/channel/', message, client, MessageMedia);
-        break;
+        return sendMediaMessage(channelId, '📺', 'https://www.youtube.com/channel/', message, client, MessageMedia);
       default:
-        // Handle the case when there is no video, playlist, or channel
-        message.reply('🤖 No se encontró ningún video, playlist, o canal.')
-        break;
+        return [null, null, 'No se encontró ningún video, playlist, o canal.'];
     }
   } else {
-    // Handle the case when there are no results
-    message.reply('🤖 Hubo un error con tu búsqueda, intenta de nuevo.')
+    return [null, null, 'Hubo un error con tu búsqueda, intenta de nuevo.'];
   }
 }
 
-// This function sends a media message with the thumbnail and caption for a video, playlist, or channel
-//
-// - id: the ID of the video, playlist, or channel
-// - emoji: the emoji to use in the caption (e.g. "🎬" for a video, "🎵" for a playlist, "📺" for a channel)
-// - urlPrefix: the URL prefix for the video, playlist, or channel (e.g. "https://youtu.be/" for a video,
-//   "https://www.youtube.com/playlist?list=" for a playlist,
-//   "https://www.youtube.com/channel/" for a channel)
-//
-
+/**
+ * Sends a media message with the thumbnail and caption for a video, playlist, or channel.
+ * 
+ * @param {string} id - The ID of the video, playlist, or channel.
+ * @param {string} emoji - The emoji to use in the caption.
+ * @param {string} urlPrefix - The URL prefix for the video, playlist, or channel.
+ * @param {Object} message - The message object from the chat client.
+ * @param {Object} client - The client instance for interacting with the chat API.
+ * @param {Object} MessageMedia - The MessageMedia instance for sending media messages.
+ * @returns {Array} - Array containing media, caption text, link and title.
+ */
 async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMedia) {
   const detailsUrl = `https://www.googleapis.com/youtube/v3/${emoji === '🎬' ? 'videos' : emoji === '🎵' ? 'playlists' : 'channels'}?part=snippet%2Cstatistics&id=${id}&key=${youtube_api_key}`;
 
@@ -326,9 +341,8 @@ async function sendMediaMessage(id, emoji, urlPrefix, message, client, MessageMe
 
   const captionText = `🎬: ${title}${channelTitle ? `\n👤: ${channelTitle}` : ''}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${urlPrefix}${id}`;
 
-  await client.sendMessage(message.id.remote, media, { 
-    caption: captionText,
-  });
+  const link = urlPrefix+id;
+  return [media, captionText, link, title];
 }
 
 module.exports = {

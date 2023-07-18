@@ -1,9 +1,9 @@
-const { PollyClient, SynthesizeSpeechCommand } = require("@aws-sdk/client-polly");
-const fs = require("fs");
-const path = require("path");
+const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
+const fs = require('fs');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
-const REGION = "us-east-1";
+const REGION = 'us-east-1';
 const client = new PollyClient({ region: REGION });
 
 const voiceOptions = {
@@ -16,7 +16,7 @@ const voiceOptions = {
   'Andres': 'neural',
   'Lupe': 'neural',
   'Penelope': 'neural',
-  'Miguel': 'standard'
+  'Miguel': 'standard',
 };
 
 function getRandomVoice() {
@@ -29,7 +29,7 @@ async function synthesizeSpeech(text, songId, voiceId) {
     Text: text,
     OutputFormat: 'mp3',
     VoiceId: voiceId,
-		Engine: voiceOptions[voiceId]
+    Engine: voiceOptions[voiceId],
   };
 
   try {
@@ -62,20 +62,20 @@ async function handleTextToAudio(stringifyMessage, message, MessageMedia, client
     }
   } else {
     // Check if second word in message is a valid voice
-    if (stringifyMessage[1].startsWith("-")) {
-			let possibleVoiceId = stringifyMessage[1].slice(1).charAt(0).toUpperCase() + stringifyMessage[1].slice(2).toLowerCase();
-			
-			if (voiceOptions.hasOwnProperty(possibleVoiceId)) {
-				voiceId = possibleVoiceId;
-			} else {
-				sendReply(message, 'Voz inválida. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.', robotEmoji);
-			}
-		
-			textToSpeak = stringifyMessage.slice(2, stringifyMessage.length).join(' ');  // start speaking from third word onwards
-		} else {
-			sendReply(message, 'Ahora puedes escoger entre varias voces. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.', robotEmoji);
-			textToSpeak = stringifyMessage.slice(1).join(' ');  // If no voice is specified, start speaking from second word onwards
-		}
+    if (stringifyMessage[1].startsWith('-')) {
+      let possibleVoiceId = stringifyMessage[1].slice(1).charAt(0).toUpperCase() + stringifyMessage[1].slice(2).toLowerCase();
+      
+      if (Object.prototype.hasOwnProperty.call(voiceOptions, possibleVoiceId)) {
+        voiceId = possibleVoiceId;
+      } else {
+        sendReply(message, 'Voz inválida. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.', robotEmoji);
+      }
+
+      textToSpeak = stringifyMessage.slice(2, stringifyMessage.length).join(' ');  // start speaking from third word onwards
+    } else {
+      sendReply(message, 'Ahora puedes escoger entre varias voces. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.', robotEmoji);
+      textToSpeak = stringifyMessage.slice(1).join(' ');  // If no voice is specified, start speaking from second word onwards
+    }
   }
 
   if (textToSpeak.length > 1000) {

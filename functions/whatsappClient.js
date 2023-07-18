@@ -20,6 +20,8 @@ let {
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 // Set subreddit for the "fromis" command
 const subreddit = utilities.capitalizeText(fromisCommand);
+const isYoutubeLink = (link) => link.includes('youtube.com') || link.includes('youtu.be');
+let isYoutubeLinkProvided;
 
 // Set function to update premium groups and users
 const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {
@@ -33,8 +35,6 @@ let refreshDataCallback;
 const setRefreshDataCallback = (callback) => {
   refreshDataCallback = callback;
 };
-
-// const { MessengerDestinationPageWelcomeMessage } = require('facebook-nodejs-business-sdk');
 
 /* 
   WhatsApp components 
@@ -124,10 +124,16 @@ client.on('message_create', async message => {
         wikipedia.handleWikipediaRequest(stringifyMessage, message, robotEmoji, query, senderName, client, MessageMedia)
         break;
       case commands.yt:
-        youtube.handleYoutubeSearch(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
+        await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
         break;
       case commands.play:
-        youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
+        isYoutubeLinkProvided = stringifyMessage.length === 2 && stringifyMessage[1] && isYoutubeLink(stringifyMessage[1]);
+
+        if (isYoutubeLinkProvided) {
+            youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
+        } else {
+          await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, !isYoutubeLinkProvided);
+        }
         break;
       case commands.say:
         amazon.handleTextToAudio(stringifyMessage, message, MessageMedia, client, robotEmoji);
