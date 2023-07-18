@@ -132,6 +132,9 @@ client.on('message_create', async message => {
         if (isYoutubeLinkProvided) {
             youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
         } else {
+					if (!paidUsers.some(user => user.phone_number === senderNumber)) {
+						return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
+					}
           await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, !isYoutubeLinkProvided);
         }
         break;
