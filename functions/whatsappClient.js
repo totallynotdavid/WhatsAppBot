@@ -247,7 +247,7 @@ client.on('message_create', async message => {
       case adminCommands.imagine:
         if (query.length > 2) {
           const pathsToImages = await imagine.handleImagine(query);
-          if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No encontré ninguna imagen.`);
+          if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`);
 
           pathsToImages.forEach(pathToImage => {
             const media = MessageMedia.fromFilePath(pathToImage);
