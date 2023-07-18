@@ -41,6 +41,7 @@ const adminCommands = {
   promote: 'promote',
   demote: 'demote',
   chat: 'chat',
+  imagine: 'imagine',
 };
 
 module.exports = {

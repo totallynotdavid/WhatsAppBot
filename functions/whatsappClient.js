@@ -7,7 +7,7 @@ const { sciHub, boTeX, lyrics, amazon, help, cae, wikipedia, reddit, utilities, 
 const newFunctions = require('../lib/functions/index.js');
 
 // Import admin commands
-const { groups, db, mentions, openai } = require('../commands/admin/index.js')
+const { groups, db, mentions, openai, imagine } = require('../commands/admin/index.js')
 
 // Import global variables
 let {
@@ -242,6 +242,20 @@ client.on('message_create', async message => {
           message.reply(`${robotEmoji} ${chatResponse}`);
         } else {
           message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
+        }
+        break;
+      case adminCommands.imagine:
+        if (query.length > 2) {
+          const pathsToImages = await imagine.handleImagine(query);
+          if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No encontré ninguna imagen.`);
+
+          pathsToImages.forEach(pathToImage => {
+            const media = MessageMedia.fromFilePath(pathToImage);
+            client.sendMessage(message.id.remote, media)
+          });
+          message.reply(`${robotEmoji} ¡Terminamos, ya vienen las imágenes!`);
+        } else {
+          message.reply(`${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`);
         }
         break;
       default:

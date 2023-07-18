@@ -15,7 +15,7 @@
     "lint": "eslint commands functions lib index.js",
     "lint:fix": "eslint --fix commands functions lib index.js",
     "postinstall": "npm i shx -g",
-		"test": "npm run -s lint"
+    "test": "npm run -s lint"
   },
   "author": "totallynotdavid",
   "license": "MIT",
@@ -26,6 +26,7 @@
     "@aws-sdk/client-polly": "^3.370.0",
     "@google-cloud/local-auth": "^2.1.0",
     "@supabase/supabase-js": "^2.7.1",
+    "bimg": "^0.1.5",
     "dotenv": "^16.0.3",
     "googleapis": "^105.0.0",
     "moment": "^2.29.4",
