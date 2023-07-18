@@ -14,7 +14,8 @@
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
     "lint:fix": "eslint --fix commands functions lib index.js",
-    "postinstall": "npm i shx -g"
+    "postinstall": "npm i shx -g",
+		"test": "npm run -s lint"
   },
   "author": "totallynotdavid",
   "license": "MIT",
