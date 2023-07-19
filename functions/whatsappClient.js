@@ -3,7 +3,7 @@ const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsa
 const qrcode = require('qrcode-terminal');
 
 // Import commands and utility functions
-const { sciHub, boTeX, lyrics, amazon, help, cae, wikipedia, reddit, utilities, stickers, docsearch, docdown, youtube, spotify } = require('../commands/index.js');
+const { sciHub, boTeX, lyrics, amazon, help, cae, wikipedia, reddit, utilities, stickers, docsearch, docdown, youtube, spotify, editImage } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import admin commands
@@ -172,6 +172,9 @@ client.on('message_create', async message => {
         /* eslint-disable no-case-declarations */ 
         const chatResponse = await openai.handleChatWithGPT(senderNumber, groupNumber, query);
         message.reply(`${robotEmoji} ${chatResponse}`);
+        break;
+      case commands.edit:
+        editImage.handleEditImage(stringifyMessage, message, client, MessageMedia, robotEmoji);
         break;
       default:
         break;
