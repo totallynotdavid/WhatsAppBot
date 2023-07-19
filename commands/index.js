@@ -15,6 +15,7 @@ const docdown = require('./docdown');
 const youtube = require('./youtube');
 const spotify = require('./spotify');
 const editImage = require('./editImage');
+const translate = require('./translate');
 
 module.exports = {
   general,
@@ -34,4 +35,5 @@ module.exports = {
   youtube,
   spotify,
   editImage,
+	translate,
 };

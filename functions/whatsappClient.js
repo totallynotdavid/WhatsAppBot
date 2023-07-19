@@ -3,7 +3,7 @@ const { Client, LocalAuth, MessageMedia /*, Buttons, List */ } = require('whatsa
 const qrcode = require('qrcode-terminal');
 
 // Import commands and utility functions
-const { sciHub, boTeX, lyrics, amazon, help, cae, wikipedia, reddit, utilities, stickers, docsearch, docdown, youtube, spotify, editImage } = require('../commands/index.js');
+const { sciHub, boTeX, lyrics, amazon, help, cae, wikipedia, reddit, utilities, stickers, docsearch, docdown, youtube, spotify, editImage, translate } = require('../commands/index.js');
 const newFunctions = require('../lib/functions/index.js');
 
 // Import admin commands
@@ -176,6 +176,10 @@ client.on('message_create', async message => {
       case commands.edit:
         editImage.handleEditImage(stringifyMessage, message, client, MessageMedia, robotEmoji);
         break;
+			case commands.t:
+				const translatedMessage = await translate.translateText(query);
+				message.reply(`${robotEmoji} ${translatedMessage}`);
+				break;
       default:
         break;
     }
