@@ -48,5 +48,10 @@
 		"command": "chat",
 		"message": "Habla de lo que quieras con el bot",
 		"usage": "chat <tu mensaje>"
+	},
+	{
+		"command": "imagine",
+		"message": "Imagina y escribe lo que quieres ver",
+		"usage": "imagine <tu mensaje>"
 	}
 ]
