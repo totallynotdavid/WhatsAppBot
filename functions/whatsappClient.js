@@ -252,8 +252,9 @@ client.on('message_create', async message => {
         }
         break;
       case adminCommands.imagine:
-        if (query.length > 2) {
-          const pathsToImages = await imagine.handleImagine(query);
+        if (query.length > 4) {
+					const translatedQuery = await translate.translateText(query);
+          const pathsToImages = await imagine.handleImagine(translatedQuery);
           if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`);
 
           pathsToImages.forEach(pathToImage => {
