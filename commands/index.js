@@ -35,5 +35,5 @@ module.exports = {
   youtube,
   spotify,
   editImage,
-	translate,
+  translate,
 };

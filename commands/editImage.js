@@ -261,7 +261,7 @@ async function handleEditImage(stringifyMessage, message, client, MessageMedia, 
       await handleSendMedia(client, message, media, robotEmoji);
     }
 
-		// Delete local files
+    // Delete local files
     imgPaths.push(imgPath);
     deleteLocalFiles(imgPaths);
 
@@ -301,8 +301,6 @@ async function getImgurLink(client, mention, imgPaths) {
       image: fs.createReadStream(imgPath),
       type: 'stream',
   });
-
-  console.log('imgurUpload', imgurUpload)
 
   return [ imgurUpload.data.link, imgurUpload.data.deletehash ];
 }
