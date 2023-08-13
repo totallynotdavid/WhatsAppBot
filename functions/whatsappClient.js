@@ -133,7 +133,7 @@ client.on('message_create', async message => {
             youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
         } else {
           if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-            return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
+            return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`);
           }
           await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, !isYoutubeLinkProvided);
         }
@@ -199,7 +199,7 @@ client.on('message_create', async message => {
     if (!(command in adminCommands)) return;
 
     if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-      return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
+      return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`);
     }
 
     /* Check if the sender is an admin of the group */

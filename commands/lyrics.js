@@ -3,7 +3,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const fetch = require('node-fetch');
 
-async function fetchSongLyrics(message) {
+async function fetchSongLyrics(message, robotEmoji) {
   try {
     const apiKey = process.env.MUSIXMATCH_API_KEY;
     let url = `https://api.musixmatch.com/ws/1.1/track.search?format=json&callback=callback&q_track_artist=${message}&f_has_lyrics=1&s_track_rating=desc&apikey=${apiKey}`;
@@ -36,10 +36,10 @@ async function fetchSongLyrics(message) {
       return lyrics;
     }
 
-    return 'No se encontraron letras para esta canción.';
+    return `${robotEmoji} Letras no disponibles para esta canción. ¿Quizá no la escribiste bien?`;
   } catch (error) {
     console.error(`Could not fetch lyrics: ${error}`);
-    return 'Hubo un error al buscar las letras de la canción.';
+    return `${robotEmoji} Letras no disponibles para esta canción. ¿Puedes intentarlo de nuevo?`;
   }
 }
 
@@ -48,7 +48,7 @@ async function handleSongLyricsRequest(stringifyMessage, message, robotEmoji) {
     message.reply(`${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`);
   } else {
     const songName = stringifyMessage.slice(1).join(' ');
-    const songLyrics = await fetchSongLyrics(songName);
+    const songLyrics = await fetchSongLyrics(songName, robotEmoji);
     if (songLyrics) {
       message.reply(songLyrics);
     } else {
