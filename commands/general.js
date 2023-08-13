@@ -151,7 +151,7 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
     cutAtStart: `yt-dlp -v -f bestaudio -o "audio/%(id)s.%(ext)s" --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss ${startTime}" ${stringifyMessage[1]}`,
     cutVideo: `yt-dlp -v -f bestaudio -o "audio/%(id)s.%(ext)s" --external-downloader ffmpeg --external-downloader-args "ffmpeg_i:-ss ${startTime} -to ${endTime}" ${stringifyMessage[1]}`, // -t doesn't work for some reason
   };
-  
+
   const command = commands[commandMode];
 
   if (!command) {
