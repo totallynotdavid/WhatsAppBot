@@ -17,7 +17,6 @@ async function handleImagineStability(prompt) {
 
 async function handleImagine(prompt) {
   const improvedPrompt = await improvePrompt(prompt);
-  console.log(`Improved prompt: ${improvedPrompt}`);
   callCounter++;
 
   try {

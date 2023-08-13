@@ -27,7 +27,7 @@ const commands  = {
   drive: 'drive',
   chat: 'chat',
   edit: 'edit',
-	t: 't',
+  t: 't',
 }
 
 const adminCommands = {

@@ -133,7 +133,7 @@ client.on('message_create', async message => {
             youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
         } else {
           if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-            return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
+            return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`);
           }
           await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, !isYoutubeLinkProvided);
         }
@@ -176,10 +176,10 @@ client.on('message_create', async message => {
       case commands.edit:
         editImage.handleEditImage(stringifyMessage, message, client, MessageMedia, robotEmoji);
         break;
-			case commands.t:
-				const translatedMessage = await translate.translateText(query);
-				message.reply(`${robotEmoji} ${translatedMessage}`);
-				break;
+      case commands.t:
+        const translatedMessage = await translate.translateText(query);
+        message.reply(`${robotEmoji} ${translatedMessage}`);
+        break;
       default:
         break;
     }
@@ -199,7 +199,7 @@ client.on('message_create', async message => {
     if (!(command in adminCommands)) return;
 
     if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-      return message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible para usuarios premium.`);
+      return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`);
     }
 
     /* Check if the sender is an admin of the group */
@@ -253,7 +253,7 @@ client.on('message_create', async message => {
         break;
       case adminCommands.imagine:
         if (query.length > 4) {
-					const translatedQuery = await translate.translateText(query);
+          const translatedQuery = await translate.translateText(query);
           const pathsToImages = await imagine.handleImagine(translatedQuery);
           if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`);
 

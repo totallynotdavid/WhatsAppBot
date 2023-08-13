@@ -72,7 +72,7 @@ async function validateAndConvertMedia(chat, mediaURL, message, MessageMedia, se
 
     if (response.ok && contentType && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
       if (contentType.startsWith('video/mp4') && contentLength && parseInt(contentLength.split('=')[1]) > 20 * 1000) {
-        message.reply(`${robotEmoji} Necesitas premium para enviar videos de más de 20 segundos.`);
+        message.reply(`${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`);
       } else {
         let sticker;
         if (localFilePath) {
