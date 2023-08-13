@@ -253,6 +253,7 @@ client.on('message_create', async message => {
         break;
       case adminCommands.imagine:
         if (query.length > 4) {
+          message.reply(`${robotEmoji} Trabajando en ello... dame unos segundos.`)
           const translatedQuery = await translate.translateText(query);
           const pathsToImages = await imagine.handleImagine(translatedQuery);
           if (pathsToImages.length === 0) return message.reply(`${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`);
