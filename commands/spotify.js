@@ -76,15 +76,13 @@ async function handleSpotifySongRequest(client, message, MessageMedia, query, st
   } else {
     let audioDownloaded = false;
     let selectedSong = null;
-    let tries = 0;
 
     for (const song of songs) {
-      tries++;
       audioDownloaded = await downloadSpotifyAudio(song);
       if (audioDownloaded) {
         selectedSong = song;
         break;
-      } 
+      }
     }
 
     if (audioDownloaded && selectedSong) {
