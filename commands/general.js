@@ -172,9 +172,13 @@ async function mp3FromYoutube(commandMode, message, client, MessageMedia, string
     return;
   }
 
-  exec(command, (error, stdout) => {
+  exec(command, (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error: ${error}`);
+      if (stderr.includes('Video unavailable. This video contains content')) {
+        message.reply(`${robotEmoji} Lo siento, este video está restringido en la ubicación del servidor (USA).`);
+      } else {
+        message.reply(`${robotEmoji} Houston, tenemos un problema. ¿Intenta de nuevo?`);
+      }
       return;
     }
 
