@@ -1,4 +1,3 @@
-const general = require('./general');
 const admin = require('./admin');
 const sciHub = require('./sciHub');
 const boTeX = require('./boTeX');
@@ -18,7 +17,6 @@ const editImage = require('./editImage');
 const translate = require('./translate');
 
 module.exports = {
-  general,
   admin,
   sciHub,
   boTeX,

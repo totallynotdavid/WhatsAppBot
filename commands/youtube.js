@@ -1,138 +1,122 @@
-const { mp3FromYoutube, searchYoutubeVideo, getYoutubeInformation } = require('./general');
+const path = require('path');
+const moment = require('moment');
+const { exec } = require('child_process');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const youtube_api_key = process.env.youtube_api_key;
 const { robotEmoji } = require('../functions/globals');  
-const { youtubeTypes } = require('../functions/regex');
-let youtubeType;
+const fetchYoutubeMetadata = require('yt_metadata');
+const utilities = require('./utilities');
 
-const WARNING = 'warning';
-const FOUND = 'found';
-
-const commandsYoutubeDownload = {
-  1: {
-    notice: `${robotEmoji} Adjunta un enlace de YouTube, no seas tan tímido.`,
-    commandMode: null,
-  },
-  2: {
-    commandMode: 'fullVideo',
-  },
-  3: {
-    commandMode: 'cutAtStart',
-  },
-  4: {
-    commandMode: 'cutVideo',
-  },
-  default: {
-    notice: `${robotEmoji} Sintaxis incorrecta. Solo envía el comando y el enlace de YouTube.`,
-    commandMode: null,
-  },
-};
-
-function handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji) {
-  const { notice = '', commandMode } = commandsYoutubeDownload[stringifyMessage.length] || commandsYoutubeDownload.default;
-
-  if (notice) {
-    message.reply(notice);
-    return;
-  }
-  if (stringifyMessage.length > 2 && (isNaN(Number(stringifyMessage[2])) || (stringifyMessage.length > 3 && isNaN(Number(stringifyMessage[3]))))) {
-    message.reply(`${robotEmoji} El formato del comando es incorrecto, los valores deben ser números.`);
-    return;
-  }
-  mp3FromYoutube(commandMode, message, client, MessageMedia, stringifyMessage, robotEmoji);
-}
-
-async function handleYoutubeSearch(stringifyMessage, message, client, MessageMedia, query, robotEmoji) {
+// Search on Youtube
+async function searchOnYoutube(query, mode) {
   try {
-    if (stringifyMessage.length < 2) {
-      return [{
-        type: WARNING,
-        message: `${robotEmoji} Adjunta un enlace o una búsqueda de YouTube, no seas tan tímido.`,
-      }]
-    }
+      const media_metadata = await fetchYoutubeMetadata(query, mode);
+      let caption;
 
-    youtubeType = 'search';
-    for (const key in youtubeTypes) {
-      if (youtubeTypes[key] && query.match(youtubeTypes[key])) {
-        youtubeType = key;
-        break;
+      if (!media_metadata || Object.keys(media_metadata).length === 0) {
+          return { error: true, message: `${robotEmoji} Houston, tenemos un problema. No se pudo encontrar el video.` };
       }
-    }
-  
-    if (youtubeType === 'search') {
-      const [ media, captionText, link, title, warningMessage ] = await searchYoutubeVideo(message, client, MessageMedia, query);
-      if (warningMessage) {
-        return [{
-          type: WARNING,
-          message: warningMessage,
-        }]
+
+      const { thumbnailUrl, title, channelTitle, viewCount, likeCount, mediaType, mediaId } = media_metadata;
+
+      let baseYoutubeUrl;
+      switch (mediaType) {
+        case 'video':
+          baseYoutubeUrl = `https://youtu.be/${mediaId}`;
+          caption = `🎬: ${title}\n📺: ${channelTitle}${viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''}${likeCount ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas` : ''}\n🔗: ${baseYoutubeUrl}`;
+          break;
+        case 'playlist':
+            baseYoutubeUrl = `https://www.youtube.com/playlist?list=${mediaId}`;
+            caption = `🎬: ${title}\n🔗: ${baseYoutubeUrl}`;
+            break;
+        case 'channel':
+            baseYoutubeUrl = `https://www.youtube.com/channel/${mediaId}`;
+            caption = `📺: ${channelTitle}\n🔗: ${baseYoutubeUrl}`;
+            break;
+        default:
+            return { error: true, message: `${robotEmoji} Tipo de medio no reconocido. No se pudo procesar el video.` };
       }
-  
-      return [{
-        type: FOUND,
-        message: captionText,
-        media: media,
-        title: title,
-        link: link,
-      }];
-    } else {
-      const [ media, captionMediaYoutube, link ] = await getYoutubeInformation(message, client, MessageMedia, query, youtubeType);
-      return [{
-        type: FOUND,
-        message: captionMediaYoutube,
-        media: media,
-        link: link,
-      }];
-    }
+
+      return { error: false, thumbnailUrl, caption };
   } catch (error) {
-    console.error(`Error in handleYoutubeSearch: ${error.message}`);
-    throw error;
+      console.error(`Error in searchOnYoutube: ${error.message}`);
+      return { error: true, message: `${robotEmoji} Hubo un problema al procesar el comando.` };
   }
 }
 
-async function handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, handleAudio = false) {
+async function sendYoutubeAudio(youtubeURL, robotEmoji) {
   try {
-    if (!Array.isArray(stringifyMessage) || stringifyMessage.length < 1) {
-      throw new Error('Invalid input format for stringifyMessage.');
+    const media_metadata = await fetchYoutubeMetadata(youtubeURL, 'idOnly');
+    
+    if (!media_metadata || !media_metadata.mediaId) {
+      return { error: true, message: `${robotEmoji} La URL no es válida.` };
     }
 
-    const result = await handleYoutubeSearch(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
+    const videoID = media_metadata.mediaId;
+    const videoLength = await getVideoLength(videoID);
 
-    if (result.length === 0) {
-      throw new Error(`${robotEmoji} Houston, tenemos un problema. No se pudo encontrar el video.`);
+    if (videoLength > 600) { // 600 seconds = 10 minutes
+      return { error: true, message: `${robotEmoji} El video es más largo de 10 minutos.` };
     }
-  
-    const resultObj = result[0];
-  
-    switch (resultObj.type) {
-      case WARNING:
-        message.reply(`${robotEmoji} ${resultObj.message}`);
-        break;
-      case FOUND:
-        if (handleAudio) {
-          const stringifyBuild = [ 'play', resultObj.link ];
-          handleYoutubeAudio(stringifyBuild, message, client, MessageMedia, robotEmoji);
-          message.reply(`${robotEmoji} El video que encontramos es: *${resultObj.title}*`);
-        } else {
-          try {
-            client.sendMessage(message.id.remote, resultObj.media, {
-              caption: resultObj.message,
-            });
-          } catch (sendError) {
-            console.error(`Failed to send message: ${sendError.message}`);
-            message.reply(`${robotEmoji} Houston, tenemos un problema.`);
-          }
-        }
-        break;
-      default:
-        throw new Error(`${robotEmoji} Houston, tenemos un problema. No se pudo encontrar el video.`);
+
+    const downloadCommand = `yt-dlp -v -f bestaudio https://youtu.be/${videoID} -o "audio/%(id)s.%(ext)s"`;
+    const downloadStdout = await execCommand(downloadCommand).catch((error) => {
+      if (error.stderr && error.stderr.includes('Video unavailable. This video contains content')) {
+        throw new Error(`${robotEmoji} Lo siento, este video está restringido en la ubicación del servidor (USA).`);
+      } else {
+        throw new Error(`${robotEmoji} Houston, tenemos un problema. ¿Intenta de nuevo?`);
+      }
+    });
+    const downloadedFilename = getVideoFilename(downloadStdout);
+
+    if (!downloadedFilename) {
+      return { error: true, message: `${robotEmoji} No se pudo descargar el audio.` };
     }
+
+    const oggFilename = `audio/${videoID}.ogg`;
+    const convertCommand = `ffmpeg -i "${downloadedFilename}" -c:a libopus "${oggFilename}"`;
+    await execCommand(convertCommand);
+
+    utilities.deleteFile(downloadedFilename);
+
+    return { error: false, filePath: oggFilename };
   } catch (error) {
-    console.error(`Error in handleCommand: ${error.message}`);
-    message.reply(`${robotEmoji} Hubo un problema al procesar el comando.`);
+    console.error(`Error in sendYoutubeAudio: ${error.message}`);
+    return { error: true, message: error.message };
   }
+}
+
+function execCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error: ${error}`);
+        return reject({ error, stdout, stderr });
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+function getVideoFilename(stdout) {
+  const regex = /Destination: (audio[/\\](.{11})\.(webm|m4a|mp3))/;
+  const match = stdout.match(regex);
+  return match ? match[1] : null;
+}
+
+async function getVideoLength(videoId) {
+  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${youtube_api_key}&fields=items(contentDetails(duration))&part=contentDetails`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  // Length is returned in ISO 8601 format
+  const duration = data.items[0].contentDetails.duration;
+  const durationInSeconds = moment.duration(duration).asSeconds();
+  return durationInSeconds;
 }
 
 module.exports = {
-  handleYoutubeAudio,
-  handleYoutubeSearch,
-  handleCommand,
+  searchOnYoutube,
+  sendYoutubeAudio,
 };

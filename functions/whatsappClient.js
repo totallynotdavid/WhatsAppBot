@@ -20,8 +20,6 @@ let {
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
 // Set subreddit for the "fromis" command
 const subreddit = utilities.capitalizeText(fromisCommand);
-const isYoutubeLink = (link) => link.includes('youtube.com') || link.includes('youtu.be');
-let isYoutubeLinkProvided;
 
 // Set function to update premium groups and users
 const setFetchedData = (fetchedPaidUsers, fetchedPhysicsUsers, fetchedPremiumGroups) => {
@@ -124,18 +122,27 @@ client.on('message_create', async message => {
         wikipedia.handleWikipediaRequest(stringifyMessage, message, robotEmoji, query, senderName, client, MessageMedia)
         break;
       case commands.yt:
-        await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji);
+        const searchResult = await youtube.searchOnYoutube(query, 'fullData');
+
+        if (searchResult.error) {
+            message.reply(searchResult.message);
+        } else {
+            if (searchResult.thumbnailUrl) {
+                const media = await MessageMedia.fromUrl(searchResult.thumbnailUrl, { unsafeMime: true });
+                client.sendMessage(message.id.remote, media, { caption: searchResult.caption });
+            } else {
+                message.reply(searchResult.caption);
+            }
+        }
         break;
       case commands.play:
-        isYoutubeLinkProvided = stringifyMessage.length === 2 && stringifyMessage[1] && isYoutubeLink(stringifyMessage[1]);
+        const audioResponse = await youtube.sendYoutubeAudio(query, robotEmoji);
 
-        if (isYoutubeLinkProvided) {
-            youtube.handleYoutubeAudio(stringifyMessage, message, client, MessageMedia, robotEmoji);
+        if (audioResponse.error) {
+            message.reply(audioResponse.message);
         } else {
-          if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-            return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`);
-          }
-          await youtube.handleCommand(stringifyMessage, message, client, MessageMedia, query, robotEmoji, !isYoutubeLinkProvided);
+            const media = MessageMedia.fromFilePath(audioResponse.filePath);
+            client.sendMessage(message.id.remote, media, { sendAudioAsVoice: true });
         }
         break;
       case commands.say:
