@@ -5,17 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "start:prod": "npm run clean:logs && pm2 start index.js --cron-restart=\"*/45 * * * *\" && npm run logs",
+    "start:prod": "pnpm run clean:logs && pm2 start index.js --cron-restart=\"*/45 * * * *\" && pnpm run logs",
     "logs": "nano ~/.pm2/logs/index-out.log",
-    "clean": "npm run clean:mundane && npm run clean:logs && npm run clean:packages && npm run clean:session && npm i && npm run start:prod",
+    "clean": "pnpm run clean:mundane && pnpm run clean:logs && pnpm run clean:packages && pnpm run clean:session && pnpm i && pnpm run start:prod",
     "clean:logs": "shx rm ~/.pm2/logs/index-out.log ~/.pm2/logs/index-error.log",
     "clean:mundane": "shx rm -rf music logs.txt",
-    "clean:packages": "shx rm -rf node_modules package-lock.json",
+    "clean:packages": "shx rm -rf node_modules",
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
     "lint:fix": "eslint --fix commands functions lib index.js",
-    "postinstall": "npm i shx -g",
-    "test": "npm run -s lint"
+    "postinstall": "pnpm i shx -g",
+    "test": "pnpm run -s lint"
   },
   "author": "totallynotdavid",
   "license": "MIT",
@@ -33,13 +33,16 @@
     "fluent-ffmpeg": "^2.1.2",
     "googleapis": "^105.0.0",
     "imgur": "^2.3.0",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "openai": "^3.2.1",
     "qrcode-terminal": "^0.12.0",
     "spotify-web-api-node": "^5.0.2",
     "sqlite3": "^5.1.6",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#df1b070d54ec2c4ba75d29a7ef758704ffaf0da5"
+    "uuid": "^9.0.1",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4",
+    "yt_metadata": "^0.0.4"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
