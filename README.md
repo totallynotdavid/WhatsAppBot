@@ -15,41 +15,41 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 - Node.js
 
-	```bash
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-	```
+  ```bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  ```
 
 - ffmpeg
 
-	```bash
-	sudo apt install ffmpeg
-	```
+  ```bash
+  sudo apt install ffmpeg
+  ```
 
 - yt-dlp
 
-	```bash
-	sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-	sudo chmod a+rx /usr/local/bin/yt-dlp  # Make executable
-	```
+  ```bash
+  sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
+  sudo chmod a+rx /usr/local/bin/yt-dlp  # Make executable
+  ```
 
 - [ImageMagick](https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion)
 
-	```bash
-	sudo apt install imagemagick -y
-	```
+  ```bash
+  sudo apt install imagemagick -y
+  ```
 
-- TeXLive 
+- TeXLive
 
-	```bash
-	cd /tmp
-	wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-	tar -xf install-tl-unx.tar.gz
-	cd install-tl-*/
-	sudo perl install-tl --no-interaction
-	echo 'export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$PATH"' >> ~/.bashrc
-	source ~/.bashrc
-	pdflatex --version
-	```
+  ```bash
+  cd /tmp
+  wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+  tar -xf install-tl-unx.tar.gz
+  cd install-tl-*/
+  sudo perl install-tl --no-interaction
+  echo 'export PATH="/usr/local/texlive/2023/bin/x86_64-linux:$PATH"' >> ~/.bashrc
+  source ~/.bashrc
+  pdflatex --version
+  ```
 
 ## Instalación
 
@@ -61,43 +61,43 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
 2. Crear un `.env` y agregar las siguientes variables:
 
-	- `spotify_client_id`
-	- `spotify_client_secret`
-	- `youtube_api_key`
-	- `supabase_api_key`
-	- `supabase_base_url`
-	- `folder_id`
+   - `spotify_client_id`
+   - `spotify_client_secret`
+   - `youtube_api_key`
+   - `supabase_api_key`
+   - `supabase_base_url`
+   - `folder_id`
 
 3. Instalar las dependencias:
 
-	```bash
-	npm install
-	```
+   ```bash
+   npm install
+   ```
 
 4. Aplica estas correcciones: [1](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717), [2](https://github.com/pedroslopez/whatsapp-web.js/pull/2087/files). También:
 
-	```bash
-	npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
-	```
+   ```bash
+   npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
+   ```
 
 5. Necesitas añadir tus credenciales de Amazon. En Linux, Unix, y macOS: `~/.aws/credentials`. Para Windows: `\Users\USUARIO\.aws\credentials`.
 
-	```bash
-	[default]
-	aws_access_key_id =
-	aws_secret_access_key =
-	```
+   ```bash
+   [default]
+   aws_access_key_id =
+   aws_secret_access_key =
+   ```
 
 6. Inicia el bot por primera vez:
 
-	```bash
-	node index.js
-	```
+   ```bash
+   node index.js
+   ```
 
 7. Usar pm2 para mantener el bot funcionando continuamente:
-	 ```
-	 pm2 start index.js --cron-restart="*/15 * * * *"
-	 ```
+   ```
+   pm2 start index.js --cron-restart="*/15 * * * *"
+   ```
 
 ## Uso
 

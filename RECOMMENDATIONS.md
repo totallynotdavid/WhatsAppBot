@@ -10,12 +10,9 @@ Si no hay demasiadas funciones independientes con await.
 
 ```javascript
 async function getPageData() {
-	const results = await Promise.allSettled([
-		fetchUser(),
-		fetchProduct(),
-	])
+  const results = await Promise.allSettled([fetchUser(), fetchProduct()]);
 
-	const [user, product] = handle(results)
+  const [user, product] = handle(results);
 }
 ```
 

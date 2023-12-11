@@ -1,6 +1,6 @@
-const { saveImageFilesLocally } = require('../../lib/api/bing');
-const { fetchImageAndWriteToFile } = require('../../lib/api/stableDiffusion');
-const { improvePrompt } = require('../../functions/promptImprover');
+const { saveImageFilesLocally } = require("../../lib/api/bing");
+const { fetchImageAndWriteToFile } = require("../../lib/api/stableDiffusion");
+const { improvePrompt } = require("../../functions/promptImprover");
 
 // 9 out of 10 calls are made to Bing Image API
 let callCounter = 0;
@@ -20,7 +20,8 @@ async function handleImagine(prompt) {
   callCounter++;
 
   try {
-    if (callCounter % 5 != 0) { // We will use Bing for 4 out of 5 calls
+    if (callCounter % 5 != 0) {
+      // We will use Bing for 4 out of 5 calls
       return await handleImagineBing(improvedPrompt);
     } else {
       return await handleImagineStability(improvedPrompt);

@@ -4,31 +4,31 @@
     "message": "Busca y reproduce tu música favorita de Spotify. Para mayor precisión, pon primero el nombre de tu artista",
     "usage": "spot fromis airplane mode"
   },
-	{
-		"command": "edit",
-		"message": "Crea memes personalizados con estilos disponibles: Gay, Greyscale, Invert, Blink, Triggered, Ad, Batslap, Beautiful, Bed, Bobross, Clown, ConfusedStonk, Deepfry, Delete, DoubleStonk, Facepalm, Jail, Kiss, LisaPresentation, Mikkelsen, NotStonk, Poutine, Rip, Snyder, Stonk, Trash, Wanted.\n\nMenciona los contactos a los que quieres aplicar el estilo. ¡La cantidad de menciones permitidas varía! Para Blink por ejemplo, puedes mencionar a varios contactos.",
-		"usage": "edit -estilo @contacto1"
-	},
-	{
-		"command": "letra",
-		"message": "Obten la letra de tu canción favorita",
-		"usage": "letra fromis airplane mode"
-	},
+  {
+    "command": "edit",
+    "message": "Crea memes personalizados con estilos disponibles: Gay, Greyscale, Invert, Blink, Triggered, Ad, Batslap, Beautiful, Bed, Bobross, Clown, ConfusedStonk, Deepfry, Delete, DoubleStonk, Facepalm, Jail, Kiss, LisaPresentation, Mikkelsen, NotStonk, Poutine, Rip, Snyder, Stonk, Trash, Wanted.\n\nMenciona los contactos a los que quieres aplicar el estilo. ¡La cantidad de menciones permitidas varía! Para Blink por ejemplo, puedes mencionar a varios contactos.",
+    "usage": "edit -estilo @contacto1"
+  },
+  {
+    "command": "letra",
+    "message": "Obten la letra de tu canción favorita",
+    "usage": "letra fromis airplane mode"
+  },
   {
     "command": "sticker",
     "message": "Transforma una imagen, video o gif (Tenor) en un sticker. Necesitas adjuntar el archivo al mensaje",
     "usage": "sticker"
   },
-	{
-		"command": "toimage",
-		"message": "Transforma un sticker en una imagen. Necesitas adjuntar el sticker al mensaje",
-		"usage": "toimage"
-	},
-	{
-		"command": "url",
-		"message": "Transforma una imagen o video en un sticker. Necesitas adjuntar la URL al mensaje",
-		"usage": "url https://i.imgur.com/NUyttbn.mp4"
-	},
+  {
+    "command": "toimage",
+    "message": "Transforma un sticker en una imagen. Necesitas adjuntar el sticker al mensaje",
+    "usage": "toimage"
+  },
+  {
+    "command": "url",
+    "message": "Transforma una imagen o video en un sticker. Necesitas adjuntar la URL al mensaje",
+    "usage": "url https://i.imgur.com/NUyttbn.mp4"
+  },
   {
     "command": "yt",
     "message": "Busca tu video, playlist o canal favorito en YouTube",
@@ -39,49 +39,49 @@
     "message": "Reproduce tu música favorita en el chat, solo acepta URLs de YouTube",
     "usage": "play https://youtu.be/f0FDOw3zvGo"
   },
-	{
-		"command": "say",
-		"message": "Haz que el bot diga lo que quieras. Las voces disponibles son: 'Ricardo', 'Conchita', 'Lucia', 'Enrique', 'Sergio', 'Mia', 'Andres', 'Lupe', 'Penelope', 'Miguel', 'Pedro'. Ricardo es la voz en portugués",
-		"usage": "say -Ricardo Hola, soy un bot"
-	},
+  {
+    "command": "say",
+    "message": "Haz que el bot diga lo que quieras. Las voces disponibles son: 'Ricardo', 'Conchita', 'Lucia', 'Enrique', 'Sergio', 'Mia', 'Andres', 'Lupe', 'Penelope', 'Miguel', 'Pedro'. Ricardo es la voz en portugués",
+    "usage": "say -Ricardo Hola, soy un bot"
+  },
   {
     "command": "w",
     "message": "Obten definiciones de Wikipedia",
     "usage": "w Portugal. The Man"
   },
-	{
-		"command": "tex",
-		"message": "Transforma código LaTeX en una imagen",
-		"usage": "tex \\int_{a}^{b} f(x) dx"
-	},
-	{
-		"command": "doi",
-		"message": "Obten el PDF de un artículo científico",
-		"usage": "doi 10.1063/1.2195321"
-	},
-	{
-		"command": "paper",
-		"message": "Busca artículos científicos sobre tu tema de interés",
-		"usage": "paper mechanics"
-	},
-	{
-		"command": "author",
-		"message": "Busca artículos científicos de un autor",
-		"usage": "author angel bustamante"
-	},
-	{
-		"command": "doc",
-		"message": "Busca documentos de tu tema de interés en la biblioteca del CAE. Si eres administrador puedes establecer tu propia carpeta de Drive. Contacta al bot para más información",
-		"usage": "doc quantum mechanics townsend"
-	},
-	{
-		"command": "drive",
-		"message": "Descarga archivos de Google Drive. Límite: 200 MB",
-		"usage": "drive https://drive.google.com/file/d/1ClPRWwCQUc6ZKizIKHJdBjULKmdbLMyF/view"
-	},
-	{
-		"command": "cae",
-		"message": "Recursos de estudio de la física",
-		"usage": "cae"
-	}
+  {
+    "command": "tex",
+    "message": "Transforma código LaTeX en una imagen",
+    "usage": "tex \\int_{a}^{b} f(x) dx"
+  },
+  {
+    "command": "doi",
+    "message": "Obten el PDF de un artículo científico",
+    "usage": "doi 10.1063/1.2195321"
+  },
+  {
+    "command": "paper",
+    "message": "Busca artículos científicos sobre tu tema de interés",
+    "usage": "paper mechanics"
+  },
+  {
+    "command": "author",
+    "message": "Busca artículos científicos de un autor",
+    "usage": "author angel bustamante"
+  },
+  {
+    "command": "doc",
+    "message": "Busca documentos de tu tema de interés en la biblioteca del CAE. Si eres administrador puedes establecer tu propia carpeta de Drive. Contacta al bot para más información",
+    "usage": "doc quantum mechanics townsend"
+  },
+  {
+    "command": "drive",
+    "message": "Descarga archivos de Google Drive. Límite: 200 MB",
+    "usage": "drive https://drive.google.com/file/d/1ClPRWwCQUc6ZKizIKHJdBjULKmdbLMyF/view"
+  },
+  {
+    "command": "cae",
+    "message": "Recursos de estudio de la física",
+    "usage": "cae"
+  }
 ]
