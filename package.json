@@ -30,7 +30,7 @@
     "bimg": "^0.1.5",
     "discord-image-generation": "^1.4.25",
     "dotenv": "^16.0.3",
-		"facebook-nodejs-business-sdk": "^18.0.4",
+    "facebook-nodejs-business-sdk": "^18.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "googleapis": "^105.0.0",
     "imgur": "^2.3.0",
@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "eslint": "^8.45.0",
+    "prettier": "3.1.1",
     "shx": "^0.3.4"
   }
 }
