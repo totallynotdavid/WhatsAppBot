@@ -1,11 +1,10 @@
 const path = require("path");
-const moment = require("moment");
 const { exec } = require("child_process");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-const youtube_api_key = process.env.youtube_api_key;
 const { robotEmoji } = require("../functions/globals");
 const fetchYoutubeMetadata = require("yt_metadata");
 const utilities = require("./utilities");
+const { getVideoLength } = require("yt_duration")
 
 // Search on Youtube
 async function searchOnYoutube(query, mode) {
@@ -76,7 +75,7 @@ async function sendYoutubeAudio(youtubeURL, robotEmoji) {
     }
 
     const videoID = media_metadata.mediaId;
-    const videoLength = await getVideoLength(videoID);
+    const videoLength = await getVideoLength(videoID, "seconds");
 
     if (videoLength > 600) {
       // 600 seconds = 10 minutes
@@ -139,18 +138,6 @@ function getVideoFilename(stdout) {
   const regex = /Destination: (audio[/\\](.{11})\.(webm|m4a|mp3))/;
   const match = stdout.match(regex);
   return match ? match[1] : null;
-}
-
-async function getVideoLength(videoId) {
-  const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${youtube_api_key}&fields=items(contentDetails(duration))&part=contentDetails`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  // Length is returned in ISO 8601 format
-  const duration = data.items[0].contentDetails.duration;
-  const durationInSeconds = moment.duration(duration).asSeconds();
-  return durationInSeconds;
 }
 
 module.exports = {
