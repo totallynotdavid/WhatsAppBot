@@ -41,9 +41,6 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
-  moment:
-    specifier: ^2.29.4
-    version: 2.29.4
   node-fetch:
     specifier: ^2.6.7
     version: 2.7.0
@@ -65,6 +62,9 @@ dependencies:
   whatsapp-web.js:
     specifier: github:pedroslopez/whatsapp-web.js#b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4
     version: github.com/pedroslopez/whatsapp-web.js/b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4
+  yt_duration:
+    specifier: ^0.0.1
+    version: 0.0.1
   yt_metadata:
     specifier: ^0.0.4
     version: 0.0.4
@@ -3390,10 +3390,6 @@ packages:
     hasBin: true
     dev: false
 
-  /moment@2.29.4:
-    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
-    dev: false
-
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
@@ -4456,6 +4452,12 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /yt_duration@0.0.1:
+    resolution: {integrity: sha512-fVCWtPn+poZq6dStKbgEZEdCXEAsJ0JUuo+TlJioS9M+jxNgv5WbmyWUPTnXL5tjNmy4j77r9NMd08uWbzFkcQ==}
+    dependencies:
+      dotenv: 16.3.1
+    dev: false
 
   /yt_metadata@0.0.4:
     resolution: {integrity: sha512-0RsZGD6s1FsIfz+iyqyf3i9+9nspZHmPCDcEDPpn7mtVTu9GvaOgWZf+RpfZsY2K2AesAqwA1+RQk6s6TzDjiw==}

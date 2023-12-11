@@ -34,7 +34,6 @@
     "googleapis": "^105.0.0",
     "imgur": "^2.3.0",
     "lodash": "^4.17.21",
-    "moment": "^2.29.4",
     "node-fetch": "^2.6.7",
     "openai": "^3.2.1",
     "qrcode-terminal": "^0.12.0",
@@ -42,6 +41,7 @@
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.1",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4",
+    "yt_duration": "^0.0.1",
     "yt_metadata": "^0.0.4"
   },
   "devDependencies": {
