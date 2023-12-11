@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "eslint": "^8.45.0",
-    "facebook-nodejs-business-sdk": "^16.0.2",
+    "facebook-nodejs-business-sdk": "^18.0.4",
     "shx": "^0.3.4"
   }
 }
