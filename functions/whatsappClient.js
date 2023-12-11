@@ -215,7 +215,7 @@ client.on("message_create", async (message) => {
           MessageMedia,
         );
         break;
-      case commands.yt:
+      case commands.yt: {
         const searchResult = await youtube.searchOnYoutube(query, "fullData");
 
         if (searchResult.error) {
@@ -234,7 +234,8 @@ client.on("message_create", async (message) => {
           }
         }
         break;
-      case commands.play:
+      }
+      case commands.play: {
         const audioResponse = await youtube.sendYoutubeAudio(query, robotEmoji);
 
         if (audioResponse.error) {
@@ -246,6 +247,7 @@ client.on("message_create", async (message) => {
           });
         }
         break;
+      }
       case commands.say:
         amazon.handleTextToAudio(
           stringifyMessage,
