@@ -70,8 +70,8 @@ const setRefreshDataCallback = (callback) => {
   refreshDataCallback = callback;
 };
 
-/* 
-  WhatsApp components 
+/*
+  WhatsApp components
 */
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -236,10 +236,10 @@ client.on("message_create", async (message) => {
         break;
       }
       case commands.play: {
-        const audioResponse = await youtube.sendYoutubeAudio(query, robotEmoji);
+        const audioResponse = await youtube.sendYoutubeAudio(query);
 
         if (audioResponse.error) {
-          message.reply(audioResponse.message);
+          message.reply(`${robotEmoji} ${audioResponse.message}`);
         } else {
           const media = MessageMedia.fromFilePath(audioResponse.filePath);
           client.sendMessage(message.id.remote, media, {
