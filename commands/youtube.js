@@ -1,10 +1,11 @@
 const path = require("path");
-const { exec } = require("child_process");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
 const { robotEmoji } = require("../functions/globals");
+const { getVideoLength } = require("yt_duration");
+const ytdlp_video_processor = require("ytdlp_video_processor");
 const fetchYoutubeMetadata = require("yt_metadata");
 const utilities = require("./utilities");
-const { getVideoLength } = require("yt_duration")
 
 // Search on Youtube
 async function searchOnYoutube(query, mode) {
@@ -66,78 +67,43 @@ async function searchOnYoutube(query, mode) {
   }
 }
 
-async function sendYoutubeAudio(youtubeURL, robotEmoji) {
+async function sendYoutubeAudio(youtubeURL) {
   try {
     const media_metadata = await fetchYoutubeMetadata(youtubeURL, "idOnly");
 
     if (!media_metadata || !media_metadata.mediaId) {
-      return { error: true, message: `${robotEmoji} La URL no es válida.` };
+      return { error: true, message: `La URL no es válida.` };
     }
 
     const videoID = media_metadata.mediaId;
     const videoLength = await getVideoLength(videoID, "seconds");
 
     if (videoLength > 600) {
-      // 600 seconds = 10 minutes
       return {
         error: true,
-        message: `${robotEmoji} El video es más largo de 10 minutos.`,
+        message: `El video es más largo de 10 minutos.`,
       };
     }
 
-    const downloadCommand = `yt-dlp -v -f bestaudio https://youtu.be/${videoID} -o "audio/%(id)s.%(ext)s"`;
-    const downloadStdout = await execCommand(downloadCommand).catch((error) => {
-      if (
-        error.stderr &&
-        error.stderr.includes("Video unavailable. This video contains content")
-      ) {
-        throw new Error(
-          `${robotEmoji} Lo siento, este video está restringido en la ubicación del servidor (USA).`,
-        );
-      } else {
-        throw new Error(
-          `${robotEmoji} Houston, tenemos un problema. ¿Intenta de nuevo?`,
-        );
-      }
-    });
-    const downloadedFilename = getVideoFilename(downloadStdout);
+    const downloadedMedia = await ytdlp_video_processor(videoID);
 
-    if (!downloadedFilename) {
-      return {
-        error: true,
-        message: `${robotEmoji} No se pudo descargar el audio.`,
-      };
+    if (
+      !downloadedMedia ||
+      downloadedMedia.length === 0 ||
+      !downloadedMedia[0].path
+    ) {
+      return { error: true, message: `No se pudo descargar el audio.` };
     }
 
-    const oggFilename = `audio/${videoID}.ogg`;
-    const convertCommand = `ffmpeg -i "${downloadedFilename}" -c:a libopus "${oggFilename}"`;
-    await execCommand(convertCommand);
+    const downloadedFilename = downloadedMedia[0].path;
 
     utilities.deleteFile(downloadedFilename);
 
-    return { error: false, filePath: oggFilename };
+    return { error: false, filePath: downloadedFilename };
   } catch (error) {
     console.error(`Error in sendYoutubeAudio: ${error.message}`);
     return { error: true, message: error.message };
   }
-}
-
-function execCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error: ${error}`);
-        return reject({ error, stdout, stderr });
-      }
-      resolve(stdout);
-    });
-  });
-}
-
-function getVideoFilename(stdout) {
-  const regex = /Destination: (audio[/\\](.{11})\.(webm|m4a|mp3))/;
-  const match = stdout.match(regex);
-  return match ? match[1] : null;
 }
 
 module.exports = {
