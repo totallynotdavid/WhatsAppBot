@@ -14,6 +14,7 @@
     "clean:session": "shx rm -rf .wwebjs_auth",
     "lint": "eslint commands functions lib index.js",
     "lint:fix": "eslint --fix commands functions lib index.js",
+    "prettier": "prettier --write .",
     "test": "pnpm run -s lint"
   },
   "author": "totallynotdavid",
@@ -40,13 +41,15 @@
     "spotify-web-api-node": "^5.0.2",
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.1",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#b5eb4f97ce0c7f9a63275841bef4e61d0e4b4db4",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#1e9b82b2011fe1ad70cee8ce7813c352470cb6c4",
     "yt_duration": "^0.0.1",
-    "yt_metadata": "^0.0.4"
+    "yt_metadata": "^0.0.4",
+    "ytdlp_video_processor": "^0.0.4"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "prettier": "3.1.1",
     "shx": "^0.3.4"
   }
