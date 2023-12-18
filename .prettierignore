@@ -9,3 +9,7 @@ node_modules
 .devcontainer
 package-lock.json
 pnpm-lock.yaml
+media
+audio
+img
+video

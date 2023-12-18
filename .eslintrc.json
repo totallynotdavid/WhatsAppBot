@@ -5,6 +5,7 @@
     "es6": true,
     "node": true
   },
+  "plugins": ["prettier"],
   "extends": ["eslint:recommended", "prettier"],
   "globals": {
     "Atomics": "readonly",
@@ -16,7 +17,6 @@
   },
   "rules": {
     "no-console": 0,
-    "quotes": ["error", "double"],
     "comma-dangle": [
       "error",
       {
