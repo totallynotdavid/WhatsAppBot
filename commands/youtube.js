@@ -81,7 +81,7 @@ async function sendYoutubeAudio(youtubeURL) {
     if (videoLength > 600) {
       return {
         error: true,
-        message: `El video es más largo de 10 minutos.`,
+        message: `El límite de duración de audio es de 10 minutos.`,
       };
     }
 
@@ -97,8 +97,6 @@ async function sendYoutubeAudio(youtubeURL) {
 
     const downloadedFilename = downloadedMedia[0].path;
 
-    utilities.deleteFile(downloadedFilename);
-
     return { error: false, filePath: downloadedFilename };
   } catch (error) {
     console.error(`Error in sendYoutubeAudio: ${error.message}`);
@@ -106,7 +104,52 @@ async function sendYoutubeAudio(youtubeURL) {
   }
 }
 
+async function sendYoutubeVideo(youtubeURL) {
+  try {
+    const media_metadata = await fetchYoutubeMetadata(youtubeURL, "idOnly");
+
+    if (!media_metadata || !media_metadata.mediaId) {
+      return { error: true, message: `La URL no es válida.` };
+    }
+
+    const videoID = media_metadata.mediaId;
+
+    const videoLength = await getVideoLength(videoID, "seconds");
+
+    if (videoLength > 210) {
+      return {
+        error: true,
+        message: `El límite de duración de video es de 3 minutos y medio.`,
+      };
+    }
+
+    const downloadedMedia = await ytdlp_video_processor(
+      videoID,
+      undefined,
+      undefined,
+      "mp4",
+      undefined,
+      "small",
+    );
+
+    if (
+      !downloadedMedia ||
+      downloadedMedia.length === 0 ||
+      !downloadedMedia[0].path
+    ) {
+      return { error: true, message: `No se pudo descargar el video.` };
+    }
+
+    const downloadedFilename = downloadedMedia[0].path;
+    return { error: false, filePath: downloadedFilename };
+  } catch (error) {
+    console.error(`Error in downloadFullVideoInBestQuality: ${error.message}`);
+    return { error: true, message: error.message };
+  }
+}
+
 module.exports = {
   searchOnYoutube,
   sendYoutubeAudio,
+  sendYoutubeVideo,
 };

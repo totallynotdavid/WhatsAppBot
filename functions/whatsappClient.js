@@ -236,6 +236,9 @@ client.on("message_create", async (message) => {
         break;
       }
       case commands.play: {
+        message.reply(
+          `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,
+        );
         const audioResponse = await youtube.sendYoutubeAudio(query);
 
         if (audioResponse.error) {
@@ -246,6 +249,35 @@ client.on("message_create", async (message) => {
             sendAudioAsVoice: true,
           });
         }
+        utilities.deleteFile(audioResponse.filePath);
+        break;
+      }
+      case commands.watch: {
+        message.reply(
+          `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,
+        );
+        const videoResponse = await youtube.sendYoutubeVideo(query);
+
+        if (videoResponse.error) {
+          message.reply(`${robotEmoji} ${videoResponse.message}`);
+        } else {
+          const isWithinLimit = await utilities.isFileSizeWithinLimit(
+            videoResponse.filePath,
+            16,
+          );
+
+          if (!isWithinLimit) {
+            message.reply(
+              `${robotEmoji} El video supera el límite de 16 MB. Prueba con otro video.`,
+            );
+          } else {
+            const media = await MessageMedia.fromFilePath(
+              videoResponse.filePath,
+            );
+            client.sendMessage(message.id.remote, media);
+          }
+        }
+        utilities.deleteFile(videoResponse.filePath);
         break;
       }
       case commands.say:

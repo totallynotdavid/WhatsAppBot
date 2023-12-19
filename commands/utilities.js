@@ -82,6 +82,24 @@ function deleteFile(filePath) {
   });
 }
 
+/**
+ * Checks if a file is less than a specified size.
+ * @param {string} filePath - Path to the file.
+ * @param {number} maxSizeInMB - Maximum file size in MB.
+ * @returns {Promise<boolean>} - Promise that resolves to true if file is within size limit.
+ */
+async function isFileSizeWithinLimit(filePath, maxSizeInMB) {
+  try {
+    const stats = await fs.stat(filePath);
+    const fileSizeInBytes = stats.size;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+    return fileSizeInBytes <= maxSizeInBytes;
+  } catch (error) {
+    console.error("Error checking file size:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   capitalizeText,
   commandGenerator,
@@ -90,4 +108,5 @@ module.exports = {
   containsVisibleChars,
   formatNumber,
   deleteFile,
+  isFileSizeWithinLimit,
 };
