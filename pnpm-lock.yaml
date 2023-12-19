@@ -69,8 +69,8 @@ dependencies:
     specifier: ^0.0.4
     version: 0.0.4
   ytdlp_video_processor:
-    specifier: ^0.0.5
-    version: 0.0.5
+    specifier: ^0.0.6
+    version: 0.0.6
 
 devDependencies:
   eslint:
@@ -4764,8 +4764,8 @@ packages:
       dotenv: 16.3.1
     dev: false
 
-  /ytdlp_video_processor@0.0.5:
-    resolution: {integrity: sha512-YQNxxXbmbQLH8TbrwafFZ/eX2x/81oLXQFt9jZMKxg9FWstyhHuD215xGVa8LtT85Zg3ZdP5KCMG4XGqdB5tIg==}
+  /ytdlp_video_processor@0.0.6:
+    resolution: {integrity: sha512-R+vRC62kbfbkpEMxjvRYW+4nK5l3LCZ4k42qBNg4o2glr67QPOooCiMAOAnJcLvD94kDliSv+WHHOHt4jHZhtA==}
     requiresBuild: true
     dev: false
 

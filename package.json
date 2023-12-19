@@ -44,7 +44,7 @@
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#1e9b82b2011fe1ad70cee8ce7813c352470cb6c4",
     "yt_duration": "^0.0.1",
     "yt_metadata": "^0.0.4",
-    "ytdlp_video_processor": "^0.0.5"
+    "ytdlp_video_processor": "^0.0.6"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
