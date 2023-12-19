@@ -19,6 +19,8 @@ const commands = {
   w: "w",
   yt: "yt",
   play: "play",
+  watch: "watch",
+  test: "test",
   doi: "doi",
   tex: "tex",
   paper: "paper",
