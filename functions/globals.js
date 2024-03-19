@@ -1,5 +1,8 @@
-let prefix = '!';
-let prefix_admin = '@';
+const env = process.env.NODE_ENV || 'dev';
+const config = require(`../config.${env}.js`);
+
+let prefix = config.command_prefix;
+let prefix_admin = config.admin_command_prefix;
 let robotEmoji = '🤖';
 let paidUsers = [];
 let physicsUsers = [];
