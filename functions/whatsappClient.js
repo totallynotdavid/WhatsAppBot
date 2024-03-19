@@ -25,7 +25,7 @@ const {
     editImage,
     translate,
 } = require('../commands/index.js');
-const newFunctions = require('../lib/functions/index.js');
+const { launchPuppeteer } = require('../lib/functions/index.js');
 
 // Import admin commands
 const {
@@ -75,7 +75,7 @@ const setRefreshDataCallback = (callback) => {
 */
 const client = new Client({
     authStrategy: new LocalAuth(),
-    puppeteer: newFunctions.launchPuppeteer(),
+    puppeteer: launchPuppeteer(),
     webVersionCache: {
         type: 'remote',
         remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2407.3.html',
@@ -117,12 +117,12 @@ client.on('message_create', async (message) => {
     const query = parts.join(' ');
 
     /*
-  The checks are done in order of importance
-  1. Check if the message is in a group
-  Here there is a divergence between the admin and the regular commands
-  1.a Regular: The message is in a premium group
-  1.b Admin: The message is from a user who is a paid user
-  */
+      The checks are done in order of importance
+      1. Check if the message is in a group
+      Here there is a divergence between the admin and the regular commands
+      1.a Regular: The message is in a premium group
+      1.b Admin: The message is from a user who is a paid user
+    */
 
     if (message.body.startsWith(prefix)) {
     // Bug: this also gets triggered if a user sends a location
@@ -150,7 +150,7 @@ client.on('message_create', async (message) => {
                 stringifyMessage,
                 helpCommand,
                 message,
-                /*client, List,*/ robotEmoji,
+                robotEmoji,
             );
             break;
         case commands.sticker:
@@ -201,7 +201,7 @@ client.on('message_create', async (message) => {
                 prefix,
                 stringifyMessage,
                 caeCommand,
-                message /*, client, Buttons*/,
+                message,
                 robotEmoji,
             );
             break;
@@ -375,13 +375,12 @@ client.on('message_create', async (message) => {
         message.react('✅');
     }
 
-    if (message.body.startsWith(prefix_admin)) {
     /*
-    The logic here is the following:
-    1. Check if string[1] is an actual command, this must be done because the user could send a message starting with the prefix but not being a command
-    2. Check if the user is a paid user
+        The logic here is the following:
+        1. Check if string[1] is an actual command, this must be done because the user could send a message starting with the prefix but not being a command
+        2. Check if the user is a paid user
     */
-
+    if (message.body.startsWith(prefix_admin)) {
         let stringifyMessage = message.body.trim().split(/\s+/);
         const command = stringifyMessage[0].split(prefix_admin)[1];
         if (!(command in adminCommands)) return;
