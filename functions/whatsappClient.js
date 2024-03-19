@@ -79,7 +79,7 @@ const client = new Client({
   webVersionCache: {
     type: 'remote',
     remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2407.3.html`,
-  }
+  },
 });
 
 client.on("qr", (qr) => {
