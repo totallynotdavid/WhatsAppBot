@@ -6,7 +6,7 @@ const websiteAllowedRegex =
   /^https?:\/\/(?:www\.)?reddit\.com\/r\/[\w-]+\/comments\/[\w-]+\/[\w-]+\/?$/i;
 
 module.exports = {
-  urlRegex,
-  imageOrVideoRegex,
-  websiteAllowedRegex,
+    urlRegex,
+    imageOrVideoRegex,
+    websiteAllowedRegex,
 };
