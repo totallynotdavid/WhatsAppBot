@@ -74,11 +74,11 @@ async function handleTextToAudio(
             );
         }
     } else {
-    // Check if second word in message is a valid voice
+        // Check if second word in message is a valid voice
         if (stringifyMessage[1].startsWith('-')) {
             let possibleVoiceId =
-        stringifyMessage[1].slice(1).charAt(0).toUpperCase() +
-        stringifyMessage[1].slice(2).toLowerCase();
+              stringifyMessage[1].slice(1).charAt(0).toUpperCase() +
+              stringifyMessage[1].slice(2).toLowerCase();
 
             if (Object.prototype.hasOwnProperty.call(voiceOptions, possibleVoiceId)) {
                 voiceId = possibleVoiceId;
@@ -94,11 +94,13 @@ async function handleTextToAudio(
                 .slice(2, stringifyMessage.length)
                 .join(' '); // start speaking from third word onwards
         } else {
+            /*
             sendReply(
                 message,
                 'Ahora puedes escoger entre varias voces. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.',
                 robotEmoji,
             );
+            */
             textToSpeak = stringifyMessage.slice(1).join(' '); // If no voice is specified, start speaking from second word onwards
         }
     }
