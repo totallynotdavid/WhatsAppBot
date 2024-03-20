@@ -13,7 +13,7 @@ function checkEnvironmentVariables() {
     const requiredVariables = [
         'spotify_client_id',
         'spotify_client_secret',
-        'youtube_api_key',
+        'YOUTUBE_API_KEY_1',
         'supabase_api_key',
         'supabase_base_url',
         'folder_id',
