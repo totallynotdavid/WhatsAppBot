@@ -42,7 +42,7 @@
     "sqlite3": "^5.1.6",
     "uuid": "^9.0.1",
     "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#72a18816a921bf0cc762cd805cc1141d22711d3c",
-    "yt_duration": "^0.0.1",
+    "yt_duration": "^0.0.2",
     "yt_metadata": "^0.0.4",
     "ytdlp_video_processor": "^0.0.6"
   },

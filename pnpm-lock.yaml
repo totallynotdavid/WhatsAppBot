@@ -63,8 +63,8 @@ dependencies:
     specifier: github:pedroslopez/whatsapp-web.js#72a18816a921bf0cc762cd805cc1141d22711d3c
     version: github.com/pedroslopez/whatsapp-web.js/72a18816a921bf0cc762cd805cc1141d22711d3c
   yt_duration:
-    specifier: ^0.0.1
-    version: 0.0.1
+    specifier: ^0.0.2
+    version: 0.0.2
   yt_metadata:
     specifier: ^0.0.4
     version: 0.0.4
@@ -2294,6 +2294,11 @@ packages:
 
   /dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+    engines: {node: '>=12'}
+    dev: false
+
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
     dev: false
 
@@ -4758,10 +4763,10 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /yt_duration@0.0.1:
-    resolution: {integrity: sha512-fVCWtPn+poZq6dStKbgEZEdCXEAsJ0JUuo+TlJioS9M+jxNgv5WbmyWUPTnXL5tjNmy4j77r9NMd08uWbzFkcQ==}
+  /yt_duration@0.0.2:
+    resolution: {integrity: sha512-TEn/0rlIKvN3+oF62OAdP8P+0YP29QZ6lt+CvTck6tA4UoqewCPUBRphrGO7noTmOoKDAlzo0xMysELnTxusrA==}
     dependencies:
-      dotenv: 16.3.1
+      dotenv: 16.4.5
     dev: false
 
   /yt_metadata@0.0.4:
