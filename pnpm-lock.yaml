@@ -66,8 +66,8 @@ dependencies:
     specifier: ^0.0.2
     version: 0.0.2
   yt_metadata:
-    specifier: ^0.0.4
-    version: 0.0.4
+    specifier: ^0.0.5
+    version: 0.0.5
   ytdlp_video_processor:
     specifier: ^0.0.6
     version: 0.0.6
@@ -4769,10 +4769,10 @@ packages:
       dotenv: 16.4.5
     dev: false
 
-  /yt_metadata@0.0.4:
-    resolution: {integrity: sha512-0RsZGD6s1FsIfz+iyqyf3i9+9nspZHmPCDcEDPpn7mtVTu9GvaOgWZf+RpfZsY2K2AesAqwA1+RQk6s6TzDjiw==}
+  /yt_metadata@0.0.5:
+    resolution: {integrity: sha512-XL0x9yRAiazXfE7bai2H3ChvYEid1wO+r54+5V80RR4H+VKtXDDX9dwyTzaPfqXH61+2NzDrAfj2a8mBOIxtBg==}
     dependencies:
-      dotenv: 16.3.1
+      dotenv: 16.4.5
     dev: false
 
   /ytdlp_video_processor@0.0.6:
