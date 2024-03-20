@@ -1,7 +1,9 @@
+const { URL } = require('node:url');
 const utilities = require('./utilities');
 const regex = require('../functions/regex');
 
 let mediaSticker, originalQuotedMessage;
+const allowedRedditHosts = ['www.reddit.com', 'reddit.com'];
 
 async function processQuotedStickerMessage(
     stringifyMessage,
@@ -197,32 +199,44 @@ async function handleStickerURL(
 
         stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
 
-        let mediaURL;
+        try {
+            const url = new URL(stickerURL);
+            const isRedditUrl = allowedRedditHosts.includes(url.host);
 
-        if (stickerURL.includes('reddit.com')) {
-            const { mediaURL: redditMediaURL, media } =
-        await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
-            if (!redditMediaURL) {
-                return;
-            }
-            mediaURL = redditMediaURL;
+            if (isRedditUrl) {
+                const { mediaURL: redditMediaURL, media } =
+                  await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
+                if (!redditMediaURL) {
+                    return;
+                }
 
-            if (media.is_video) {
-                const localFilePath = await reddit.saveRedditVideo(media);
-                await validateAndConvertMedia(
-                    chat,
-                    mediaURL,
-                    message,
-                    MessageMedia,
-                    senderName,
-                    senderNumber,
-                    robotEmoji,
-                    localFilePath,
-                );
+                if (media.is_video) {
+                    const localFilePath = await reddit.saveRedditVideo(media);
+                    await validateAndConvertMedia(
+                        chat,
+                        redditMediaURL,
+                        message,
+                        MessageMedia,
+                        senderName,
+                        senderNumber,
+                        robotEmoji,
+                        localFilePath,
+                    );
+                } else {
+                    await validateAndConvertMedia(
+                        chat,
+                        redditMediaURL,
+                        message,
+                        MessageMedia,
+                        senderName,
+                        senderNumber,
+                        robotEmoji,
+                    );
+                }
             } else {
                 await validateAndConvertMedia(
                     chat,
-                    mediaURL,
+                    stickerURL,
                     message,
                     MessageMedia,
                     senderName,
@@ -230,16 +244,10 @@ async function handleStickerURL(
                     robotEmoji,
                 );
             }
-        } else {
-            mediaURL = stickerURL;
-            await validateAndConvertMedia(
-                chat,
-                mediaURL,
-                message,
-                MessageMedia,
-                senderName,
-                senderNumber,
-                robotEmoji,
+        } catch (error) {
+            console.error('Error parsing URL:', error);
+            message.reply(
+                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo.`,
             );
         }
     }
