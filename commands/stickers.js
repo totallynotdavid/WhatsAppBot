@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 const utilities = require('./utilities');
 const regex = require('../functions/regex');
 
@@ -13,8 +12,8 @@ async function processQuotedStickerMessage(
 ) {
     if (
         stringifyMessage.length === 1 &&
-    message._data.quotedMsg &&
-    message._data.quotedMsg.type === 'sticker'
+        message._data.quotedMsg &&
+        message._data.quotedMsg.type === 'sticker'
     ) {
         originalQuotedMessage = await message.getQuotedMessage();
         mediaSticker = await originalQuotedMessage.downloadMedia();
@@ -124,13 +123,13 @@ async function validateAndConvertMedia(
 
         if (
             response.ok &&
-      contentType &&
-      (contentType.startsWith('image/') || contentType.startsWith('video/'))
+            contentType &&
+            (contentType.startsWith('image/') || contentType.startsWith('video/'))
         ) {
             if (
                 contentType.startsWith('video/mp4') &&
-        contentLength &&
-        parseInt(contentLength.split('=')[1]) > 20 * 1000
+                contentLength &&
+                parseInt(contentLength.split('=')[1]) > 20 * 1000
             ) {
                 message.reply(
                     `${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`,
@@ -186,8 +185,8 @@ async function handleStickerURL(
         if (
             !(
                 regex.websiteAllowedRegex.test(stickerURL) ||
-        regex.urlRegex.test(stickerURL) ||
-        regex.imageOrVideoRegex.test(stickerURL)
+                regex.urlRegex.test(stickerURL) ||
+                regex.imageOrVideoRegex.test(stickerURL)
             )
         ) {
             message.reply(
