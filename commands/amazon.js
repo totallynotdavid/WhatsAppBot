@@ -1,3 +1,6 @@
+// You need to create an access key on https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials
+// These keys are stored on C:\Users\{user}\.aws\credentials or ~/.aws/credentials
+
 const {
     PollyClient,
     SynthesizeSpeechCommand,
