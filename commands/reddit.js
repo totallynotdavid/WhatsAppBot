@@ -87,13 +87,13 @@ async function handleRedditMedia(stickerURL, message, robotEmoji) {
             };
         } else if (
             media.url.startsWith('https://v.redd.it/') ||
-      media.url.startsWith('https://i.imgur.com/')
+            media.url.startsWith('https://i.imgur.com/')
         ) {
             mediaURL = media.url;
         } else if (
             media.preview &&
-      media.preview.images &&
-      media.preview.images.length > 0
+            media.preview.images &&
+            media.preview.images.length > 0
         ) {
             mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, '&');
         } else if (media.url) {
