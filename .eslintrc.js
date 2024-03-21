@@ -4,8 +4,12 @@ module.exports = {
         es2021: true,
         node: true,
     },
-    extends: `eslint:recommended`,
-    plugins: [`@stylistic/js`],
+    extends: [
+        "eslint:recommended",
+        "plugin:@stylistic/js",
+        "plugin:prettier/recommended",
+    ],
+    plugins: ["@stylistic/js", "prettier"],
     overrides: [
         {
             env: {
