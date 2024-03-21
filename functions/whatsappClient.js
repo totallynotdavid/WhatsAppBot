@@ -441,6 +441,8 @@ client.on(`message_create`, async (message) => {
                 message,
                 client,
                 robotEmoji,
+                prefix_admin,
+                adminCommands.join,
             );
             break;
         case adminCommands.addgroup:

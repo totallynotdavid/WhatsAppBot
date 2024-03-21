@@ -181,18 +181,28 @@ async function handleJoinGroupRequest(
     message,
     client,
     robotEmoji,
+    prefix_admin,
+    command,
 ) {
-    if (stringifyMessage.length === 2) {
-        const inviteLink = stringifyMessage[1];
-        const inviteCode = inviteLink.split(`https://chat.whatsapp.com/`)[1];
-        try {
-            await client.acceptInvite(inviteCode);
-            message.reply(`${robotEmoji} ¡Listo! Me acabo de unir al grupo.`);
-        } catch (error) {
-            message.reply(`${robotEmoji} No me he podido unir. ¿El enlace es correcto?`,);
-        }
-    } else {
-        message.reply(`${robotEmoji} Necesito el enlace de invitación del grupo. ¿Puedes enviarlo?`,);
+    if (stringifyMessage.length !== 2) {
+        message.reply(`${robotEmoji} El comando no es válido. Por favor, envía el enlace de invitación al grupo usando el formato correcto:\n\n${prefix_admin}${command} https://chat.whatsapp.com/TuCodigoDeInvitacion`);
+        return;
+    }
+
+    const inviteLink = stringifyMessage[1];
+
+    if (!inviteLink.startsWith(`https://chat.whatsapp.com/`)) {
+        message.reply(`${robotEmoji} El enlace de invitación que mandaste no parece válido. Por favor, verifica el enlace e inténtalo de nuevo.`);
+        return;
+    }
+
+    const inviteCode = inviteLink.split(`https://chat.whatsapp.com/`)[1];
+
+    try {
+        await client.acceptInvite(inviteCode);
+        message.reply(`${robotEmoji} ¡Listo! Me acabo de unir al grupo.`);
+    } catch (error) {
+        message.reply(`${robotEmoji} No me he podido unir al grupo. Asegúrate de que el enlace de invitación sea correcto y de que aún esté activo.`);
     }
 }
 
