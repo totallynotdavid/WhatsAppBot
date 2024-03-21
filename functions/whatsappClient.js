@@ -455,6 +455,14 @@ client.on(`message_create`, async (message) => {
                 senderNumber,
             );
             break;
+        case adminCommands.add:
+            groups.handleAddUserToGroup(
+                admins,
+                message,
+                client,
+                robotEmoji,
+            );
+            break;
         case adminCommands.addpremium:
             db.handleUpgradeUserToPremium(
                 senderNumber,

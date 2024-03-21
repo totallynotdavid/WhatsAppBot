@@ -155,6 +155,52 @@ function handleDemoteUsersToParticipants(
     }
 }
 
+async function handleAddUserToGroup(
+    admins,
+    message,
+    client,
+    robotEmoji
+) {
+    if (!message.hasQuotedMsg) {
+        message.reply(`${robotEmoji} Este comando debe ser usado como respuesta a un mensaje que contenga un contacto.`);
+        return;
+    }
+
+    const quotedMessage = await message.getQuotedMessage();
+
+    if (!quotedMessage.vCards || quotedMessage.vCards.length === 0) {
+        message.reply(`${robotEmoji} El mensaje al que estás respondiendo no contiene un contacto.`);
+        return;
+    }
+
+    const groupChat = await message.getChat();
+    const contactIds = [];
+
+    for (const vCard of quotedMessage.vCards) {
+        const vCardLines = vCard.split(`\n`);
+        const contactIdLine = vCardLines.find(line => line.startsWith(`TEL;type=CELL;waid=`));
+        const contactId = contactIdLine ? contactIdLine.split(`:`)[1].replace(/\+/g, ``).replace(/ /g, ``) : null;
+
+        if (!contactId) {
+            message.reply(`${robotEmoji} No se pudo obtener el ID del contacto desde el mensaje citado.`);
+            return;
+        }
+
+        contactIds.push(`${contactId}@c.us`);
+    }
+
+    if (!admins.some(admin => admin.id._serialized === `${client.info.wid.user}@c.us`)) {
+        return message.reply(`${robotEmoji} Necesito permisos de administrador en el grupo para continuar.`);
+    }
+
+    try {
+        await groupChat.addParticipants(contactIds);
+        message.reply(`${robotEmoji} Los usuarios han sido agregados al grupo.`);
+    } catch (error) {
+        message.reply(`${robotEmoji} No se pudo agregar a los usuarios al grupo. Por favor, verifica que los contactos sean válidos y que no estén ya en el grupo.`);
+    }
+}
+
 async function processUser(
     userIds,
     adminCondition,
@@ -324,6 +370,7 @@ module.exports = {
     handlePromoteUsersToAdmins,
     handleDemoteUsersToParticipants,
     handleJoinGroupRequest,
+    handleAddUserToGroup,
     handleDeleteMessage,
     handleToggleBotActivation,
     hasValidSpecialDay,

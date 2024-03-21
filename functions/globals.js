@@ -43,6 +43,7 @@ const adminCommands = {
     del: `del`,
     join: `join`,
     addgroup: `addgroup`,
+    add: `add`,
     addpremium: `addpremium`,
     refresh: `refresh`,
     promote: `promote`,
