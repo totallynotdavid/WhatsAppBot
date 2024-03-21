@@ -30,6 +30,11 @@
     "usage": "addgroup"
   },
   {
+    "command": "add",
+    "message": "Utiliza este comando para añadir usuarios al grupo. Responde a un mensaje que contenga los contactos de los usuarios que deseas añadir. Es posible incluir a varios usuarios.\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
+    "usage": "add"
+  },
+  {
     "command": "addpremium",
     "message": "Registra un nuevo usuario para el bot. Disponible solo para el propietario",
     "usage": "addpremium <user> <nombre> <dias>"
