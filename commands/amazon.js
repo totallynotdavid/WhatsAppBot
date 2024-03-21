@@ -1,10 +1,9 @@
 // You need to create an access key on https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/security_credentials
 // These keys are stored on C:\Users\{user}\.aws\credentials or ~/.aws/credentials
 
-const {
-    PollyClient,
-    SynthesizeSpeechCommand,
-} = require(`@aws-sdk/client-polly`);
+const { PollyClient, SynthesizeSpeechCommand } = require(
+    `@aws-sdk/client-polly`
+);
 const fs = require(`fs`);
 const path = require(`path`);
 const { v4: uuidv4 } = require(`uuid`);
@@ -30,9 +29,7 @@ function getRandomVoice() {
     return voices[Math.floor(Math.random() * voices.length)];
 }
 
-async function synthesizeSpeech(
-    text, songId, voiceId
-) {
+async function synthesizeSpeech(text, songId, voiceId) {
     const params = {
         Text: text,
         OutputFormat: `mp3`,
@@ -54,9 +51,7 @@ async function synthesizeSpeech(
     }
 }
 
-async function sendReply(
-    message, replyText, robotEmoji
-) {
+async function sendReply(message, replyText, robotEmoji) {
     return message.reply(`${robotEmoji} ${replyText}`);
 }
 
@@ -65,7 +60,7 @@ async function handleTextToAudio(
     message,
     MessageMedia,
     client,
-    robotEmoji,
+    robotEmoji
 ) {
     let textToSpeak = ``;
     let voiceId = getRandomVoice();
@@ -77,23 +72,28 @@ async function handleTextToAudio(
             return sendReply(
                 message,
                 `Lo siento, no puedo leer tu mente. Adjunta el texto que quieres que diga.`,
-                robotEmoji,
+                robotEmoji
             );
         }
     } else {
         // Check if second word in message is a valid voice
         if (stringifyMessage[1].startsWith(`-`)) {
             let possibleVoiceId =
-              stringifyMessage[1].slice(1).charAt(0).toUpperCase() +
-              stringifyMessage[1].slice(2).toLowerCase();
+                stringifyMessage[1].slice(1).charAt(0).toUpperCase() +
+                stringifyMessage[1].slice(2).toLowerCase();
 
-            if (Object.prototype.hasOwnProperty.call(voiceOptions, possibleVoiceId)) {
+            if (
+                Object.prototype.hasOwnProperty.call(
+                    voiceOptions,
+                    possibleVoiceId
+                )
+            ) {
                 voiceId = possibleVoiceId;
             } else {
                 sendReply(
                     message,
                     `Voz inválida. Utiliza <!help say> para ver las voces disponibles. Usaremos una voz random.`,
-                    robotEmoji,
+                    robotEmoji
                 );
             }
 
@@ -116,7 +116,7 @@ async function handleTextToAudio(
         return sendReply(
             message,
             `Lo siento, el texto es demasiado largo. Por favor, limita tu mensaje a 1000 caracteres.`,
-            robotEmoji,
+            robotEmoji
         );
     }
 
@@ -124,15 +124,11 @@ async function handleTextToAudio(
     let filePath;
 
     try {
-        filePath = await synthesizeSpeech(
-            textToSpeak, songId, voiceId
-        );
+        filePath = await synthesizeSpeech(textToSpeak, songId, voiceId);
         const media = MessageMedia.fromFilePath(filePath);
-        await client.sendMessage(
-            message.id.remote, media, {
-                sendAudioAsVoice: true,
-            }
-        );
+        await client.sendMessage(message.id.remote, media, {
+            sendAudioAsVoice: true,
+        });
     } catch (err) {
         throw new Error(`Failed to handle text to audio: ${err.message}`);
     } finally {

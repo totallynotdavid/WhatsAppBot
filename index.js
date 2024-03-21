@@ -4,9 +4,9 @@ const spotifyAPI = require(`./commands/spotify`);
 const database = require(`./lib/api/supabaseCommunicationModule.js`);
 
 /* CHECKING */
-const {
-    checkEnvironmentVariables,
-} = require(`./functions/checkEnvironmentVariables`);
+const { checkEnvironmentVariables } = require(
+    `./functions/checkEnvironmentVariables`
+);
 const checkStructure = require(`./functions/checkStructure`);
 checkEnvironmentVariables(); // Check all envs are set before starting
 checkStructure.checkFolderStructure();
@@ -17,18 +17,22 @@ checkStructure.cleanFolderStructure();
 const refreshData = async () => {
     const [paidUsers, physicsUsers, premiumGroups] = await Promise.all([
         database.fetchDataFromTable(
-            `paid_users`, `phone_number`, `premium_expiry`
+            `paid_users`,
+            `phone_number`,
+            `premium_expiry`
         ),
         database.fetchDataFromTable(`physics_users`, `phone_number`),
         database.fetchDataFromTable(
             `premium_groups`,
             `group_id`,
             `contact_number`,
-            `isActive`,
+            `isActive`
         ),
     ]);
 
-    const validPremiumUsers = paidUsers.filter(({ premium_expiry }) => new Date(premium_expiry) > Date.now(),);
+    const validPremiumUsers = paidUsers.filter(
+        ({ premium_expiry }) => new Date(premium_expiry) > Date.now()
+    );
 
     const expiredPremiumUsers = paidUsers
         .filter(({ premium_expiry }) => new Date(premium_expiry) < Date.now())
@@ -39,21 +43,21 @@ const refreshData = async () => {
             `premium_groups`,
             { isActive: false },
             `contact_number`,
-            expiredPremiumUsers,
+            expiredPremiumUsers
         );
     }
 
     whatsappClient.setFetchedData(
-        validPremiumUsers, physicsUsers, premiumGroups
+        validPremiumUsers,
+        physicsUsers,
+        premiumGroups
     );
 
     const lastCheck = new Date().toISOString();
-    await database.updateTable(
-        `app_metadata`, { lastCheck }, null, null, {
-            column: `id`,
-            value: 1,
-        }
-    );
+    await database.updateTable(`app_metadata`, { lastCheck }, null, null, {
+        column: `id`,
+        value: 1,
+    });
 };
 
 refreshData()
@@ -63,7 +67,7 @@ refreshData()
         const midnight = new Date(
             now.getFullYear(),
             now.getMonth(),
-            now.getDate() + 1,
+            now.getDate() + 1
         );
 
         if (nextFifteenMinutes >= midnight) {

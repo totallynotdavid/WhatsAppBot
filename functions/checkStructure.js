@@ -11,13 +11,15 @@ const imgDirectory = `./img`;
 function checkAndCreateFolder(directory, purpose) {
     if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory);
-        console.log(`Created [${directory}] folder because there was none. This is to store the ${purpose} files.`,);
+        console.log(
+            `Created [${directory}] folder because there was none. This is to store the ${purpose} files.`
+        );
     }
 }
 
 function cleanFolder(directory, purpose) {
     try {
-        readdirSync(directory).forEach((f) => rmSync(`${directory}/${f}`));
+        readdirSync(directory).forEach(f => rmSync(`${directory}/${f}`));
     } catch (error) {
         console.error(`Error cleaning ${purpose} folder:`, error);
     }

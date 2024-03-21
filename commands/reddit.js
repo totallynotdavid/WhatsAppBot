@@ -3,9 +3,7 @@ const path = require(`path`);
 const fetch = require(`node-fetch`);
 
 // fromis command
-async function getRedditImage(
-    message, subreddit, client, MessageMedia
-) {
+async function getRedditImage(message, subreddit, client, MessageMedia) {
     try {
         const response = await fetch(`https://meme-api.com/gimme/${subreddit}`);
         if (!response.ok) {
@@ -18,11 +16,9 @@ async function getRedditImage(
         }
 
         const imageMedia = await MessageMedia.fromUrl(imageData.url);
-        client.sendMessage(
-            message.id.remote, imageMedia, {
-                caption: imageData.title,
-            }
-        );
+        client.sendMessage(message.id.remote, imageMedia, {
+            caption: imageData.title,
+        });
     } catch (err) {
         message.reply(`🤖 Hubo un error al tratar de enviar la imagen.`);
         console.error(err);
@@ -41,9 +37,11 @@ async function getRedditVideo(media) {
             continue;
         }
 
-        const fileStream = fs.createWriteStream(path.join(__dirname, videoTitle));
+        const fileStream = fs.createWriteStream(
+            path.join(__dirname, videoTitle)
+        );
         response.body.pipe(fileStream);
-        fileStream.on(`error`, (error) => {
+        fileStream.on(`error`, error => {
             console.error(`Error while saving the file:`, error);
         });
         fileStream.on(`finish`, () => {
@@ -62,9 +60,7 @@ async function saveRedditVideo(media) {
         const videoResponse = await fetch(videoURL);
         const videoBuffer = await videoResponse.buffer();
         const videoId = media.id;
-        const videoPath = path.join(
-            __dirname, `..`, `video`, `${videoId}.mp4`
-        );
+        const videoPath = path.join(__dirname, `..`, `video`, `${videoId}.mp4`);
         fs.writeFileSync(videoPath, videoBuffer);
         return videoPath;
     } catch (error) {
@@ -73,9 +69,7 @@ async function saveRedditVideo(media) {
     }
 }
 
-async function handleRedditMedia(
-    stickerURL, message, robotEmoji
-) {
+async function handleRedditMedia(stickerURL, message, robotEmoji) {
     try {
         const postURL = stickerURL.replace(/\/$/, ``) + `.json`;
         const response = await fetch(postURL);
@@ -103,11 +97,16 @@ async function handleRedditMedia(
             media.preview.images &&
             media.preview.images.length > 0
         ) {
-            mediaURL = media.preview.images[0].source.url.replace(/&amp;/g, `&`);
+            mediaURL = media.preview.images[0].source.url.replace(
+                /&amp;/g,
+                `&`
+            );
         } else if (media.url) {
             mediaURL = media.url;
         } else {
-            message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`,);
+            message.reply(
+                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`
+            );
             return {
                 mediaURL: mediaURL,
                 media: media,
@@ -119,7 +118,9 @@ async function handleRedditMedia(
         };
     } catch (error) {
         console.error(error);
-        message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+        message.reply(
+            `${robotEmoji} Parece que algo salió mal, intenta de nuevo.`
+        );
         return null;
     }
 }

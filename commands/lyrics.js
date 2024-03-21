@@ -27,7 +27,9 @@ async function fetchSongLyrics(message, robotEmoji) {
 
         if (trackList && trackList.length > 0) {
             const trackId = trackList[0].track.track_id;
-            const lyricsResponse = await fetch(`https://api.musixmatch.com/ws/1.1/track.lyrics.get?format=json&callback=callback&track_id=${trackId}&apikey=${apiKey}`,);
+            const lyricsResponse = await fetch(
+                `https://api.musixmatch.com/ws/1.1/track.lyrics.get?format=json&callback=callback&track_id=${trackId}&apikey=${apiKey}`
+            );
             if (!lyricsResponse.ok) {
                 throw new Error(`HTTP error! status: ${lyricsResponse.status}`);
             }
@@ -43,11 +45,11 @@ async function fetchSongLyrics(message, robotEmoji) {
     }
 }
 
-async function handleSongLyricsRequest(
-    stringifyMessage, message, robotEmoji
-) {
+async function handleSongLyricsRequest(stringifyMessage, message, robotEmoji) {
     if (stringifyMessage.length === 1) {
-        message.reply(`${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`,);
+        message.reply(
+            `${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`
+        );
     } else {
         const songName = stringifyMessage.slice(1).join(` `);
         const songLyrics = await fetchSongLyrics(songName, robotEmoji);

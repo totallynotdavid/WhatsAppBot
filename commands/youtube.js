@@ -32,29 +32,31 @@ async function searchOnYoutube(query, mode) {
 
         let baseYoutubeUrl;
         switch (mediaType) {
-        case `video`:
-            baseYoutubeUrl = `https://youtu.be/${mediaId}`;
-            caption = `🎬: ${title}\n📺: ${channelTitle}${
-                viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ``
-            }${
-                likeCount
-                    ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas`
-                    : ``
-            }\n🔗: ${baseYoutubeUrl}`;
-            break;
-        case `playlist`:
-            baseYoutubeUrl = `https://www.youtube.com/playlist?list=${mediaId}`;
-            caption = `🎬: ${title}\n🔗: ${baseYoutubeUrl}`;
-            break;
-        case `channel`:
-            baseYoutubeUrl = `https://www.youtube.com/channel/${mediaId}`;
-            caption = `📺: ${channelTitle}\n🔗: ${baseYoutubeUrl}`;
-            break;
-        default:
-            return {
-                error: true,
-                message: `${robotEmoji} Tipo de medio no reconocido. No se pudo procesar el video.`,
-            };
+            case `video`:
+                baseYoutubeUrl = `https://youtu.be/${mediaId}`;
+                caption = `🎬: ${title}\n📺: ${channelTitle}${
+                    viewCount
+                        ? `\n👀: ${utilities.formatNumber(viewCount)} vistas`
+                        : ``
+                }${
+                    likeCount
+                        ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas`
+                        : ``
+                }\n🔗: ${baseYoutubeUrl}`;
+                break;
+            case `playlist`:
+                baseYoutubeUrl = `https://www.youtube.com/playlist?list=${mediaId}`;
+                caption = `🎬: ${title}\n🔗: ${baseYoutubeUrl}`;
+                break;
+            case `channel`:
+                baseYoutubeUrl = `https://www.youtube.com/channel/${mediaId}`;
+                caption = `📺: ${channelTitle}\n🔗: ${baseYoutubeUrl}`;
+                break;
+            default:
+                return {
+                    error: true,
+                    message: `${robotEmoji} Tipo de medio no reconocido. No se pudo procesar el video.`,
+                };
         }
 
         return { error: false, thumbnailUrl, caption };
@@ -89,8 +91,8 @@ async function sendYoutubeAudio(youtubeURL) {
 
         if (
             !downloadedMedia ||
-      downloadedMedia.length === 0 ||
-      !downloadedMedia[0].path
+            downloadedMedia.length === 0 ||
+            !downloadedMedia[0].path
         ) {
             return { error: true, message: `No se pudo descargar el audio.` };
         }
@@ -129,13 +131,13 @@ async function sendYoutubeVideo(youtubeURL) {
             undefined,
             `mp4`,
             undefined,
-            `small`,
+            `small`
         );
 
         if (
             !downloadedMedia ||
-      downloadedMedia.length === 0 ||
-      !downloadedMedia[0].path
+            downloadedMedia.length === 0 ||
+            !downloadedMedia[0].path
         ) {
             return { error: true, message: `No se pudo descargar el video.` };
         }
@@ -143,7 +145,9 @@ async function sendYoutubeVideo(youtubeURL) {
         const downloadedFilename = downloadedMedia[0].path;
         return { error: false, filePath: downloadedFilename };
     } catch (error) {
-        console.error(`Error in downloadFullVideoInBestQuality: ${error.message}`);
+        console.error(
+            `Error in downloadFullVideoInBestQuality: ${error.message}`
+        );
         return { error: true, message: error.message };
     }
 }

@@ -49,8 +49,9 @@ async function downloadSpotifyAudio(song) {
         const audioStream = await fetch(song.preview_url);
         const fileWriter = fs.createWriteStream(`./audio/${song.id}.mp3`);
         audioStream.body.pipe(fileWriter);
-        return new Promise((resolve) =>
-            fileWriter.on(`finish`, () => resolve(true)),);
+        return new Promise(resolve =>
+            fileWriter.on(`finish`, () => resolve(true))
+        );
     } catch (error) {
         console.error(`Error downloading audio file:`, error);
         return false;
@@ -63,18 +64,18 @@ async function sendSpotifyAudio(
     client,
     message,
     song,
-    robotEmoji,
+    robotEmoji
 ) {
     try {
         const media = MessageMedia.fromFilePath(`./audio/${song.id}.mp3`);
-        await client.sendMessage(
-            message.id.remote, media, {
-                sendAudioAsVoice: true,
-            }
-        );
+        await client.sendMessage(message.id.remote, media, {
+            sendAudioAsVoice: true,
+        });
     } catch (error) {
         console.error(`Error sending audio file:`, error);
-        message.reply(`${robotEmoji} Houston, tenemos un problema. No se pudo enviar el audio.`,);
+        message.reply(
+            `${robotEmoji} Houston, tenemos un problema. No se pudo enviar el audio.`
+        );
         return null;
     }
 }
@@ -85,12 +86,16 @@ async function handleSpotifySongRequest(
     MessageMedia,
     query,
     stringifyMessage,
-    robotEmoji,
+    robotEmoji
 ) {
-    const songs = await getSongData(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=5`,);
+    const songs = await getSongData(
+        `https://api.spotify.com/v1/search?q=${query}&type=track&limit=5`
+    );
 
     if (stringifyMessage.length === 1) {
-        message.reply(`${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`,);
+        message.reply(
+            `${robotEmoji} Cómo te atreves a pedirme una canción sin decirme el nombre.`
+        );
     } else {
         let audioDownloaded = false;
         let selectedSong = null;
@@ -104,16 +109,20 @@ async function handleSpotifySongRequest(
         }
 
         if (audioDownloaded && selectedSong) {
-            message.reply(`${robotEmoji} La canción que encontré es: *${selectedSong.name}* - *${selectedSong.artists[0].name}*`,);
+            message.reply(
+                `${robotEmoji} La canción que encontré es: *${selectedSong.name}* - *${selectedSong.artists[0].name}*`
+            );
             await sendSpotifyAudio(
                 MessageMedia,
                 client,
                 message,
                 selectedSong,
-                robotEmoji,
+                robotEmoji
             );
         } else {
-            message.reply(`${robotEmoji} Parece que esta canción está restringida por Spotify.`,);
+            message.reply(
+                `${robotEmoji} Parece que esta canción está restringida por Spotify.`
+            );
         }
     }
 }

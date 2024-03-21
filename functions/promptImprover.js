@@ -80,8 +80,7 @@ const shotTypes = [
 ];
 
 const PROMPT_TEMPLATES = {
-    normal:
-    `[input], [environment], [shot_type], captured on [medium], [condition], during [times_of_day], evoking a [atmosphere] mood, shot in [style], [detail]`,
+    normal: `[input], [environment], [shot_type], captured on [medium], [condition], during [times_of_day], evoking a [atmosphere] mood, shot in [style], [detail]`,
 };
 
 function getRandomElement(arr) {

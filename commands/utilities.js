@@ -22,7 +22,7 @@ function commandGenerator(
     message,
     stringifyMessage,
     prefix,
-    robotEmoji,
+    robotEmoji
 ) {
     try {
         const commandObj = fixedDataCommandDict[stringifyMessage[1]];
@@ -30,13 +30,19 @@ function commandGenerator(
         if (commandObj) {
             const builtMessage = commandObj.usage
                 ? `${robotEmoji} ${
-                    commandObj.message
-                }.\n\n*Ejemplo de uso*:\n\n${codeWrapper(`${prefix}${commandObj.usage}`,)}`
+                      commandObj.message
+                  }.\n\n*Ejemplo de uso*:\n\n${codeWrapper(
+                      `${prefix}${commandObj.usage}`
+                  )}`
                 : `${robotEmoji} ${commandObj.message}.`;
 
             message.reply(builtMessage);
         } else {
-            message.reply(`${robotEmoji} Parece que ${codeWrapper(stringifyMessage[1],)} no existe.`,);
+            message.reply(
+                `${robotEmoji} Parece que ${codeWrapper(
+                    stringifyMessage[1]
+                )} no existe.`
+            );
         }
     } catch (err) {
         console.error(err);
@@ -67,7 +73,7 @@ function formatNumber(number) {
 }
 
 function deleteFile(filePath) {
-    fs.unlink(filePath, (err) => {
+    fs.unlink(filePath, err => {
         if (err) {
             console.error(`Error deleting file: ${err}`);
         } else {

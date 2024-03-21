@@ -10,7 +10,7 @@ async function processQuotedStickerMessage(
     message,
     chat,
     robotEmoji,
-    senderName,
+    senderName
 ) {
     if (
         stringifyMessage.length === 1 &&
@@ -24,7 +24,9 @@ async function processQuotedStickerMessage(
             caption: `${robotEmoji} Solicitado por ${senderName}.`,
         });
     } else {
-        message.reply(`${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`,);
+        message.reply(
+            `${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`
+        );
     }
 }
 
@@ -33,10 +35,12 @@ async function transformMediaToSticker(
     message,
     senderName,
     senderNumber,
-    robotEmoji,
+    robotEmoji
 ) {
     if (!message.hasQuotedMsg && !message.hasMedia) {
-        message.reply(`${robotEmoji} Tarao, te olvidaste de adjuntar la imagen.`);
+        message.reply(
+            `${robotEmoji} Tarao, te olvidaste de adjuntar la imagen.`
+        );
         return;
     }
 
@@ -45,7 +49,9 @@ async function transformMediaToSticker(
             originalQuotedMessage = await message.getQuotedMessage();
 
             if (!originalQuotedMessage.hasMedia) {
-                message.reply(`${robotEmoji} Este mensaje no contiene ninguna imagen.`);
+                message.reply(
+                    `${robotEmoji} Este mensaje no contiene ninguna imagen.`
+                );
                 return;
             }
 
@@ -58,7 +64,7 @@ async function transformMediaToSticker(
             message,
             mediaSticker,
             senderName,
-            senderNumber,
+            senderNumber
         );
     } catch (error) {
         console.log(error);
@@ -70,11 +76,14 @@ async function convertImageToSticker(
     message,
     mediaSticker,
     senderName,
-    senderNumber,
+    senderNumber
 ) {
     try {
         senderName = senderName.trim();
-        if (!utilities.containsVisibleChars(senderName) || senderName.length < 2) {
+        if (
+            !utilities.containsVisibleChars(senderName) ||
+            senderName.length < 2
+        ) {
             var match = senderNumber.match(/(^|[^])\d+/);
             senderName = `+${match[0]}, necesitas un nombre para usar stickers`;
         }
@@ -85,7 +94,9 @@ async function convertImageToSticker(
         });
         message.reply(`🤖 ¡Sticker en camino!`);
     } catch (e) {
-        message.reply(`🤖 Hubo un error al tratar de convertir esta imagen en sticker.`,);
+        message.reply(
+            `🤖 Hubo un error al tratar de convertir esta imagen en sticker.`
+        );
     }
 }
 
@@ -94,11 +105,9 @@ async function convertUrlImageToSticker(
     message,
     sticker,
     senderName,
-    senderNumber,
+    senderNumber
 ) {
-    convertImageToSticker(
-        chat, message, sticker, senderName, senderNumber
-    );
+    convertImageToSticker(chat, message, sticker, senderName, senderNumber);
 }
 
 async function validateAndConvertMedia(
@@ -109,7 +118,7 @@ async function validateAndConvertMedia(
     senderName,
     senderNumber,
     robotEmoji,
-    localFilePath = null,
+    localFilePath = null
 ) {
     try {
         if (mediaURL.endsWith(`.gifv`)) {
@@ -124,14 +133,17 @@ async function validateAndConvertMedia(
         if (
             response.ok &&
             contentType &&
-            (contentType.startsWith(`image/`) || contentType.startsWith(`video/`))
+            (contentType.startsWith(`image/`) ||
+                contentType.startsWith(`video/`))
         ) {
             if (
                 contentType.startsWith(`video/mp4`) &&
                 contentLength &&
                 parseInt(contentLength.split(`=`)[1]) > 20 * 1000
             ) {
-                message.reply(`${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`,);
+                message.reply(
+                    `${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`
+                );
             } else {
                 let sticker;
                 if (localFilePath) {
@@ -144,15 +156,19 @@ async function validateAndConvertMedia(
                     message,
                     sticker,
                     senderName,
-                    senderNumber,
+                    senderNumber
                 );
             }
         } else {
-            message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`,);
+            message.reply(
+                `${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`
+            );
         }
     } catch (error) {
         console.error(error);
-        message.reply(`${robotEmoji} Parece que algo salió mal, intenta de nuevo.`);
+        message.reply(
+            `${robotEmoji} Parece que algo salió mal, intenta de nuevo.`
+        );
     }
 }
 
@@ -170,7 +186,7 @@ async function handleStickerURL(
     chat,
     MessageMedia,
     senderName,
-    senderNumber,
+    senderNumber
 ) {
     if (stringifyMessage.length !== 2) {
         message.reply(`${robotEmoji} URL, solo la URL.`);
@@ -185,7 +201,9 @@ async function handleStickerURL(
                 regex.imageOrVideoRegex.test(stickerURL)
             )
         ) {
-            message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`,);
+            message.reply(
+                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`
+            );
             return;
         }
 
@@ -197,9 +215,11 @@ async function handleStickerURL(
 
             if (isRedditUrl) {
                 const { mediaURL: redditMediaURL, media } =
-                  await reddit.handleRedditMedia(
-                      stickerURL, message, robotEmoji
-                  );
+                    await reddit.handleRedditMedia(
+                        stickerURL,
+                        message,
+                        robotEmoji
+                    );
                 if (!redditMediaURL) {
                     return;
                 }
@@ -214,7 +234,7 @@ async function handleStickerURL(
                         senderName,
                         senderNumber,
                         robotEmoji,
-                        localFilePath,
+                        localFilePath
                     );
                 } else {
                     await validateAndConvertMedia(
@@ -224,7 +244,7 @@ async function handleStickerURL(
                         MessageMedia,
                         senderName,
                         senderNumber,
-                        robotEmoji,
+                        robotEmoji
                     );
                 }
             } else {
@@ -235,12 +255,14 @@ async function handleStickerURL(
                     MessageMedia,
                     senderName,
                     senderNumber,
-                    robotEmoji,
+                    robotEmoji
                 );
             }
         } catch (error) {
             console.error(`Error parsing URL:`, error);
-            message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo.`,);
+            message.reply(
+                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo.`
+            );
         }
     }
 }

@@ -10,123 +10,127 @@ const clientImgur = new ImgurClient({ clientId: process.env.IMGUR_CLIENT_ID });
 const commandDefinitions = {
     Gay: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Gay().getImage(avatars[0]),
+        function: avatars => new DIG.Gay().getImage(avatars[0]),
     },
     Greyscale: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Greyscale().getImage(avatars[0]),
+        function: avatars => new DIG.Greyscale().getImage(avatars[0]),
     },
     Invert: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Invert().getImage(avatars[0]),
+        function: avatars => new DIG.Invert().getImage(avatars[0]),
     },
     Blink: {
         maxAvatars: Infinity,
         needsNumber: true,
-        function: (avatars, delay) => new DIG.Blink().getImage(delay, ...avatars),
+        function: (avatars, delay) =>
+            new DIG.Blink().getImage(delay, ...avatars),
         outputFormat: `gif`,
     },
     Triggered: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Triggered().getImage(avatars[0]),
+        function: avatars => new DIG.Triggered().getImage(avatars[0]),
         outputFormat: `gif`,
     },
     Ad: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Ad().getImage(avatars[0]),
+        function: avatars => new DIG.Ad().getImage(avatars[0]),
     },
     Batslap: {
         maxAvatars: 2,
-        function: (avatars) => new DIG.Batslap().getImage(avatars[0], avatars[1]),
+        function: avatars => new DIG.Batslap().getImage(avatars[0], avatars[1]),
     },
     Beautiful: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Beautiful().getImage(avatars[0]),
+        function: avatars => new DIG.Beautiful().getImage(avatars[0]),
     },
     Bed: {
         maxAvatars: 2,
-        function: (avatars) => new DIG.Bed().getImage(avatars[0], avatars[1]),
+        function: avatars => new DIG.Bed().getImage(avatars[0], avatars[1]),
     },
     Bobross: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Bobross().getImage(avatars[0]),
+        function: avatars => new DIG.Bobross().getImage(avatars[0]),
     },
     Clown: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Clown().getImage(avatars[0]),
+        function: avatars => new DIG.Clown().getImage(avatars[0]),
     },
     ConfusedStonk: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.ConfusedStonk().getImage(avatars[0]),
+        function: avatars => new DIG.ConfusedStonk().getImage(avatars[0]),
     },
     Deepfry: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Deepfry().getImage(avatars[0]),
+        function: avatars => new DIG.Deepfry().getImage(avatars[0]),
     },
     Delete: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Delete().getImage(avatars[0]),
+        function: avatars => new DIG.Delete().getImage(avatars[0]),
     },
     DoubleStonk: {
         maxAvatars: 2,
-        function: (avatars) =>
+        function: avatars =>
             new DIG.DoubleStonk().getImage(avatars[0], avatars[1]),
     },
     Facepalm: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Facepalm().getImage(avatars[0]),
+        function: avatars => new DIG.Facepalm().getImage(avatars[0]),
     },
     Hitler: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Hitler().getImage(avatars[0]),
+        function: avatars => new DIG.Hitler().getImage(avatars[0]),
     },
     Jail: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Jail().getImage(avatars[0]),
+        function: avatars => new DIG.Jail().getImage(avatars[0]),
     },
     Kiss: {
         maxAvatars: 2,
-        function: (avatars) => new DIG.Kiss().getImage(avatars[0], avatars[1]),
+        function: avatars => new DIG.Kiss().getImage(avatars[0], avatars[1]),
     },
     LisaPresentation: {
         maxAvatars: 0,
         needsText: true,
-        function: (text) => new DIG.LisaPresentation().getImage(text),
+        function: text => new DIG.LisaPresentation().getImage(text),
     },
     Mikkelsen: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Mikkelsen().getImage(avatars[0]),
+        function: avatars => new DIG.Mikkelsen().getImage(avatars[0]),
     },
     NotStonk: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.NotStonk().getImage(avatars[0]),
+        function: avatars => new DIG.NotStonk().getImage(avatars[0]),
     },
     Podium: {
         maxAvatars: 3,
         function: (avatars, names) =>
             new DIG.Podium().getImage(
-                avatars[0], avatars[1], avatars[2], ...names
+                avatars[0],
+                avatars[1],
+                avatars[2],
+                ...names
             ),
     },
     Poutine: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Poutine().getImage(avatars[0]),
+        function: avatars => new DIG.Poutine().getImage(avatars[0]),
     },
     Rip: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Rip().getImage(avatars[0]),
+        function: avatars => new DIG.Rip().getImage(avatars[0]),
     },
     Snyder: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Snyder().getImage(avatars[0]),
+        function: avatars => new DIG.Snyder().getImage(avatars[0]),
     },
     Stonk: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Stonk().getImage(avatars[0]),
+        function: avatars => new DIG.Stonk().getImage(avatars[0]),
     },
     Trash: {
         maxAvatars: 1,
-        function: (avatars) => new DIG.Trash().getImage(avatars[0]),
+        function: avatars => new DIG.Trash().getImage(avatars[0]),
     },
     Wanted: {
         maxAvatars: 1,
@@ -136,10 +140,12 @@ const commandDefinitions = {
     },
 };
 
-const commandMap = new Map(Object.entries(commandDefinitions).map(([key, val]) => [
-    key.toLowerCase(),
-    { command: val, originalKey: key },
-]),);
+const commandMap = new Map(
+    Object.entries(commandDefinitions).map(([key, val]) => [
+        key.toLowerCase(),
+        { command: val, originalKey: key },
+    ])
+);
 
 function isValidEditType(editType) {
     const editTypeLowerCase = editType.toLowerCase();
@@ -162,7 +168,7 @@ async function getMentions(
     message,
     client,
     imgPaths,
-    robotEmoji,
+    robotEmoji
 ) {
     let mentions;
     if (command.maxAvatars === Infinity) {
@@ -173,21 +179,19 @@ async function getMentions(
 
     let uniqueMentions = Array.from(new Set(mentions));
 
-    let avatarsPromises = uniqueMentions.map((mention) => {
+    let avatarsPromises = uniqueMentions.map(mention => {
         if (!/^@\d{3,}$/.test(mention)) {
             message.reply(`${robotEmoji} Mención inválida: ${mention}`);
             return;
         }
-        return getImgurLink(
-            client, mention, imgPaths
-        );
+        return getImgurLink(client, mention, imgPaths);
     });
 
     let uniqueAvatars = await Promise.all(avatarsPromises);
-    let uniqueLinks = uniqueAvatars.map((avatar) => avatar[0]);
-    let deleteHashes = uniqueAvatars.map((avatar) => avatar[1]);
+    let uniqueLinks = uniqueAvatars.map(avatar => avatar[0]);
+    let deleteHashes = uniqueAvatars.map(avatar => avatar[1]);
     return [
-        mentions.map((mention) => uniqueLinks[uniqueMentions.indexOf(mention)]),
+        mentions.map(mention => uniqueLinks[uniqueMentions.indexOf(mention)]),
         deleteHashes,
     ];
 }
@@ -198,13 +202,17 @@ async function getParameters(stringifyMessage, command) {
     if (command.needsNumber) {
         let number = parseFloat(stringifyMessage[stringifyMessage.length - 1]); // Get the number at the end of the array
         if (isNaN(number)) {
-            throw new Error(`Invalid number value: ${
-                stringifyMessage[stringifyMessage.length - 1]
-            }`,);
+            throw new Error(
+                `Invalid number value: ${
+                    stringifyMessage[stringifyMessage.length - 1]
+                }`
+            );
         }
         parameters.push(number);
     } else if (command.needsText) {
-        parameters.push(stringifyMessage.slice(2 + command.maxAvatars).join(` `));
+        parameters.push(
+            stringifyMessage.slice(2 + command.maxAvatars).join(` `)
+        );
     } else if (command.needsCurrency) {
         parameters.push(stringifyMessage[2 + command.maxAvatars]);
     } else if (command.name === `Podium`) {
@@ -215,19 +223,17 @@ async function getParameters(stringifyMessage, command) {
     return parameters;
 }
 
-async function getImgURL(
-    command, editType, parameters, avatars
-) {
+async function getImgURL(command, editType, parameters, avatars) {
     let imgURL;
     if (editType in commandDefinitions) {
         switch (true) {
-        case command.needsNumber:
-        case command.needsCurrency:
-            imgURL = await command.function(avatars, ...parameters);
-            break;
-        default:
-            imgURL = await command.function(...parameters, avatars);
-            break;
+            case command.needsNumber:
+            case command.needsCurrency:
+                imgURL = await command.function(avatars, ...parameters);
+                break;
+            default:
+                imgURL = await command.function(...parameters, avatars);
+                break;
         }
     } else {
         throw new Error(`${editType} no es un comando válido.`);
@@ -235,15 +241,13 @@ async function getImgURL(
     return imgURL;
 }
 
-async function getMedia(
-    imgURL, command, MessageMedia
-) {
+async function getMedia(imgURL, command, MessageMedia) {
     const fileExtension = command.outputFormat || `png`;
     let imgPath = path.resolve(
         __dirname,
         `..`,
         `img`,
-        `edited_image_${Date.now()}.${fileExtension}`,
+        `edited_image_${Date.now()}.${fileExtension}`
     );
 
     fs.writeFileSync(imgPath, imgURL);
@@ -272,10 +276,12 @@ async function handleEditImage(
     message,
     client,
     MessageMedia,
-    robotEmoji,
+    robotEmoji
 ) {
     try {
-        const [isValid, editType, matchedCommandOrError] = isValidEditType(stringifyMessage[1].substr(1),);
+        const [isValid, editType, matchedCommandOrError] = isValidEditType(
+            stringifyMessage[1].substr(1)
+        );
         if (!isValid) {
             return message.reply(`${robotEmoji} ${matchedCommandOrError}.`);
         }
@@ -289,30 +295,24 @@ async function handleEditImage(
             message,
             client,
             imgPaths,
-            robotEmoji,
+            robotEmoji
         ); // Returns the imgur links of the avatars and the deleteHashes
 
         if (avatars.length > command.maxAvatars) {
-            return message.reply(`${robotEmoji} ${editType} requiere exactamente ${command.maxAvatars} menciones.`,);
+            return message.reply(
+                `${robotEmoji} ${editType} requiere exactamente ${command.maxAvatars} menciones.`
+            );
         }
 
         const parameters = await getParameters(stringifyMessage, command); // Gets the "-" parameters
-        const imgURL = await getImgURL(
-            command, editType, parameters, avatars
-        ); // Calls DIG passing the parameters and the avatars and returns the images in Base64
+        const imgURL = await getImgURL(command, editType, parameters, avatars); // Calls DIG passing the parameters and the avatars and returns the images in Base64
 
-        const [media, imgPath] = await getMedia(
-            imgURL, command, MessageMedia
-        ); // Returns the MessageMedia object
+        const [media, imgPath] = await getMedia(imgURL, command, MessageMedia); // Returns the MessageMedia object
 
         if (command.outputFormat === `gif`) {
-            await handleSendMedia(
-                client, message, media, robotEmoji, true
-            );
+            await handleSendMedia(client, message, media, robotEmoji, true);
         } else {
-            await handleSendMedia(
-                client, message, media, robotEmoji
-            );
+            await handleSendMedia(client, message, media, robotEmoji);
         }
 
         // Delete local files
@@ -323,7 +323,9 @@ async function handleEditImage(
         await deleteImgurImages(deleteHashes, clientImgur);
     } catch (err) {
         console.error(err);
-        return message.reply(`${robotEmoji} Algo no salió bien. ¿Estás seguro de que usaste el comando correctamente?`,);
+        return message.reply(
+            `${robotEmoji} Algo no salió bien. ¿Estás seguro de que usaste el comando correctamente?`
+        );
     }
 }
 
@@ -332,7 +334,7 @@ async function handleSendMedia(
     message,
     media,
     robotEmoji,
-    sendVideoAsGif = false,
+    sendVideoAsGif = false
 ) {
     let messageClientParameters = {
         caption: `${robotEmoji} Hey, aquí está ${
@@ -344,22 +346,21 @@ async function handleSendMedia(
         messageClientParameters.sendVideoAsGif = true;
     }
 
-    await client.sendMessage(
-        message.id.remote, media, messageClientParameters
-    );
+    await client.sendMessage(message.id.remote, media, messageClientParameters);
     return `completed`;
 }
 
-async function getImgurLink(
-    client, mention, imgPaths
-) {
+async function getImgurLink(client, mention, imgPaths) {
     let chatId = mention.replace(`@`, ``) + `@c.us`;
     let imageUrl = await client.getProfilePicUrl(chatId);
 
     const response = await fetch(imageUrl);
     const buffer = await response.buffer();
     let imgPath = path.resolve(
-        __dirname, `..`, `img`, `image_${Date.now()}.png`
+        __dirname,
+        `..`,
+        `img`,
+        `image_${Date.now()}.png`
     );
     fs.writeFileSync(imgPath, buffer);
 

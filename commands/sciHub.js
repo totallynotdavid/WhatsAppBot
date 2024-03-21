@@ -11,7 +11,7 @@ async function getPdfLink(
     client,
     MessageMedia,
     stringifyMessage,
-    robotEmoji,
+    robotEmoji
 ) {
     const link = stringifyMessage[1];
 
@@ -26,20 +26,18 @@ async function getPdfLink(
 
     if (pdfLink) {
         const pdfFilename = await downloadPdf(pdfLink, link);
-        const media = await MessageMedia.fromFilePath(path.join(
-            __dirname, `../pdf`, pdfFilename
-        ),);
-        await client.sendMessage(
-            message.id.remote, media, {
-                caption: `PDF file`,
-            }
+        const media = await MessageMedia.fromFilePath(
+            path.join(__dirname, `../pdf`, pdfFilename)
         );
+        await client.sendMessage(message.id.remote, media, {
+            caption: `PDF file`,
+        });
 
-        fs.unlinkSync(path.join(
-            __dirname, `../pdf`, pdfFilename
-        ));
+        fs.unlinkSync(path.join(__dirname, `../pdf`, pdfFilename));
     } else {
-        message.reply(`${robotEmoji} No hemos podido encontrar el PDF de este artículo.`,);
+        message.reply(
+            `${robotEmoji} No hemos podido encontrar el PDF de este artículo.`
+        );
     }
 }
 
@@ -51,23 +49,23 @@ async function downloadPdf(pdfLink, link) {
     const response = await fetch(pdfLink);
 
     if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.status} ${response.statusText}`,);
+        throw new Error(
+            `Failed to download PDF: ${response.status} ${response.statusText}`
+        );
     }
 
-    const fileStream = fs.createWriteStream(path.join(
-        __dirname, `../pdf`, outputFilename
-    ),);
+    const fileStream = fs.createWriteStream(
+        path.join(__dirname, `../pdf`, outputFilename)
+    );
 
     return new Promise((resolve, reject) => {
-        pipeline(
-            response.body, fileStream, (error) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(outputFilename);
-                }
+        pipeline(response.body, fileStream, error => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(outputFilename);
             }
-        );
+        });
     });
 }
 
@@ -86,9 +84,7 @@ async function getDoi(paperId) {
     }
 }
 
-async function paperKeyword(
-    message, query, robotEmoji
-) {
+async function paperKeyword(message, query, robotEmoji) {
     const keywords = query;
     try {
         const response = await searchByKeyword(keywords);
@@ -126,25 +122,35 @@ async function searchByKeyword(keywords, maxResults = 5) {
     }
 }
 
-async function authorRecentPapers(
-    message, authorQuery, robotEmoji
-) {
+async function authorRecentPapers(message, authorQuery, robotEmoji) {
     try {
         const papers = await getAuthorRecentPapers(authorQuery);
         if (papers.length > 0) {
             const paperList = papers
-                .map((paper, index) =>
-                    `${index + 1}. *${paper.title}* ${
-                        paper.year ? `(${paper.year})` : ``
-                    }${paper.doi ? ` (DOI: https://doi.org/${paper.doi})` : ``}`,)
+                .map(
+                    (paper, index) =>
+                        `${index + 1}. *${paper.title}* ${
+                            paper.year ? `(${paper.year})` : ``
+                        }${
+                            paper.doi
+                                ? ` (DOI: https://doi.org/${paper.doi})`
+                                : ``
+                        }`
+                )
                 .join(`\n\n`);
-            message.reply(`${robotEmoji} Últimos artículos de ${authorQuery}:\n\n${paperList}`,);
+            message.reply(
+                `${robotEmoji} Últimos artículos de ${authorQuery}:\n\n${paperList}`
+            );
         } else {
-            message.reply(`${robotEmoji} No se encontraron artículos recientes para ${authorQuery}.`,);
+            message.reply(
+                `${robotEmoji} No se encontraron artículos recientes para ${authorQuery}.`
+            );
         }
     } catch (error) {
         console.log(`Error al buscar artículos recientes:`, error);
-        message.reply(`Ha ocurrido un error al buscar los artículos recientes.`);
+        message.reply(
+            `Ha ocurrido un error al buscar los artículos recientes.`
+        );
     }
 }
 
@@ -161,7 +167,7 @@ async function getAuthorRecentPapers(authorQuery, maxResults = 5) {
         const author = response.data[0];
         const sortedPapers = author.papers.sort((a, b) => b.year - a.year);
         const recentPapers = sortedPapers.slice(0, maxResults);
-        return recentPapers.map((paper) => ({
+        return recentPapers.map(paper => ({
             title: paper.title,
             year: paper.year,
             doi: paper.externalIds ? paper.externalIds.DOI : null,
@@ -172,26 +178,28 @@ async function getAuthorRecentPapers(authorQuery, maxResults = 5) {
 }
 
 async function formatResponse(results) {
-    const formattedResults = await Promise.all(results.map(async (result, index) => {
-        const maxAuthors = 2;
-        const authors = result.authors
-            .slice(0, maxAuthors)
-            .map((author) => author.name);
-        const authorString =
-        authors.length === result.authors.length
-            ? authors.join(`, `)
-            : `${authors.join(`, `)} et al.`;
+    const formattedResults = await Promise.all(
+        results.map(async (result, index) => {
+            const maxAuthors = 2;
+            const authors = result.authors
+                .slice(0, maxAuthors)
+                .map(author => author.name);
+            const authorString =
+                authors.length === result.authors.length
+                    ? authors.join(`, `)
+                    : `${authors.join(`, `)} et al.`;
 
-        const doi = await getDoi(result.paperId);
+            const doi = await getDoi(result.paperId);
 
-        return `${index + 1}. *${result.title}* (${
-            result.year
-        }) de _${authorString}_ ${
-            result.journal && result.journal.name
-                ? `publicado en ${result.journal.name}`
-                : ``
-        } ${doi ? `(DOI: https://doi.org/${doi})` : ``}`;
-    }),);
+            return `${index + 1}. *${result.title}* (${
+                result.year
+            }) de _${authorString}_ ${
+                result.journal && result.journal.name
+                    ? `publicado en ${result.journal.name}`
+                    : ``
+            } ${doi ? `(DOI: https://doi.org/${doi})` : ``}`;
+        })
+    );
 
     return formattedResults.join(`\n\n`);
 }
@@ -203,7 +211,7 @@ async function request(api, query) {
     const url = `${api}?${queryString}`;
     const response = await fetch(url, {
         method: `GET`,
-        headers: { 'Content-Type': `application/json` },
+        headers: { "Content-Type": `application/json` },
     });
     return await response.json();
 }
@@ -212,24 +220,18 @@ function handleSearchPapersByKeywords(
     stringifyMessage,
     message,
     query,
-    robotEmoji,
+    robotEmoji
 ) {
     if (stringifyMessage.length >= 2) {
-        paperKeyword(
-            message, query, robotEmoji
-        );
+        paperKeyword(message, query, robotEmoji);
     } else {
         message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
     }
 }
 
-function handleSearchAuthor(
-    stringifyMessage, message, query, robotEmoji
-) {
+function handleSearchAuthor(stringifyMessage, message, query, robotEmoji) {
     if (stringifyMessage.length >= 2) {
-        authorRecentPapers(
-            message, query, robotEmoji
-        );
+        authorRecentPapers(message, query, robotEmoji);
     } else {
         message.reply(`${robotEmoji} ¿De qué autor quieres buscar?`);
     }
@@ -240,15 +242,15 @@ function handleDoiRequest(
     client,
     MessageMedia,
     stringifyMessage,
-    robotEmoji,
+    robotEmoji
 ) {
     if (stringifyMessage.length === 2) {
-        getPdfLink(
-            message, client, MessageMedia, stringifyMessage, robotEmoji
-        );
+        getPdfLink(message, client, MessageMedia, stringifyMessage, robotEmoji);
         return;
     } else {
-        message.reply(`${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`,);
+        message.reply(
+            `${robotEmoji} Adjunta el DOI de la publicación que quieres descargar.`
+        );
     }
 }
 
