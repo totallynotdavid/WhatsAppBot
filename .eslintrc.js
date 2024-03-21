@@ -4,12 +4,8 @@ module.exports = {
         es2021: true,
         node: true,
     },
-    extends: [
-        "eslint:recommended",
-        "plugin:@stylistic/js",
-        "plugin:prettier/recommended",
-    ],
-    plugins: ["@stylistic/js", "prettier"],
+    extends: [`eslint:recommended`, `plugin:prettier/recommended`],
+    plugins: [`prettier`],
     overrides: [
         {
             env: {
@@ -26,17 +22,10 @@ module.exports = {
         sourceType: `module`,
     },
     rules: {
-        "indent": [`error`, 4],
         "linebreak-style": [`error`, `unix`],
         "quotes": [`error`, `backtick`],
         "semi": [`error`, `always`],
         "multiline-ternary": [`error`, `always-multiline`],
         "no-multi-spaces": [`error`],
-        "function-paren-newline": [
-            `error`,
-            {
-                minItems: 3,
-            },
-        ],
     },
 };
