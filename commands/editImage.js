@@ -1,10 +1,10 @@
-const DIG = require('discord-image-generation');
-const fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-const ffmpeg = require('fluent-ffmpeg');
+const DIG = require(`discord-image-generation`);
+const fetch = require(`node-fetch`);
+const fs = require(`fs`);
+const path = require(`path`);
+const ffmpeg = require(`fluent-ffmpeg`);
 
-const { ImgurClient } = require('imgur');
+const { ImgurClient } = require(`imgur`);
 const clientImgur = new ImgurClient({ clientId: process.env.IMGUR_CLIENT_ID });
 
 const commandDefinitions = {
@@ -24,12 +24,12 @@ const commandDefinitions = {
         maxAvatars: Infinity,
         needsNumber: true,
         function: (avatars, delay) => new DIG.Blink().getImage(delay, ...avatars),
-        outputFormat: 'gif',
+        outputFormat: `gif`,
     },
     Triggered: {
         maxAvatars: 1,
         function: (avatars) => new DIG.Triggered().getImage(avatars[0]),
-        outputFormat: 'gif',
+        outputFormat: `gif`,
     },
     Ad: {
         maxAvatars: 1,
@@ -104,7 +104,9 @@ const commandDefinitions = {
     Podium: {
         maxAvatars: 3,
         function: (avatars, names) =>
-            new DIG.Podium().getImage(avatars[0], avatars[1], avatars[2], ...names),
+            new DIG.Podium().getImage(
+                avatars[0], avatars[1], avatars[2], ...names
+            ),
     },
     Poutine: {
         maxAvatars: 1,
@@ -134,12 +136,10 @@ const commandDefinitions = {
     },
 };
 
-const commandMap = new Map(
-    Object.entries(commandDefinitions).map(([key, val]) => [
-        key.toLowerCase(),
-        { command: val, originalKey: key },
-    ]),
-);
+const commandMap = new Map(Object.entries(commandDefinitions).map(([key, val]) => [
+    key.toLowerCase(),
+    { command: val, originalKey: key },
+]),);
 
 function isValidEditType(editType) {
     const editTypeLowerCase = editType.toLowerCase();
@@ -178,7 +178,9 @@ async function getMentions(
             message.reply(`${robotEmoji} Mención inválida: ${mention}`);
             return;
         }
-        return getImgurLink(client, mention, imgPaths);
+        return getImgurLink(
+            client, mention, imgPaths
+        );
     });
 
     let uniqueAvatars = await Promise.all(avatarsPromises);
@@ -196,18 +198,16 @@ async function getParameters(stringifyMessage, command) {
     if (command.needsNumber) {
         let number = parseFloat(stringifyMessage[stringifyMessage.length - 1]); // Get the number at the end of the array
         if (isNaN(number)) {
-            throw new Error(
-                `Invalid number value: ${
-                    stringifyMessage[stringifyMessage.length - 1]
-                }`,
-            );
+            throw new Error(`Invalid number value: ${
+                stringifyMessage[stringifyMessage.length - 1]
+            }`,);
         }
         parameters.push(number);
     } else if (command.needsText) {
-        parameters.push(stringifyMessage.slice(2 + command.maxAvatars).join(' '));
+        parameters.push(stringifyMessage.slice(2 + command.maxAvatars).join(` `));
     } else if (command.needsCurrency) {
         parameters.push(stringifyMessage[2 + command.maxAvatars]);
-    } else if (command.name === 'Podium') {
+    } else if (command.name === `Podium`) {
         let names = stringifyMessage.slice(2 + command.maxAvatars);
         parameters.push(names);
     }
@@ -215,7 +215,9 @@ async function getParameters(stringifyMessage, command) {
     return parameters;
 }
 
-async function getImgURL(command, editType, parameters, avatars) {
+async function getImgURL(
+    command, editType, parameters, avatars
+) {
     let imgURL;
     if (editType in commandDefinitions) {
         switch (true) {
@@ -233,27 +235,29 @@ async function getImgURL(command, editType, parameters, avatars) {
     return imgURL;
 }
 
-async function getMedia(imgURL, command, MessageMedia) {
-    const fileExtension = command.outputFormat || 'png';
+async function getMedia(
+    imgURL, command, MessageMedia
+) {
+    const fileExtension = command.outputFormat || `png`;
     let imgPath = path.resolve(
         __dirname,
-        '..',
-        'img',
+        `..`,
+        `img`,
         `edited_image_${Date.now()}.${fileExtension}`,
     );
 
     fs.writeFileSync(imgPath, imgURL);
 
     let media = MessageMedia.fromFilePath(imgPath);
-    if (fileExtension === 'gif') {
-        let videoPath = imgPath.replace('.gif', '.mp4');
+    if (fileExtension === `gif`) {
+        let videoPath = imgPath.replace(`.gif`, `.mp4`);
         await new Promise((resolve, reject) => {
             ffmpeg(imgPath)
-                .outputOptions('-movflags', 'faststart')
-                .toFormat('mp4')
+                .outputOptions(`-movflags`, `faststart`)
+                .toFormat(`mp4`)
                 .saveToFile(videoPath)
-                .on('end', resolve)
-                .on('error', reject);
+                .on(`end`, resolve)
+                .on(`error`, reject);
         });
 
         imgPath = videoPath;
@@ -271,9 +275,7 @@ async function handleEditImage(
     robotEmoji,
 ) {
     try {
-        const [isValid, editType, matchedCommandOrError] = isValidEditType(
-            stringifyMessage[1].substr(1),
-        );
+        const [isValid, editType, matchedCommandOrError] = isValidEditType(stringifyMessage[1].substr(1),);
         if (!isValid) {
             return message.reply(`${robotEmoji} ${matchedCommandOrError}.`);
         }
@@ -291,20 +293,26 @@ async function handleEditImage(
         ); // Returns the imgur links of the avatars and the deleteHashes
 
         if (avatars.length > command.maxAvatars) {
-            return message.reply(
-                `${robotEmoji} ${editType} requiere exactamente ${command.maxAvatars} menciones.`,
-            );
+            return message.reply(`${robotEmoji} ${editType} requiere exactamente ${command.maxAvatars} menciones.`,);
         }
 
         const parameters = await getParameters(stringifyMessage, command); // Gets the "-" parameters
-        const imgURL = await getImgURL(command, editType, parameters, avatars); // Calls DIG passing the parameters and the avatars and returns the images in Base64
+        const imgURL = await getImgURL(
+            command, editType, parameters, avatars
+        ); // Calls DIG passing the parameters and the avatars and returns the images in Base64
 
-        const [media, imgPath] = await getMedia(imgURL, command, MessageMedia); // Returns the MessageMedia object
+        const [media, imgPath] = await getMedia(
+            imgURL, command, MessageMedia
+        ); // Returns the MessageMedia object
 
-        if (command.outputFormat === 'gif') {
-            await handleSendMedia(client, message, media, robotEmoji, true);
+        if (command.outputFormat === `gif`) {
+            await handleSendMedia(
+                client, message, media, robotEmoji, true
+            );
         } else {
-            await handleSendMedia(client, message, media, robotEmoji);
+            await handleSendMedia(
+                client, message, media, robotEmoji
+            );
         }
 
         // Delete local files
@@ -315,9 +323,7 @@ async function handleEditImage(
         await deleteImgurImages(deleteHashes, clientImgur);
     } catch (err) {
         console.error(err);
-        return message.reply(
-            `${robotEmoji} Algo no salió bien. ¿Estás seguro de que usaste el comando correctamente?`,
-        );
+        return message.reply(`${robotEmoji} Algo no salió bien. ¿Estás seguro de que usaste el comando correctamente?`,);
     }
 }
 
@@ -330,7 +336,7 @@ async function handleSendMedia(
 ) {
     let messageClientParameters = {
         caption: `${robotEmoji} Hey, aquí está ${
-            sendVideoAsGif ? 'el GIF' : 'la imagen'
+            sendVideoAsGif ? `el GIF` : `la imagen`
         }.`,
     };
 
@@ -338,24 +344,30 @@ async function handleSendMedia(
         messageClientParameters.sendVideoAsGif = true;
     }
 
-    await client.sendMessage(message.id.remote, media, messageClientParameters);
-    return 'completed';
+    await client.sendMessage(
+        message.id.remote, media, messageClientParameters
+    );
+    return `completed`;
 }
 
-async function getImgurLink(client, mention, imgPaths) {
-    let chatId = mention.replace('@', '') + '@c.us';
+async function getImgurLink(
+    client, mention, imgPaths
+) {
+    let chatId = mention.replace(`@`, ``) + `@c.us`;
     let imageUrl = await client.getProfilePicUrl(chatId);
 
     const response = await fetch(imageUrl);
     const buffer = await response.buffer();
-    let imgPath = path.resolve(__dirname, '..', 'img', `image_${Date.now()}.png`);
+    let imgPath = path.resolve(
+        __dirname, `..`, `img`, `image_${Date.now()}.png`
+    );
     fs.writeFileSync(imgPath, buffer);
 
     imgPaths.push(imgPath);
 
     let imgurUpload = await clientImgur.upload({
         image: fs.createReadStream(imgPath),
-        type: 'stream',
+        type: `stream`,
     });
 
     return [imgurUpload.data.link, imgurUpload.data.deletehash];

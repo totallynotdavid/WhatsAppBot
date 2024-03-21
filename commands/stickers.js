@@ -1,9 +1,9 @@
-const { URL } = require('node:url');
-const utilities = require('./utilities');
-const regex = require('../functions/regex');
+const { URL } = require(`node:url`);
+const utilities = require(`./utilities`);
+const regex = require(`../functions/regex`);
 
 let mediaSticker, originalQuotedMessage;
-const allowedRedditHosts = ['www.reddit.com', 'reddit.com'];
+const allowedRedditHosts = [`www.reddit.com`, `reddit.com`];
 
 async function processQuotedStickerMessage(
     stringifyMessage,
@@ -15,7 +15,7 @@ async function processQuotedStickerMessage(
     if (
         stringifyMessage.length === 1 &&
         message._data.quotedMsg &&
-        message._data.quotedMsg.type === 'sticker'
+        message._data.quotedMsg.type === `sticker`
     ) {
         originalQuotedMessage = await message.getQuotedMessage();
         mediaSticker = await originalQuotedMessage.downloadMedia();
@@ -24,9 +24,7 @@ async function processQuotedStickerMessage(
             caption: `${robotEmoji} Solicitado por ${senderName}.`,
         });
     } else {
-        message.reply(
-            `${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`,
-        );
+        message.reply(`${robotEmoji} Contesta a un mensaje con un sticker. Solo usa el comando, no añadas nada más.`,);
     }
 }
 
@@ -83,13 +81,11 @@ async function convertImageToSticker(
         chat.sendMessage(mediaSticker, {
             sendMediaAsSticker: true,
             stickerName: `${senderName}`,
-            stickerAuthor: 'davibot',
+            stickerAuthor: `davibot`,
         });
-        message.reply('🤖 ¡Sticker en camino!');
+        message.reply(`🤖 ¡Sticker en camino!`);
     } catch (e) {
-        message.reply(
-            '🤖 Hubo un error al tratar de convertir esta imagen en sticker.',
-        );
+        message.reply(`🤖 Hubo un error al tratar de convertir esta imagen en sticker.`,);
     }
 }
 
@@ -100,7 +96,9 @@ async function convertUrlImageToSticker(
     senderName,
     senderNumber,
 ) {
-    convertImageToSticker(chat, message, sticker, senderName, senderNumber);
+    convertImageToSticker(
+        chat, message, sticker, senderName, senderNumber
+    );
 }
 
 async function validateAndConvertMedia(
@@ -114,28 +112,26 @@ async function validateAndConvertMedia(
     localFilePath = null,
 ) {
     try {
-        if (mediaURL.endsWith('.gifv')) {
-            mediaURL = mediaURL.replace(/\.gifv$/i, '.mp4');
+        if (mediaURL.endsWith(`.gifv`)) {
+            mediaURL = mediaURL.replace(/\.gifv$/i, `.mp4`);
         }
 
         const response = await fetch(mediaURL);
         const [contentType, contentLength] = (
-            response.headers.get('content-type') || ''
-        ).split(';');
+            response.headers.get(`content-type`) || ``
+        ).split(`;`);
 
         if (
             response.ok &&
             contentType &&
-            (contentType.startsWith('image/') || contentType.startsWith('video/'))
+            (contentType.startsWith(`image/`) || contentType.startsWith(`video/`))
         ) {
             if (
-                contentType.startsWith('video/mp4') &&
+                contentType.startsWith(`video/mp4`) &&
                 contentLength &&
-                parseInt(contentLength.split('=')[1]) > 20 * 1000
+                parseInt(contentLength.split(`=`)[1]) > 20 * 1000
             ) {
-                message.reply(
-                    `${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`,
-                );
+                message.reply(`${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`,);
             } else {
                 let sticker;
                 if (localFilePath) {
@@ -152,9 +148,7 @@ async function validateAndConvertMedia(
                 );
             }
         } else {
-            message.reply(
-                `${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`,
-            );
+            message.reply(`${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`,);
         }
     } catch (error) {
         console.error(error);
@@ -180,7 +174,7 @@ async function handleStickerURL(
 ) {
     if (stringifyMessage.length !== 2) {
         message.reply(`${robotEmoji} URL, solo la URL.`);
-        message.react('⚠️');
+        message.react(`⚠️`);
     } else {
         let stickerURL = stringifyMessage[1];
 
@@ -191,13 +185,11 @@ async function handleStickerURL(
                 regex.imageOrVideoRegex.test(stickerURL)
             )
         ) {
-            message.reply(
-                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`,
-            );
+            message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo. Solo se aceptan imágenes y videos.`,);
             return;
         }
 
-        stickerURL = stickerURL.replace(/\.gifv$/i, '.mp4'); // Fix for Imgur links
+        stickerURL = stickerURL.replace(/\.gifv$/i, `.mp4`); // Fix for Imgur links
 
         try {
             const url = new URL(stickerURL);
@@ -205,7 +197,9 @@ async function handleStickerURL(
 
             if (isRedditUrl) {
                 const { mediaURL: redditMediaURL, media } =
-                  await reddit.handleRedditMedia(stickerURL, message, robotEmoji);
+                  await reddit.handleRedditMedia(
+                      stickerURL, message, robotEmoji
+                  );
                 if (!redditMediaURL) {
                     return;
                 }
@@ -245,10 +239,8 @@ async function handleStickerURL(
                 );
             }
         } catch (error) {
-            console.error('Error parsing URL:', error);
-            message.reply(
-                `${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo.`,
-            );
+            console.error(`Error parsing URL:`, error);
+            message.reply(`${robotEmoji} URL inválida, por favor verifica y vuelve a enviarlo.`,);
         }
     }
 }

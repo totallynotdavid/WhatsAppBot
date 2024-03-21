@@ -1,4 +1,4 @@
-const supabaseCommunicationModule = require('../../lib/api/supabaseCommunicationModule.js');
+const supabaseCommunicationModule = require(`../../lib/api/supabaseCommunicationModule.js`);
 
 /* https://github.com/pedroslopez/whatsapp-web.js/issues/2067 */
 async function banUser(chat, participantId) {
@@ -10,7 +10,9 @@ async function banUser(chat, participantId) {
     }
 }
 
-async function banMultipleUsers(client, chat, userIds, message, robotEmoji) {
+async function banMultipleUsers(
+    client, chat, userIds, message, robotEmoji
+) {
     let totalBanned = 0;
     let totalErrors = 0;
 
@@ -27,14 +29,10 @@ async function banMultipleUsers(client, chat, userIds, message, robotEmoji) {
     }
 
     if (totalBanned > 0) {
-        message.reply(
-            `${robotEmoji} ${totalBanned} usuario(s) baneado(s) exitosamente.`,
-        );
+        message.reply(`${robotEmoji} ${totalBanned} usuario(s) baneado(s) exitosamente.`,);
     }
     if (totalErrors > 0) {
-        message.reply(
-            `${robotEmoji} Hubo problemas al banear a ${totalErrors} usuario(s).`,
-        );
+        message.reply(`${robotEmoji} Hubo problemas al banear a ${totalErrors} usuario(s).`,);
     }
 }
 
@@ -48,13 +46,9 @@ function handleBanUserFromGroup(
     robotEmoji,
 ) {
     if (
-        !admins.some(
-            (admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,
-        )
+        !admins.some((admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,)
     ) {
-        return message.reply(
-            `${robotEmoji} Necesito permisos de administrador en el grupo para continuar.`,
-        );
+        return message.reply(`${robotEmoji} Necesito permisos de administrador en el grupo para continuar.`,);
     }
 
     if (quotedMessage && stringifyMessage.length === 1) {
@@ -62,14 +56,16 @@ function handleBanUserFromGroup(
         if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
             message.reply(`${robotEmoji} Cómo te atreves.`);
         } else {
-            banMultipleUsers(client, chat, [quotedAuthor], message, robotEmoji);
+            banMultipleUsers(
+                client, chat, [quotedAuthor], message, robotEmoji
+            );
         }
     } else if (stringifyMessage.length > 1) {
-        banMultipleUsers(client, chat, message.mentionedIds, message, robotEmoji);
-    } else {
-        message.reply(
-            `${robotEmoji} Para eliminar a alguien del grupo, responde a su mensaje o menciónalo.`,
+        banMultipleUsers(
+            client, chat, message.mentionedIds, message, robotEmoji
         );
+    } else {
+        message.reply(`${robotEmoji} Para eliminar a alguien del grupo, responde a su mensaje o menciónalo.`,);
     }
 }
 
@@ -83,22 +79,18 @@ function handlePromoteUsersToAdmins(
     robotEmoji,
 ) {
     if (
-        !admins.some(
-            (admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,
-        )
+        !admins.some((admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,)
     ) {
-        return message.reply(
-            `${robotEmoji} Es necesario que el bot sea administrador del grupo.`,
-        );
+        return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`,);
     }
 
     if (stringifyMessage.length === 1 && quotedMessage) {
         processUser(
             quotedMessage.author,
             (userId) => !admins.some((admin) => admin.id._serialized === userId),
-            'promoteParticipants',
-            'Se ha añadido',
-            'Este usuario ya es administrador.',
+            `promoteParticipants`,
+            `Se ha añadido`,
+            `Este usuario ya es administrador.`,
         );
     } else if (
         stringifyMessage.length > 1 &&
@@ -108,17 +100,15 @@ function handlePromoteUsersToAdmins(
         processUser(
             message.mentionedIds,
             (userId) => !admins.some((admin) => admin.id._serialized === userId),
-            'promoteParticipants',
-            'Se han añadido',
-            'Todos los usuarios mencionados ya son administradores.',
+            `promoteParticipants`,
+            `Se han añadido`,
+            `Todos los usuarios mencionados ya son administradores.`,
             chat,
             message,
             robotEmoji,
         );
     } else {
-        message.reply(
-            `${robotEmoji} Para hacer a alguien admin, responde a su mensaje o menciónalo.`,
-        );
+        message.reply(`${robotEmoji} Para hacer a alguien admin, responde a su mensaje o menciónalo.`,);
     }
 }
 
@@ -132,22 +122,18 @@ function handleDemoteUsersToParticipants(
     robotEmoji,
 ) {
     if (
-        !admins.some(
-            (admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,
-        )
+        !admins.some((admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,)
     ) {
-        return message.reply(
-            `${robotEmoji} Es necesario que el bot sea administrador del grupo.`,
-        );
+        return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`,);
     }
 
     if (stringifyMessage.length === 1 && quotedMessage) {
         processUser(
             quotedMessage.author,
             (userId) => admins.some((admin) => admin.id._serialized === userId),
-            'demoteParticipants',
-            'Se ha eliminado',
-            'Este usuario no es administrador.',
+            `demoteParticipants`,
+            `Se ha eliminado`,
+            `Este usuario no es administrador.`,
         );
     } else if (
         stringifyMessage.length > 1 &&
@@ -157,17 +143,15 @@ function handleDemoteUsersToParticipants(
         processUser(
             message.mentionedIds,
             (userId) => admins.some((admin) => admin.id._serialized === userId),
-            'demoteParticipants',
-            'Se han eliminado',
-            'Ninguno de los usuarios mencionados es administrador.',
+            `demoteParticipants`,
+            `Se han eliminado`,
+            `Ninguno de los usuarios mencionados es administrador.`,
             chat,
             message,
             robotEmoji,
         );
     } else {
-        message.reply(
-            `${robotEmoji} Para quitar el rol de admin a alguien, responde a su mensaje o menciónalo.`,
-        );
+        message.reply(`${robotEmoji} Para quitar el rol de admin a alguien, responde a su mensaje o menciónalo.`,);
     }
 }
 
@@ -200,19 +184,15 @@ async function handleJoinGroupRequest(
 ) {
     if (stringifyMessage.length === 2) {
         const inviteLink = stringifyMessage[1];
-        const inviteCode = inviteLink.split('https://chat.whatsapp.com/')[1];
+        const inviteCode = inviteLink.split(`https://chat.whatsapp.com/`)[1];
         try {
             await client.acceptInvite(inviteCode);
             message.reply(`${robotEmoji} ¡Listo! Me acabo de unir al grupo.`);
         } catch (error) {
-            message.reply(
-                `${robotEmoji} No me he podido unir. ¿El enlace es correcto?`,
-            );
+            message.reply(`${robotEmoji} No me he podido unir. ¿El enlace es correcto?`,);
         }
     } else {
-        message.reply(
-            `${robotEmoji} Necesito el enlace de invitación del grupo. ¿Puedes enviarlo?`,
-        );
+        message.reply(`${robotEmoji} Necesito el enlace de invitación del grupo. ¿Puedes enviarlo?`,);
     }
 }
 
@@ -225,13 +205,9 @@ async function handleDeleteMessage(
     robotEmoji,
 ) {
     if (
-        !admins.some(
-            (admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,
-        )
+        !admins.some((admin) => admin.id._serialized === `${client.info.wid.user}@c.us`,)
     ) {
-        return message.reply(
-            `${robotEmoji} Es necesario que el bot sea administrador del grupo.`,
-        );
+        return message.reply(`${robotEmoji} Es necesario que el bot sea administrador del grupo.`,);
     }
 
     if (quotedMessage && stringifyMessage.length === 1) {
@@ -241,9 +217,7 @@ async function handleDeleteMessage(
         }
         await quotedMessage.delete(true);
     } else {
-        message.reply(
-            `${robotEmoji} Para eliminar un mensaje, simplemente responde a él.`,
-        );
+        message.reply(`${robotEmoji} Para eliminar un mensaje, simplemente responde a él.`,);
     }
 }
 
@@ -258,18 +232,20 @@ async function handleToggleBotActivation(
         const botCommand = stringifyMessage[1];
 
         switch (botCommand) {
-        case 'on':
-            await enableBot(message, chat.id._serialized, robotEmoji);
+        case `on`:
+            await enableBot(
+                message, chat.id._serialized, robotEmoji
+            );
             await refreshDataCallback();
             break;
-        case 'off':
-            await disableBot(message, chat.id._serialized, robotEmoji);
+        case `off`:
+            await disableBot(
+                message, chat.id._serialized, robotEmoji
+            );
             await refreshDataCallback();
             break;
         default:
-            message.reply(
-                `${robotEmoji} Solo puedes habilitar o deshabilitar el bot.`,
-            );
+            message.reply(`${robotEmoji} Solo puedes habilitar o deshabilitar el bot.`,);
             break;
         }
     } else {
@@ -277,7 +253,9 @@ async function handleToggleBotActivation(
     }
 }
 
-async function enableBot(message, groupId, robotEmoji) {
+async function enableBot(
+    message, groupId, robotEmoji
+) {
     try {
         const group = await supabaseCommunicationModule.searchPremiumGroup(groupId);
         if (group.isActive) {
@@ -292,13 +270,13 @@ async function enableBot(message, groupId, robotEmoji) {
     return Promise.resolve();
 }
 
-async function disableBot(message, groupId, robotEmoji) {
+async function disableBot(
+    message, groupId, robotEmoji
+) {
     try {
         const group = await supabaseCommunicationModule.searchPremiumGroup(groupId);
         if (!group.isActive) {
-            message.reply(
-                `${robotEmoji} El bot ya está desactivado para este grupo.`,
-            );
+            message.reply(`${robotEmoji} El bot ya está desactivado para este grupo.`,);
         } else {
             await supabaseCommunicationModule.updateBotStatus(groupId, false);
             message.reply(`${robotEmoji} El bot se ha desactivado para este grupo.`);

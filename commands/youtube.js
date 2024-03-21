@@ -1,11 +1,11 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+const path = require(`path`);
+require(`dotenv`).config({ path: path.resolve(__dirname, `../.env`) });
 
-const { robotEmoji } = require('../functions/globals');
-const { getVideoLength } = require('yt_duration');
-const ytdlp_video_processor = require('ytdlp_video_processor');
-const fetchYoutubeMetadata = require('yt_metadata');
-const utilities = require('./utilities');
+const { robotEmoji } = require(`../functions/globals`);
+const { getVideoLength } = require(`yt_duration`);
+const ytdlp_video_processor = require(`ytdlp_video_processor`);
+const fetchYoutubeMetadata = require(`yt_metadata`);
+const utilities = require(`./utilities`);
 
 // Search on Youtube
 async function searchOnYoutube(query, mode) {
@@ -32,21 +32,21 @@ async function searchOnYoutube(query, mode) {
 
         let baseYoutubeUrl;
         switch (mediaType) {
-        case 'video':
+        case `video`:
             baseYoutubeUrl = `https://youtu.be/${mediaId}`;
             caption = `🎬: ${title}\n📺: ${channelTitle}${
-                viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ''
+                viewCount ? `\n👀: ${utilities.formatNumber(viewCount)} vistas` : ``
             }${
                 likeCount
                     ? `\n👍: ${utilities.formatNumber(likeCount)} me gustas`
-                    : ''
+                    : ``
             }\n🔗: ${baseYoutubeUrl}`;
             break;
-        case 'playlist':
+        case `playlist`:
             baseYoutubeUrl = `https://www.youtube.com/playlist?list=${mediaId}`;
             caption = `🎬: ${title}\n🔗: ${baseYoutubeUrl}`;
             break;
-        case 'channel':
+        case `channel`:
             baseYoutubeUrl = `https://www.youtube.com/channel/${mediaId}`;
             caption = `📺: ${channelTitle}\n🔗: ${baseYoutubeUrl}`;
             break;
@@ -69,19 +69,19 @@ async function searchOnYoutube(query, mode) {
 
 async function sendYoutubeAudio(youtubeURL) {
     try {
-        const media_metadata = await fetchYoutubeMetadata(youtubeURL, 'idOnly');
+        const media_metadata = await fetchYoutubeMetadata(youtubeURL, `idOnly`);
 
         if (!media_metadata || !media_metadata.mediaId) {
-            return { error: true, message: 'La URL no es válida.' };
+            return { error: true, message: `La URL no es válida.` };
         }
 
         const videoID = media_metadata.mediaId;
-        const videoLength = await getVideoLength(videoID, 'seconds');
+        const videoLength = await getVideoLength(videoID, `seconds`);
 
         if (videoLength > 600) {
             return {
                 error: true,
-                message: 'El límite de duración de audio es de 10 minutos.',
+                message: `El límite de duración de audio es de 10 minutos.`,
             };
         }
 
@@ -92,7 +92,7 @@ async function sendYoutubeAudio(youtubeURL) {
       downloadedMedia.length === 0 ||
       !downloadedMedia[0].path
         ) {
-            return { error: true, message: 'No se pudo descargar el audio.' };
+            return { error: true, message: `No se pudo descargar el audio.` };
         }
 
         const downloadedFilename = downloadedMedia[0].path;
@@ -106,20 +106,20 @@ async function sendYoutubeAudio(youtubeURL) {
 
 async function sendYoutubeVideo(youtubeURL) {
     try {
-        const media_metadata = await fetchYoutubeMetadata(youtubeURL, 'idOnly');
+        const media_metadata = await fetchYoutubeMetadata(youtubeURL, `idOnly`);
 
         if (!media_metadata || !media_metadata.mediaId) {
-            return { error: true, message: 'La URL no es válida.' };
+            return { error: true, message: `La URL no es válida.` };
         }
 
         const videoID = media_metadata.mediaId;
 
-        const videoLength = await getVideoLength(videoID, 'seconds');
+        const videoLength = await getVideoLength(videoID, `seconds`);
 
         if (videoLength > 210) {
             return {
                 error: true,
-                message: 'El límite de duración de video es de 3 minutos y medio.',
+                message: `El límite de duración de video es de 3 minutos y medio.`,
             };
         }
 
@@ -127,9 +127,9 @@ async function sendYoutubeVideo(youtubeURL) {
             videoID,
             undefined,
             undefined,
-            'mp4',
+            `mp4`,
             undefined,
-            'small',
+            `small`,
         );
 
         if (
@@ -137,7 +137,7 @@ async function sendYoutubeVideo(youtubeURL) {
       downloadedMedia.length === 0 ||
       !downloadedMedia[0].path
         ) {
-            return { error: true, message: 'No se pudo descargar el video.' };
+            return { error: true, message: `No se pudo descargar el video.` };
         }
 
         const downloadedFilename = downloadedMedia[0].path;

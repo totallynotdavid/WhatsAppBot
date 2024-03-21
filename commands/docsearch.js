@@ -1,6 +1,8 @@
-const { searchFolderDatabase } = require('../lib/api/gdrive');
+const { searchFolderDatabase } = require(`../lib/api/gdrive`);
 
-async function searchDocuments(stringifyMessage, message, query, robotEmoji) {
+async function searchDocuments(
+    stringifyMessage, message, query, robotEmoji
+) {
     if (stringifyMessage.length >= 2) {
         searchFolderDatabase(query)
             .then((results) => {
@@ -17,7 +19,7 @@ async function searchDocuments(stringifyMessage, message, query, robotEmoji) {
                 }
             })
             .catch((error) => {
-                console.error('Error searching folder cache:', error);
+                console.error(`Error searching folder cache:`, error);
             });
     } else {
         message.reply(`${robotEmoji} Ya, pero, ¿de qué quieres buscar?`);

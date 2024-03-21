@@ -1,5 +1,5 @@
-const fs = require('fs').promises;
-const { downloadFilesFromGoogleDrive } = require('../lib/api/gdrive');
+const fs = require(`fs`).promises;
+const { downloadFilesFromGoogleDrive } = require(`../lib/api/gdrive`);
 
 async function handleGoogleDriveDownloads(
     stringifyMessage,
@@ -18,19 +18,19 @@ async function handleGoogleDriveDownloads(
 
             if (fileStats.size > maxSize) {
                 await fs.unlink(filePath);
-                return message.reply(
-                    `${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`,
-                );
+                return message.reply(`${robotEmoji} El archivo es demasiado grande. El tamaño máximo es de 200 MB.`,);
             }
 
             const media = await MessageMedia.fromFilePath(filePath);
-            await client.sendMessage(message.id.remote, media, {
-                caption: `${robotEmoji} Aquí tienes tu archivo.`,
-            });
+            await client.sendMessage(
+                message.id.remote, media, {
+                    caption: `${robotEmoji} Aquí tienes tu archivo.`,
+                }
+            );
 
             await fs.unlink(filePath);
         } catch (error) {
-            console.error('Error sending file:', error);
+            console.error(`Error sending file:`, error);
             message.reply(`${robotEmoji} ¿Seguro de que ese archivo existe?`);
         }
         break;

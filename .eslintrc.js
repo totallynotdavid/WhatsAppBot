@@ -4,9 +4,9 @@ module.exports = {
         'es2021': true,
         'node': true
     },
-    'extends': 'eslint:recommended',
+    'extends': `eslint:recommended`,
     plugins: [
-        '@stylistic/js'
+        `@stylistic/js`
     ],
     'overrides': [
         {
@@ -14,40 +14,46 @@ module.exports = {
                 'node': true
             },
             'files': [
-                '.eslintrc.{js,cjs}'
+                `.eslintrc.{js,cjs}`
             ],
             'parserOptions': {
-                'sourceType': 'script'
+                'sourceType': `script`
             }
         }
     ],
     'parserOptions': {
-        'ecmaVersion': 'latest',
-        'sourceType': 'module'
+        'ecmaVersion': `latest`,
+        'sourceType': `module`
     },
     'rules': {
         'indent': [
-            'error',
+            `error`,
             4
         ],
         'linebreak-style': [
-            'error',
-            'unix'
+            `error`,
+            `unix`
         ],
         'quotes': [
-            'error',
-            'single'
+            `error`,
+            `backtick`
         ],
         'semi': [
-            'error',
-            'always'
+            `error`,
+            `always`
         ],
         'multiline-ternary': [
-            'error',
-            'always-multiline'
+            `error`,
+            `always-multiline`
         ],
         'no-multi-spaces': [
-            'error'
+            `error`
         ],
+        'function-paren-newline': [
+            `error`,
+            {
+                'minItems': 3
+            }
+        ]
     }
 };

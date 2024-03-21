@@ -1,9 +1,9 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { execFile } = require('child_process');
-const util = require('util');
+const fs = require(`fs`).promises;
+const path = require(`path`);
+const { execFile } = require(`child_process`);
+const util = require(`util`);
 const execFilePromise = util.promisify(execFile);
-const os = require('os');
+const os = require(`os`);
 
 const latexTemplate = `
 \\documentclass[preview,border=2pt,convert={density=300,outext=.png}]{standalone}
@@ -19,16 +19,16 @@ const latexTemplate = `
 `;
 
 async function cleanUp() {
-    const folderPath = path.join(__dirname, '..', 'img');
+    const folderPath = path.join(
+        __dirname, `..`, `img`
+    );
 
     try {
         const files = await fs.readdir(folderPath);
 
-        await Promise.all(
-            files.map((file) => fs.unlink(path.join(folderPath, file))),
-        );
+        await Promise.all(files.map((file) => fs.unlink(path.join(folderPath, file))),);
     } catch (error) {
-        console.error('Error cleaning up /img/ folder:', error);
+        console.error(`Error cleaning up /img/ folder:`, error);
     }
 }
 
@@ -42,45 +42,49 @@ async function transformLatexToImage(
     const latexCode = query;
 
     try {
-        const latexDocument = latexTemplate.replace('%s', latexCode);
-        const writePath = path.join(__dirname, '..', 'img', 'input.tex');
+        const latexDocument = latexTemplate.replace(`%s`, latexCode);
+        const writePath = path.join(
+            __dirname, `..`, `img`, `input.tex`
+        );
         await fs.writeFile(writePath, latexDocument);
 
-        await execFilePromise(
-            'pdflatex', [
-                '-output-directory=' +
-                path.join(__dirname, '..', 'img'), '-jobname=latex',
-                writePath,
-            ]
-        );
+        await execFilePromise(`pdflatex`, [
+            `-output-directory=` +
+                path.join(
+                    __dirname, `..`, `img`
+                ), `-jobname=latex`,
+            writePath,
+        ]);
 
         const pdfPath = path.join(
             __dirname,
-            '..',
-            'img',
-            'latex.pdf'
+            `..`,
+            `img`,
+            `latex.pdf`
         );
 
         await fs.access(pdfPath);
 
-        const pngPath = path.join(__dirname, '..', 'img', 'latex.png');
+        const pngPath = path.join(
+            __dirname, `..`, `img`, `latex.png`
+        );
         const convertCommand =
-            os.platform() === 'win32' ? 'magick' : 'convert';
+            os.platform() === `win32` ? `magick` : `convert`;
         const args = [
-            '-density', '300',
-            '-trim',
-            '-background', 'white',
-            '-gravity', 'center',
-            '-extent', '120%x180%',
-            '-alpha', 'remove',
+            `-density`, `300`,
+            `-trim`,
+            `-background`, `white`,
+            `-gravity`, `center`,
+            `-extent`, `120%x180%`,
+            `-alpha`, `remove`,
             pdfPath,
-            '-quality', '100',
-            '-define', 'png:color-type=2',
+            `-quality`, `100`,
+            `-define`, `png:color-type=2`,
             pngPath,
         ];
 
-        if (os.platform() === 'win32') {
-            await execFilePromise('magick', ['convert', ...args]);
+        if (os.platform() === `win32`) {
+            await execFilePromise(`magick`, [`convert`, ...args]);
         } else {
             await execFilePromise(convertCommand, args);
         }
@@ -89,16 +93,16 @@ async function transformLatexToImage(
         await fs.access(pngPath);
 
         const media = MessageMedia.fromFilePath(pngPath);
-        await client.sendMessage(message.id.remote, media, {
-            caption: `${robotEmoji} Generado por boTeX`,
-        });
+        await client.sendMessage(
+            message.id.remote, media, {
+                caption: `${robotEmoji} Generado por boTeX`,
+            }
+        );
 
         await cleanUp();
     } catch (error) {
-        console.error('Error:', error);
-        message.reply(
-            `${robotEmoji} Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.`,
-        );
+        console.error(`Error:`, error);
+        message.reply(`${robotEmoji} Houston, tenemos un problema. No se pudo transformar el código LaTeX a imagen.`,);
     }
 }
 
@@ -110,14 +114,14 @@ function handleLatexToImage(
     robotEmoji,
 ) {
     if (stringifyMessage.length > 1) {
-        const query = stringifyMessage.slice(1).join(' ');
+        const query = stringifyMessage.slice(1).join(` `);
         const beginRegex = /\\begin\{[a-z]*\}/g;
         if (beginRegex.test(query)) {
-            message.reply(
-                `${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`,
-            );
+            message.reply(`${robotEmoji} No es necesario usar \\begin{document} ni \\end{document} o similares.`,);
         }
-        transformLatexToImage(message, client, MessageMedia, query, robotEmoji);
+        transformLatexToImage(
+            message, client, MessageMedia, query, robotEmoji
+        );
     }
 }
 

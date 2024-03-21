@@ -1,8 +1,8 @@
-const path = require('path');
-const { get } = require('lodash');
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
-const { Configuration, OpenAIApi } = require('openai');
-const supabaseCommunicationModule = require('../../lib/api/supabaseCommunicationModule.js');
+const path = require(`path`);
+const { get } = require(`lodash`);
+require(`dotenv`).config({ path: path.resolve(__dirname, `../../.env`) });
+const { Configuration, OpenAIApi } = require(`openai`);
+const supabaseCommunicationModule = require(`../../lib/api/supabaseCommunicationModule.js`);
 
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -31,7 +31,7 @@ function trimUserMessage(
     } else {
     // example: "Hello world" -> "Hello wo..."
         trimmedMessage = userMessage.substring(0, maxLength);
-        trimmedMessage = trimmedMessage + '...';
+        trimmedMessage = trimmedMessage + `...`;
     }
 
     return `${trimmedMessage}`;
@@ -41,12 +41,12 @@ async function callOpenAI(apiMethod, options) {
     try {
         const result = await openai[apiMethod](options);
         const contentPath =
-      apiMethod === 'createCompletion'
-          ? 'choices[0].text'
-          : 'choices[0].message.content';
+      apiMethod === `createCompletion`
+          ? `choices[0].text`
+          : `choices[0].message.content`;
 
         if (!result.data || !get(result.data, contentPath)) {
-            console.error('OpenAI response does not contain expected data');
+            console.error(`OpenAI response does not contain expected data`);
             return null;
         }
         return get(result, `data.${contentPath}`);
@@ -56,7 +56,9 @@ async function callOpenAI(apiMethod, options) {
     }
 }
 
-const handleChatWithGPT = async (senderNumber, group, query) => {
+const handleChatWithGPT = async (
+    senderNumber, group, query
+) => {
     try {
         let previousMessages = await supabaseCommunicationModule.fetchLastNMessages(
             senderNumber,
@@ -65,18 +67,18 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
         );
 
         const flattenedMessages = previousMessages.flat();
-        const totalLength = flattenedMessages.reduce(
-            (total, msg) => total + msg.content.length,
-            0,
-        );
+        const totalLength = flattenedMessages.reduce((total, msg) => total + msg.content.length,
+            0,);
 
         if (totalLength > MAX_CONVERSATION_LENGTH) {
             const promptForSummary = flattenedMessages
                 .map((msg) => `${msg.role}: ${msg.content}`)
-                .join('\n');
-            const trimmedMessage = trimUserMessage(promptForSummary, 500, true);
-            const summary = await callOpenAI('createCompletion', {
-                model: 'text-davinci-003',
+                .join(`\n`);
+            const trimmedMessage = trimUserMessage(
+                promptForSummary, 500, true
+            );
+            const summary = await callOpenAI(`createCompletion`, {
+                model: `text-davinci-003`,
                 prompt: `Summarize 🗣️ in > 15 words:\n${trimmedMessage}`,
                 max_tokens: 50,
             });
@@ -86,10 +88,10 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
                     senderNumber,
                     summary,
                     group,
-                    'gpt_messages',
-                    'system',
+                    `gpt_messages`,
+                    `system`,
                 );
-                previousMessages = [{ role: 'system', content: summary }];
+                previousMessages = [{ role: `system`, content: summary }];
             }
         }
 
@@ -109,17 +111,17 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
 
         const messages = [
             {
-                role: 'system',
+                role: `system`,
                 content:
-          'Act as a succinct assistant. Talk in Spanish. No inappropriate content. 🗣️: ',
+          `Act as a succinct assistant. Talk in Spanish. No inappropriate content. 🗣️: `,
             },
             ...nonSummaryMessages,
             ...summaryMessage,
-            { role: 'user', content: chatMessage },
+            { role: `user`, content: chatMessage },
         ];
 
-        let chatResponse = await callOpenAI('createChatCompletion', {
-            model: 'gpt-3.5-turbo',
+        let chatResponse = await callOpenAI(`createChatCompletion`, {
+            model: `gpt-3.5-turbo`,
             messages: messages,
             max_tokens: MAX_TOKENS,
         });
@@ -129,28 +131,28 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
                 senderNumber,
                 query,
                 group,
-                'gpt_messages',
+                `gpt_messages`,
             );
             await supabaseCommunicationModule.addGPTConversations(
                 senderNumber,
                 chatResponse,
                 group,
-                'gpt_messages',
-                'assistant',
+                `gpt_messages`,
+                `assistant`,
             );
         } else {
             await supabaseCommunicationModule.addGPTConversations(
                 senderNumber,
                 query,
                 group,
-                'gpt_messages',
+                `gpt_messages`,
             );
             await supabaseCommunicationModule.addGPTConversations(
                 senderNumber,
-                'Assistant did not have a response.',
+                `Assistant did not have a response.`,
                 group,
-                'gpt_messages',
-                'assistant',
+                `gpt_messages`,
+                `assistant`,
             );
         }
 

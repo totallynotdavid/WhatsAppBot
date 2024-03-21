@@ -3,8 +3,8 @@ const {
     Client,
     LocalAuth,
     MessageMedia
-} = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+} = require(`whatsapp-web.js`);
+const qrcode = require(`qrcode-terminal`);
 
 // Import commands and utility functions
 const {
@@ -24,8 +24,8 @@ const {
     spotify,
     editImage,
     translate,
-} = require('../commands/index.js');
-const { launchPuppeteer } = require('../lib/functions/index.js');
+} = require(`../commands/index.js`);
+const { launchPuppeteer } = require(`../lib/functions/index.js`);
 
 // Import admin commands
 const {
@@ -34,7 +34,7 @@ const {
     mentions,
     openai,
     imagine,
-} = require('../commands/admin/index.js');
+} = require(`../commands/admin/index.js`);
 
 // Import global variables
 let {
@@ -46,7 +46,7 @@ let {
     premiumGroups,
     commands,
     adminCommands,
-} = require('./globals');
+} = require(`./globals`);
 
 // Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
@@ -77,31 +77,29 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: launchPuppeteer(),
     webVersionCache: {
-        type: 'remote',
-        remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2407.3.html',
+        type: `remote`,
+        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2407.3.html`,
     },
 });
 
-client.on('qr', (qr) => {
+client.on(`qr`, (qr) => {
     qrcode.generate(qr, {
         small: true,
     });
 });
 
-client.on('auth_failure', (authFailureMessage) => {
-    console.error('Error de autenticación', authFailureMessage);
+client.on(`auth_failure`, (authFailureMessage) => {
+    console.error(`Error de autenticación`, authFailureMessage);
 });
 
-client.on('ready', () => {
-    console.log('Estamos listos, ¡el bot está en linea!');
-    console.log(
-        `Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`,
-    );
+client.on(`ready`, () => {
+    console.log(`Estamos listos, ¡el bot está en linea!`);
+    console.log(`Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`,);
 });
 
 /* Commands */
 
-client.on('message_create', async (message) => {
+client.on(`message_create`, async (message) => {
     let [contactInfo, chat] = await Promise.all([
         message.getContact(),
         message.getChat(),
@@ -113,8 +111,8 @@ client.on('message_create', async (message) => {
     const groupNumber = chat.id._serialized;
 
     /* Get all the text after the command (yt & wiki & chat) */
-    const parts = message.body.split(' ').slice(1);
-    const query = parts.join(' ');
+    const parts = message.body.split(` `).slice(1);
+    const query = parts.join(` `);
 
     /*
       The checks are done in order of importance
@@ -127,9 +125,7 @@ client.on('message_create', async (message) => {
     if (message.body.startsWith(prefix)) {
     // Bug: this also gets triggered if a user sends a location
         if (
-            !premiumGroups.some(
-                (group) => group.group_id === groupNumber && group.isActive,
-            )
+            !premiumGroups.some((group) => group.group_id === groupNumber && group.isActive,)
         )
             return;
 
@@ -194,7 +190,9 @@ client.on('message_create', async (message) => {
             );
             break;
         case commands.letra:
-            lyrics.handleSongLyricsRequest(stringifyMessage, message, robotEmoji);
+            lyrics.handleSongLyricsRequest(
+                stringifyMessage, message, robotEmoji
+            );
             break;
         case commands.cae:
             cae.getCAEMessage(
@@ -206,7 +204,9 @@ client.on('message_create', async (message) => {
             );
             break;
         case commands.fromis:
-            reddit.getRedditImage(message, subreddit, client, MessageMedia);
+            reddit.getRedditImage(
+                message, subreddit, client, MessageMedia
+            );
             break;
         case commands.w:
             wikipedia.handleWikipediaRequest(
@@ -220,19 +220,19 @@ client.on('message_create', async (message) => {
             );
             break;
         case commands.yt: {
-            const searchResult = await youtube.searchOnYoutube(query, 'fullData');
+            const searchResult = await youtube.searchOnYoutube(query, `fullData`);
 
             if (searchResult.error) {
                 message.reply(searchResult.message);
             } else {
                 if (searchResult.thumbnailUrl) {
-                    const media = await MessageMedia.fromUrl(
-                        searchResult.thumbnailUrl,
-                        { unsafeMime: true },
+                    const media = await MessageMedia.fromUrl(searchResult.thumbnailUrl,
+                        { unsafeMime: true },);
+                    client.sendMessage(
+                        message.id.remote, media, {
+                            caption: searchResult.caption,
+                        }
                     );
-                    client.sendMessage(message.id.remote, media, {
-                        caption: searchResult.caption,
-                    });
                 } else {
                     message.reply(searchResult.caption);
                 }
@@ -240,44 +240,36 @@ client.on('message_create', async (message) => {
             break;
         }
         case commands.play: {
-            message.reply(
-                `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,
-            );
+            message.reply(`${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,);
             const audioResponse = await youtube.sendYoutubeAudio(query);
 
             if (audioResponse.error) {
                 message.reply(`${robotEmoji} ${audioResponse.message}`);
             } else {
                 const media = MessageMedia.fromFilePath(audioResponse.filePath);
-                client.sendMessage(message.id.remote, media, {
-                    sendAudioAsVoice: true,
-                });
+                client.sendMessage(
+                    message.id.remote, media, {
+                        sendAudioAsVoice: true,
+                    }
+                );
             }
             utilities.deleteFile(audioResponse.filePath);
             break;
         }
         case commands.watch: {
-            message.reply(
-                `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,
-            );
+            message.reply(`${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`,);
             const videoResponse = await youtube.sendYoutubeVideo(query);
 
             if (videoResponse.error) {
                 message.reply(`${robotEmoji} ${videoResponse.message}`);
             } else {
-                const isWithinLimit = await utilities.isFileSizeWithinLimit(
-                    videoResponse.filePath,
-                    16,
-                );
+                const isWithinLimit = await utilities.isFileSizeWithinLimit(videoResponse.filePath,
+                    16,);
 
                 if (!isWithinLimit) {
-                    message.reply(
-                        `${robotEmoji} El video supera el límite de 16 MB. Prueba con otro video.`,
-                    );
+                    message.reply(`${robotEmoji} El video supera el límite de 16 MB. Prueba con otro video.`,);
                 } else {
-                    const media = await MessageMedia.fromFilePath(
-                        videoResponse.filePath,
-                    );
+                    const media = await MessageMedia.fromFilePath(videoResponse.filePath,);
                     client.sendMessage(message.id.remote, media);
                 }
             }
@@ -320,10 +312,14 @@ client.on('message_create', async (message) => {
             );
             break;
         case commands.author:
-            sciHub.handleSearchAuthor(stringifyMessage, message, query, robotEmoji);
+            sciHub.handleSearchAuthor(
+                stringifyMessage, message, query, robotEmoji
+            );
             break;
         case commands.doc:
-            docsearch.searchDocuments(stringifyMessage, message, query, robotEmoji);
+            docsearch.searchDocuments(
+                stringifyMessage, message, query, robotEmoji
+            );
             break;
         case commands.drive:
             docdown.handleGoogleDriveDownloads(
@@ -342,9 +338,7 @@ client.on('message_create', async (message) => {
             }
 
             if (!(await groups.hasValidSpecialDay(groupNumber))) {
-                message.reply(
-                    `${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`,
-                );
+                message.reply(`${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`,);
                 return;
             }
             /* eslint-disable no-case-declarations */
@@ -372,7 +366,7 @@ client.on('message_create', async (message) => {
             break;
         }
 
-        message.react('✅');
+        message.react(`✅`);
     }
 
     /*
@@ -386,16 +380,12 @@ client.on('message_create', async (message) => {
         if (!(command in adminCommands)) return;
 
         if (!paidUsers.some((user) => user.phone_number === senderNumber)) {
-            return message.reply(
-                `${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`,
-            );
+            return message.reply(`${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`,);
         }
 
         /* Check if the sender is an admin of the group */
         const participantsArray = Object.values(chat.participants);
-        const admins = participantsArray.filter(
-            (participant) => participant.isAdmin,
-        );
+        const admins = participantsArray.filter((participant) => participant.isAdmin,);
 
         const quotedMessage = await message.getQuotedMessage();
         const ownerNumber = client.info.wid.user;
@@ -411,7 +401,9 @@ client.on('message_create', async (message) => {
             );
             break;
         case adminCommands.todos:
-            mentions.mentionEveryone(chat, client, message, senderName);
+            mentions.mentionEveryone(
+                chat, client, message, senderName
+            );
             break;
         case adminCommands.ban:
             groups.handleBanUserFromGroup(
@@ -518,15 +510,11 @@ client.on('message_create', async (message) => {
             break;
         case adminCommands.imagine:
             if (query.length > 4) {
-                message.reply(
-                    `${robotEmoji} Trabajando en ello... dame unos segundos.`,
-                );
+                message.reply(`${robotEmoji} Trabajando en ello... dame unos segundos.`,);
                 const translatedQuery = await translate.translateText(query);
                 const pathsToImages = await imagine.handleImagine(translatedQuery);
                 if (pathsToImages.length === 0)
-                    return message.reply(
-                        `${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`,
-                    );
+                    return message.reply(`${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`,);
 
                 pathsToImages.forEach((pathToImage) => {
                     const media = MessageMedia.fromFilePath(pathToImage);
@@ -534,16 +522,14 @@ client.on('message_create', async (message) => {
                 });
                 message.reply(`${robotEmoji} ¡Terminamos, ya vienen las imágenes!`);
             } else {
-                message.reply(
-                    `${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`,
-                );
+                message.reply(`${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`,);
             }
             break;
         default:
             break;
         }
 
-        message.react('✅');
+        message.react(`✅`);
     }
 });
 
