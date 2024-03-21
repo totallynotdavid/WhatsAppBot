@@ -5,6 +5,9 @@ module.exports = {
         'node': true
     },
     'extends': 'eslint:recommended',
+    plugins: [
+        '@stylistic/js'
+    ],
     'overrides': [
         {
             'env': {
@@ -38,6 +41,13 @@ module.exports = {
         'semi': [
             'error',
             'always'
-        ]
+        ],
+        'multiline-ternary': [
+            'error',
+            'always-multiline'
+        ],
+        'no-multi-spaces': [
+            'error'
+        ],
     }
 };
