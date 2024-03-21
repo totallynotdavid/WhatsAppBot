@@ -1,8 +1,8 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const util = require('util');
-const execPromise = util.promisify(exec);
+const execFilePromise = util.promisify(execFile);
 const os = require('os');
 
 const latexTemplate = `
@@ -37,7 +37,7 @@ async function transformLatexToImage(
     client,
     MessageMedia,
     query,
-    robotEmoji,
+    robotEmoji
 ) {
     const latexCode = query;
 
@@ -46,31 +46,49 @@ async function transformLatexToImage(
         const writePath = path.join(__dirname, '..', 'img', 'input.tex');
         await fs.writeFile(writePath, latexDocument);
 
-        await execPromise(
-            `pdflatex -output-directory=${path.join(
-                __dirname,
-                '..',
-                'img',
-            )} -jobname=latex ${writePath}`,
+        await execFilePromise(
+            'pdflatex', [
+                '-output-directory=' +
+                path.join(__dirname, '..', 'img'), '-jobname=latex',
+                writePath,
+            ]
         );
 
-        // Check if OS is Windows, and change command accordingly
+        const pdfPath = path.join(
+            __dirname,
+            '..',
+            'img',
+            'latex.pdf'
+        );
+
+        await fs.access(pdfPath);
+
+        const pngPath = path.join(__dirname, '..', 'img', 'latex.png');
         const convertCommand =
-      os.platform() === 'win32' ? 'magick convert' : 'convert';
+            os.platform() === 'win32' ? 'magick' : 'convert';
+        const args = [
+            '-density', '300',
+            '-trim',
+            '-background', 'white',
+            '-gravity', 'center',
+            '-extent', '120%x180%',
+            '-alpha', 'remove',
+            pdfPath,
+            '-quality', '100',
+            '-define', 'png:color-type=2',
+            pngPath,
+        ];
 
-        await execPromise(
-            `${convertCommand} -density 300 -trim -background white -gravity center -extent 120%x180% -alpha remove ${path.join(
-                __dirname,
-                '../img/latex.pdf',
-            )} -quality 100 -define png:color-type=2 ${path.join(
-                __dirname,
-                '../img/latex.png',
-            )}`,
-        );
+        if (os.platform() === 'win32') {
+            await execFilePromise('magick', ['convert', ...args]);
+        } else {
+            await execFilePromise(convertCommand, args);
+        }
 
-        const media = MessageMedia.fromFilePath(
-            path.join(__dirname, '..', 'img', 'latex.png'),
-        );
+        // We have to make sure the PNG file exists
+        await fs.access(pngPath);
+
+        const media = MessageMedia.fromFilePath(pngPath);
         await client.sendMessage(message.id.remote, media, {
             caption: `${robotEmoji} Generado por boTeX`,
         });
