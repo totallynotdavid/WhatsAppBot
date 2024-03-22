@@ -48,6 +48,8 @@ const adminCommands = {
     refresh: `refresh`,
     promote: `promote`,
     demote: `demote`,
+    close: `close`,
+    open: `open`,
     chat: `chat`,
     imagine: `imagine`,
 };

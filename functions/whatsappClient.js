@@ -537,6 +537,30 @@ client.on(`message`, async message => {
                     robotEmoji
                 );
                 break;
+            case adminCommands.close:
+                const closeResponse = await chat.setMessagesAdminsOnly(true);
+                if (closeResponse) {
+                    message.reply(
+                        `${robotEmoji} Mensajes permitidos solo para administradores`
+                    );
+                } else {
+                    message.reply(
+                        `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
+                    );
+                }
+                break;
+            case adminCommands.open:
+                const openResponse = await chat.setMessagesAdminsOnly(false);
+                if (openResponse) {
+                    message.reply(
+                        `${robotEmoji} Mensajes permitidos para todos los miembros`
+                    );
+                } else {
+                    message.reply(
+                        `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
+                    );
+                }
+                break;
             case adminCommands.chat:
                 if (query.length > 1) {
                     const chatResponse = await openai.handleChatWithGPT(

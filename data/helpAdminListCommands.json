@@ -50,6 +50,16 @@
         "usage": "demote <user>"
     },
     {
+        "command": "open",
+        "message": "Permite que todos los usuarios puedan enviar mensajes en el grupo.\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
+        "usage": "open"
+    },
+    {
+        "command": "close",
+        "message": "Solo los administradores pueden enviar mensajes en el grupo.\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
+        "usage": "close"
+    },
+    {
         "command": "chat",
         "message": "Habla de lo que quieras con el bot",
         "usage": "chat <tu mensaje>"
