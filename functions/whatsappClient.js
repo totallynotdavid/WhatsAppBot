@@ -21,6 +21,7 @@ const {
     editImage,
     translate,
 } = require(`../commands/index.js`);
+const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
 
 // Import admin commands
@@ -91,17 +92,28 @@ client.on(`ready`, () => {
     );
 });
 
-/* Commands */
-
-client.on(`message_create`, async message => {
+/*
+  Event can be triggered by: message or message_create
+  * message_create includes the messages by the bot itself (good for testing)
+  * message is the one we want to use on production (it doesn't include the bot's messages
+*/
+client.on(`message`, async message => {
     let [contactInfo, chat] = await Promise.all([
         message.getContact(),
         message.getChat(),
     ]);
-    if (!chat.isGroup) return;
+
+    const senderNumber = message.id.participant || message.id.remote;
+    const isPaidUser = paidUsers.some(
+        user => user.phone_number === senderNumber
+    );
+
+    if (!chat.isGroup && !isPaidUser) {
+        await handleContactRequest(client, message, robotEmoji);
+        return;
+    }
 
     const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
-    const senderNumber = message.id.participant || message.id.remote;
     const groupNumber = chat.id._serialized;
 
     /* Get all the text after the command (yt & wiki & chat) */
