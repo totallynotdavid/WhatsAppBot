@@ -3,6 +3,7 @@ const db = require(`./database`);
 const mentions = require(`./mentions`);
 const openai = require(`./openai`);
 const imagine = require(`./imagine`);
+const { getUserInfo } = require(`./userInfo`);
 
 module.exports = {
     groups,
@@ -10,4 +11,5 @@ module.exports = {
     mentions,
     openai,
     imagine,
+    getUserInfo,
 };

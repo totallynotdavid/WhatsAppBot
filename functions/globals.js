@@ -52,6 +52,7 @@ const adminCommands = {
     open: `open`,
     chat: `chat`,
     imagine: `imagine`,
+    subscription: `subscription`,
 };
 
 module.exports = {

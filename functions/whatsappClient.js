@@ -25,7 +25,7 @@ const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
 
 // Import admin commands
-const { groups, db, mentions, openai, imagine } = require(
+const { groups, db, mentions, openai, imagine, getUserInfo } = require(
     `../commands/admin/index.js`
 );
 
@@ -599,6 +599,15 @@ client.on(`message`, async message => {
                         `${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`
                     );
                 }
+                break;
+            case adminCommands.subscription:
+                const subscriptionInfo = getUserInfo(
+                    senderNumber,
+                    robotEmoji,
+                    paidUsers,
+                    premiumGroups
+                );
+                message.reply(subscriptionInfo);
                 break;
             default:
                 break;
