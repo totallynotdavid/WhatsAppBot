@@ -4,6 +4,7 @@ const mentions = require(`./mentions`);
 const openai = require(`./openai`);
 const imagine = require(`./imagine`);
 const { getUserInfo } = require(`./userInfo`);
+const { handleGlobalMessage } = require(`./globalMessage`);
 
 module.exports = {
     groups,
@@ -12,4 +13,5 @@ module.exports = {
     openai,
     imagine,
     getUserInfo,
+    handleGlobalMessage,
 };

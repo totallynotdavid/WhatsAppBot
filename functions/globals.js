@@ -53,6 +53,7 @@ const adminCommands = {
     chat: `chat`,
     imagine: `imagine`,
     subscription: `subscription`,
+    global: `global`,
 };
 
 module.exports = {

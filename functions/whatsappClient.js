@@ -25,9 +25,15 @@ const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
 
 // Import admin commands
-const { groups, db, mentions, openai, imagine, getUserInfo } = require(
-    `../commands/admin/index.js`
-);
+const {
+    groups,
+    db,
+    mentions,
+    openai,
+    imagine,
+    getUserInfo,
+    handleGlobalMessage,
+} = require(`../commands/admin/index.js`);
 
 // Import global variables
 let {
@@ -103,13 +109,14 @@ client.on(`message`, async message => {
         message.getChat(),
     ]);
 
+    const ownerNumber = process.env.adminNumber;
     const senderNumber = message.id.participant || message.id.remote;
     const isPaidUser = paidUsers.some(
         user => user.phone_number === senderNumber
     );
 
     if (!chat.isGroup && !isPaidUser) {
-        await handleContactRequest(client, message, robotEmoji);
+        await handleContactRequest(client, message, robotEmoji, ownerNumber);
         return;
     }
 
@@ -421,7 +428,6 @@ client.on(`message`, async message => {
         );
 
         const quotedMessage = await message.getQuotedMessage();
-        const ownerNumber = client.info.wid.user;
 
         switch (command) {
             case adminCommands.help:
@@ -611,6 +617,17 @@ client.on(`message`, async message => {
                 await client.sendMessage(senderNumber, subscriptionInfo);
                 await message.reply(
                     `${robotEmoji} Hey, te acabo de enviar un mensaje privado con más información sobre tu suscripción.`
+                );
+                break;
+            case adminCommands.global:
+                await handleGlobalMessage(
+                    client,
+                    paidUsers,
+                    senderNumber,
+                    ownerNumber,
+                    message,
+                    robotEmoji,
+                    stringifyMessage
                 );
                 break;
             default:
