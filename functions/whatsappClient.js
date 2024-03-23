@@ -608,7 +608,10 @@ client.on(`message`, async message => {
                     paidUsers,
                     premiumGroups
                 );
-                await message.reply(subscriptionInfo);
+                await client.sendMessage(senderNumber, subscriptionInfo);
+                await message.reply(
+                    `${robotEmoji} Hey, te acabo de enviar un mensaje privado con más información sobre tu suscripción.`
+                );
                 break;
             default:
                 break;
