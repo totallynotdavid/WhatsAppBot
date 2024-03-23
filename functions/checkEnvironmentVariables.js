@@ -20,7 +20,6 @@ function checkEnvironmentVariables() {
         `facebook_access_token`,
         `facebookId`,
         `adminNumber`,
-        `MUSIXMATCH_API_KEY`,
         `OPENAI_API_KEY`,
     ];
 
