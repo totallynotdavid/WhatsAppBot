@@ -1,7 +1,7 @@
 [
     {
         "command": "ban",
-        "message": "Este comando elimina a un usuario del grupo. Puedes usarlo de dos maneras: \n1. Respondiendo directamente al mensaje del usuario que deseas eliminar. \n2. Mencionando explícitamente al usuario junto con el comando. \n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
+        "message": "Este comando elimina a un usuario del grupo. Puedes usarlo de dos maneras:\n1. Respondiendo directamente al mensaje del usuario que deseas eliminar.\n2. Mencionando explícitamente al usuario junto con el comando.\n\nTambién puedes eliminar a todos usando <@ban @todos>\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
         "usage": "ban <user>"
     },
     {
@@ -71,7 +71,7 @@
     },
     {
         "command": "subscription",
-        "message": "Te proporciona información detallada sobre tu suscripción. Incluye tu número de teléfono, la fecha de expiración de tu suscripción y la lista de grupos registrados con el bot.",
+        "message": "Te proporciona información detallada sobre tu suscripción. Incluye tu número de teléfono, la fecha de expiración de tu suscripción y la lista de grupos registrados con el bot",
         "usage": "subscription"
     },
     {
