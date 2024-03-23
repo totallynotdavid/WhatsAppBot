@@ -18,7 +18,7 @@ También se provee de comandos especiales para usuarios de pago:
 -   Menciona a todos los miembros del grupo
 -   Añade o elimina usuarios del grupo
 -   Activa o desactiva el bot en grupos en particular
--   Conversa con el bot utilizando el [modelo 'text-davinci-003'](https://platform.openai.com/docs/models) de OpenAI
+-   Conversa con el bot utilizando el [modelo 'gpt-3.5-turbo-instruct'](https://platform.openai.com/docs/models) de OpenAI
 -   Genera imágenes a través de [Bing Create](https://www.bing.com/images/create/) o la [API de Stability AI](https://platform.stability.ai/docs/api-reference#tag/Text-to-Image)
 
 ## Prerrequisitos
