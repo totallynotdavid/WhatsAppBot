@@ -73,5 +73,10 @@
         "command": "subscription",
         "message": "Te proporciona información detallada sobre tu suscripción. Incluye tu número de teléfono, la fecha de expiración de tu suscripción y la lista de grupos registrados con el bot.",
         "usage": "subscription"
+    },
+    {
+        "command": "global",
+        "message": "Envía un mensaje a todos los usuarios de pago.\n\n*Importante*: Disponible solo para el propietario",
+        "usage": "global <tu mensaje>"
     }
 ]
