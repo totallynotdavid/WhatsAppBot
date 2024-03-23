@@ -1,19 +1,31 @@
 # WhatsAppBot
 
-Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitiendo a los usuarios interactuar con él mediante comandos enviados a través del chat.
+WhatsAppBot es una aplicación escrita en Javacript, utiliza Node.js junto a [whatsapp-web.js](https://docs.wwebjs.dev/) para iniciar un bot. El bot tiene funcionalidades variadas, entre ellas:
 
-## Funciones
+-   Convierte imágenes, gifs y vídeos en stickers y viceversa
+-   Busca y reproduce canciones de Spotify (vista previa provista a través de sus [APIs](https://developer.spotify.com/documentation/web-api/reference/search)) y Youtube (a través de [yt-dlp](https://github.com/yt-dlp/yt-dlp) y [ffmpeg](https://ffmpeg.org/ffmpeg.html))
+-   Busca y reproduce vídeos de YouTube a través de [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+-   Busca la letra de canciones a través de scraping gracias al paquete [fetch-lyrics](https://github.com/susudeepa/fetch-lyrics)
+-   Obtén información de Wikipedia (a través de su [API](https://en.wikipedia.org/w/api.php))
+-   Tranforma texto en audio a través de [Amazon Polly](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/polly-examples.html)
+-   Obtén imágenes de Reddit a través de su API no oficial
+-   Transforma código LaTeX en imágenes
+-   Busca y descarga artículos científicos de Sci-Hub
+-   Busca y descarga archivos de Google Drive
 
--   Convierte imágenes y vídeos en pegatinas
--   Busca y reproduce canciones de Spotify
--   Obtén información de Wikipedia
--   Obtén imágenes de Reddit
--   Busca y reproduce vídeos de YouTube
+También se provee de comandos especiales para usuarios de pago:
+
 -   Menciona a todos los miembros del grupo
+-   Añade o elimina usuarios del grupo
+-   Activa o desactiva el bot en grupos en particular
+-   Conversa con el bot utilizando el [modelo 'text-davinci-003'](https://platform.openai.com/docs/models) de OpenAI
+-   Genera imágenes a través de [Bing Create](https://www.bing.com/images/create/) o la [API de Stability AI](https://platform.stability.ai/docs/api-reference#tag/Text-to-Image)
 
 ## Prerrequisitos
 
--   Node.js
+Desarrollo en Windows, pero hago deploy en un servidor que utiliza Ubuntu 22.04 así que no deberías de tener mucho problema en caso de ser usuario de Windows.
+
+-   Node.js (nvm)
 
     ```bash
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
@@ -63,10 +75,16 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
 
     - `spotify_client_id`
     - `spotify_client_secret`
-    - `youtube_api_key`
     - `supabase_api_key`
     - `supabase_base_url`
     - `folder_id`
+    - `adminNumber`
+    - `YOUTUBE_API_KEY_1` (puedes aumentar varias keys, el bot rotará entre ellas)
+    - `NODE_ENV`
+    - `IMGUR_CLIENT_ID`
+    - `OPENAI_API_KEY`
+    - `STABILITY_API_KEY`
+    - `BING_IMAGE_COOKIE`
 
 3. Instalar las dependencias:
 
@@ -74,13 +92,7 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
     npm install
     ```
 
-4. Aplica estas correcciones: [1](https://github.com/pedroslopez/whatsapp-web.js/issues/2066#issuecomment-1470534717), [2](https://github.com/pedroslopez/whatsapp-web.js/pull/2087/files). También:
-
-    ```bash
-    npm i github:pedroslopez/whatsapp-web.js#fix-buttons-list
-    ```
-
-5. Necesitas añadir tus credenciales de Amazon. En Linux, Unix, y macOS: `~/.aws/credentials`. Para Windows: `\Users\USUARIO\.aws\credentials`.
+4. Necesitas añadir tus credenciales de Amazon. En Linux, Unix, y macOS: `~/.aws/credentials`. Para Windows: `\Users\{usuario}\.aws\credentials`.
 
     ```bash
     [default]
@@ -88,36 +100,24 @@ Este bot está diseñado para funcionar en la plataforma WhatsApp Web, permitien
     aws_secret_access_key =
     ```
 
-6. Inicia el bot por primera vez:
+5. Inicia el bot por primera vez:
 
     ```bash
     node index.js
     ```
 
-7. Usar pm2 para mantener el bot funcionando continuamente:
+6. Puedes usar pm2 para mantener el bot funcionando continuamente:
     ```
     pm2 start index.js --cron-restart="*/15 * * * *"
     ```
 
+> [!TIP]
+> En mi caso, reinicio el bot cada 45 minutos para evitar acumulación en la memoria RAM, antes, utilizaba un servidor gratuito de Digital Ocean y mucho antes de AWS y al llegar al tope, el servidor se caía y tenía que reiniciarlo manualmente.
+
 ## Uso
 
-El Bot funciona interpretando los comandos que empiezan por `!` o `@`.
+El bot funciona interpretando los comandos que empiezan por `!` o `@`. Puedes redefinirlos en el archivo `config.dev.js` y `config.prod.js`. Para cambiar entre modos, modifica el valor `NODE_ENV` en `.env`.
 
-### Comandos disponibles
+## Licencia
 
--   `!help` - Muestra una lista de los comandos disponibles
--   `!sticker` - Convierte la imagen o el vídeo adjuntos en una pegatina
--   `!url` - Convierte una imagen o un vídeo de una URL en una pegatina
--   `!spot <nombre_canción>` - Busca y reproduce una canción en Spotify
--   `!cae` - Muestra un mensaje sobre un meme popular
--   `!fromis` - Obtiene una imagen del subreddit "Fromis"
--   `!w <consulta_búsqueda>` - Busca un artículo en Wikipedia
--   `!yt <search_query>` - Busca un vídeo en YouTube
--   `!play <youtube_url> [tiempo_de_inicio] [tiempo_final]` - Descarga y escucha una video de Youtube
--   `!lx <código de LaTeX>` - Transforma código LaTeX en imagen
--   `!sh <doi>` - Obten el PDF de un artículo científico
-
-### Comandos para administradores
-
--   `@todos` - Menciona a todos los miembros del grupo
--   `@ban` - Elimina a un miembro del grupo
+Este proyecto se encuentra bajo la [licencia MIT](LICENSE), lo que significa que es de código abierto y cualquier persona puede utilizarlo, modificarlo y distribuirlo libremente.
