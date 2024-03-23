@@ -601,13 +601,14 @@ client.on(`message`, async message => {
                 }
                 break;
             case adminCommands.subscription:
-                const subscriptionInfo = getUserInfo(
+                const subscriptionInfo = await getUserInfo(
+                    client,
                     senderNumber,
                     robotEmoji,
                     paidUsers,
                     premiumGroups
                 );
-                message.reply(subscriptionInfo);
+                await message.reply(subscriptionInfo);
                 break;
             default:
                 break;
