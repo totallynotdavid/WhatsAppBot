@@ -47,7 +47,8 @@ function handleBanUserFromGroup(
     chat,
     quotedMessage,
     message,
-    robotEmoji
+    robotEmoji,
+    banAll = false
 ) {
     if (
         !admins.some(
@@ -59,25 +60,39 @@ function handleBanUserFromGroup(
         );
     }
 
-    if (quotedMessage && stringifyMessage.length === 1) {
-        const quotedAuthor = quotedMessage.author;
-        if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
-            message.reply(`${robotEmoji} Cómo te atreves.`);
-        } else {
-            banMultipleUsers(client, chat, [quotedAuthor], message, robotEmoji);
-        }
-    } else if (stringifyMessage.length > 1) {
-        banMultipleUsers(
-            client,
-            chat,
-            message.mentionedIds,
-            message,
-            robotEmoji
+    if (banAll) {
+        const participants = Object.values(chat.participants);
+        const userIds = participants.map(
+            participant => participant.id._serialized
         );
+        banMultipleUsers(client, chat, userIds, message, robotEmoji);
     } else {
-        message.reply(
-            `${robotEmoji} Para eliminar a alguien del grupo, responde a su mensaje o menciónalo.`
-        );
+        if (quotedMessage && stringifyMessage.length === 1) {
+            const quotedAuthor = quotedMessage.author;
+            if (quotedAuthor === `${client.info.wid.user}:8@c.us`) {
+                message.reply(`${robotEmoji} Cómo te atreves.`);
+            } else {
+                banMultipleUsers(
+                    client,
+                    chat,
+                    [quotedAuthor],
+                    message,
+                    robotEmoji
+                );
+            }
+        } else if (stringifyMessage.length > 1) {
+            banMultipleUsers(
+                client,
+                chat,
+                message.mentionedIds,
+                message,
+                robotEmoji
+            );
+        } else {
+            message.reply(
+                `${robotEmoji} Para eliminar a alguien del grupo, responde a su mensaje o menciónalo.`
+            );
+        }
     }
 }
 

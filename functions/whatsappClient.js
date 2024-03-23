@@ -437,6 +437,9 @@ client.on(`message`, async message => {
                 mentions.mentionEveryone(chat, client, message, senderName);
                 break;
             case adminCommands.ban:
+                const banAll =
+                    stringifyMessage.length === 2 &&
+                    stringifyMessage[1] === `${prefix_admin}todos`;
                 groups.handleBanUserFromGroup(
                     admins,
                     stringifyMessage,
@@ -444,7 +447,8 @@ client.on(`message`, async message => {
                     chat,
                     quotedMessage,
                     message,
-                    robotEmoji
+                    robotEmoji,
+                    banAll
                 );
                 break;
             case adminCommands.bot:
