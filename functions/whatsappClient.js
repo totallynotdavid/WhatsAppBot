@@ -258,9 +258,6 @@ client.on(`message`, async message => {
                 break;
             }
             case commands.play: {
-                message.reply(
-                    `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`
-                );
                 const audioResponse = await youtube.sendYoutubeAudio(query);
 
                 if (audioResponse.error) {
@@ -277,9 +274,6 @@ client.on(`message`, async message => {
                 break;
             }
             case commands.watch: {
-                message.reply(
-                    `${robotEmoji} Trabajando en ello... la descarga puede tardar un poco.`
-                );
                 const videoResponse = await youtube.sendYoutubeVideo(query);
 
                 if (videoResponse.error) {
