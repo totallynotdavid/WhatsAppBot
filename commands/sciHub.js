@@ -3,8 +3,7 @@ const path = require(`path`);
 const fetch = require(`node-fetch`);
 const { pipeline } = require(`stream`);
 
-const sciHub_baseURL = `https://sci-hub.mksa.top/`;
-const iframeRegex = /<iframe src="(.*?)"(?:.*?)>/;
+const sciHub_baseURL = `https://pismin.com/`;
 
 async function getPdfLink(
     message,
@@ -14,26 +13,43 @@ async function getPdfLink(
     robotEmoji
 ) {
     const link = stringifyMessage[1];
-
     const response = await fetch(`${sciHub_baseURL}${link}`);
     const html = await response.text();
-    const match = iframeRegex.exec(html);
-    const pdfLink = match
-        ? match[1].startsWith(`http`)
-            ? match[1]
-            : `http:${match[1]}`
-        : null;
 
-    if (pdfLink) {
-        const pdfFilename = await downloadPdf(pdfLink, link);
-        const media = await MessageMedia.fromFilePath(
-            path.join(__dirname, `../pdf`, pdfFilename)
-        );
-        await client.sendMessage(message.id.remote, media, {
-            caption: `PDF file`,
-        });
+    const citationDiv = /<div\s+id="citation"[^>]*>(.*?)<\/div>/s.exec(html);
+    let paperTitle = null;
 
-        fs.unlinkSync(path.join(__dirname, `../pdf`, pdfFilename));
+    if (citationDiv && citationDiv[1]) {
+        const titleMatch = /<i>(.*?)<\/i>/s.exec(citationDiv[1]);
+        paperTitle = titleMatch ? titleMatch[1].trim() : null;
+    }
+
+    // Find the div with id="article"
+    const articleDiv = /<div\s+id="article">(.*?)<\/div>/s.exec(html);
+
+    if (articleDiv && articleDiv[1]) {
+        // Find the embed tag with id="pdf" inside the article div
+        const pdfEmbedTag =
+            /<embed\s+type="application\/pdf"\s+src="(.*?)"\s+id="pdf"/s.exec(
+                articleDiv[1]
+            );
+
+        if (pdfEmbedTag && pdfEmbedTag[1]) {
+            const pdfLink = pdfEmbedTag[1];
+            const pdfFilename = await downloadPdf(pdfLink, link);
+            const media = await MessageMedia.fromFilePath(
+                path.join(__dirname, `../pdf`, pdfFilename)
+            );
+            const caption = paperTitle
+                ? `${robotEmoji} El artículo que encontré es: *${paperTitle}*`
+                : `${robotEmoji} Aquí está tu artículo.`;
+            await client.sendMessage(message.id.remote, media, { caption });
+            fs.unlinkSync(path.join(__dirname, `../pdf`, pdfFilename));
+        } else {
+            message.reply(
+                `${robotEmoji} No hemos podido encontrar el PDF de este artículo.`
+            );
+        }
     } else {
         message.reply(
             `${robotEmoji} No hemos podido encontrar el PDF de este artículo.`
