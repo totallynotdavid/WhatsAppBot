@@ -211,6 +211,14 @@ async function handleAddUserToGroup(admins, message, client, robotEmoji) {
         return;
     }
 
+    // We limit the number of contacts that can be added at once to 3 to avoid spam reports
+    if (quotedMessage.vCards.length > 3) {
+        message.reply(
+            `${robotEmoji} No se pueden agregar más de 3 contactos a la vez.`
+        );
+        return;
+    }
+
     const groupChat = await message.getChat();
     const contactIds = [];
 

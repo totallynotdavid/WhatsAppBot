@@ -31,7 +31,7 @@
     },
     {
         "command": "add",
-        "message": "Añade a nuevos usuarios a tu grupo. Responde a un mensaje que contenga el contacto de la persona que quieres añadir, y el bot se encargará del resto.\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
+        "message": "Añade a nuevos usuarios a tu grupo, hasta un máximo de 3 contactos. Responde a un mensaje que contenga el contacto de la persona que quieres añadir, y el bot se encargará del resto.\n\n*Importante*: El bot debe tener permisos de administrador en el grupo",
         "usage": "add"
     },
     {
