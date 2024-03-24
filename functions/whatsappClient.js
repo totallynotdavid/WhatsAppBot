@@ -23,6 +23,9 @@ const {
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
+const supabaseCommunicationModule = require(
+    `../lib/api/supabaseCommunicationModule.js`
+);
 
 // Import admin commands
 const {
@@ -136,7 +139,6 @@ client.on(`message`, async message => {
     */
 
     if (message.body.startsWith(prefix)) {
-        // Bug: this also gets triggered if a user sends a location
         if (
             !premiumGroups.some(
                 group => group.group_id === groupNumber && group.isActive
@@ -152,7 +154,12 @@ client.on(`message`, async message => {
         if (!(command in commands)) return;
 
         /* Logging all commands received to Supabase */
-        // supabaseCommunicationModule.insertMessage(senderNumber, message.body, message.to, 'users');
+        supabaseCommunicationModule.insertMessage(
+            senderNumber,
+            message.body,
+            message.to,
+            `users`
+        );
 
         switch (command) {
             case commands.help:
