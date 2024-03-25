@@ -108,6 +108,13 @@ client.on(`ready`, () => {
   * message is the one we want to use on production (it doesn't include the bot's messages
 */
 client.on(`message`, async message => {
+    if (
+        !message.body.startsWith(prefix) &&
+        !message.body.startsWith(prefix_admin)
+    ) {
+        return;
+    }
+
     let [contactInfo, chat] = await Promise.all([
         message.getContact(),
         message.getChat(),
