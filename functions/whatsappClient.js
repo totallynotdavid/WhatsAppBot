@@ -1,6 +1,8 @@
-// Packages
 const { Client, LocalAuth, MessageMedia } = require(`whatsapp-web.js`);
 const qrcode = require(`qrcode-terminal`);
+const supabaseCommunicationModule = require(
+  `../lib/api/supabaseCommunicationModule.js`
+);
 
 // Import commands and utility functions
 const {
@@ -23,9 +25,6 @@ const {
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
-const supabaseCommunicationModule = require(
-    `../lib/api/supabaseCommunicationModule.js`
-);
 
 // Import admin commands
 const {
