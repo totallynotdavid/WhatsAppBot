@@ -1,9 +1,12 @@
+const ownerNumber = process.env.adminNumber;
+
+// Load config file based on environment
 const env = process.env.NODE_ENV || `dev`;
 const config = require(`../config.${env}.js`);
 
 let prefix = config.command_prefix;
 let prefix_admin = config.admin_command_prefix;
-let robotEmoji = `🤖`;
+let robotEmoji = config.robotEmoji;
 let paidUsers = [];
 let physicsUsers = [];
 let premiumGroups = [];
@@ -59,6 +62,7 @@ const adminCommands = {
 module.exports = {
     prefix,
     prefix_admin,
+    ownerNumber,
     robotEmoji,
     paidUsers,
     physicsUsers,
