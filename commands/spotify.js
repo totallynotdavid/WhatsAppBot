@@ -6,10 +6,10 @@ require(`dotenv`).config({ path: path.resolve(__dirname, `../.env`) });
 const spotifyWebApi = require(`spotify-web-api-node`);
 
 /* Define the environment variables */
-const { spotify_client_id, spotify_client_secret } = process.env;
+const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env;
 const spotifyApi = new spotifyWebApi({
-    clientId: spotify_client_id,
-    clientSecret: spotify_client_secret,
+    clientId: SPOTIFY_CLIENT_ID,
+    clientSecret: SPOTIFY_CLIENT_SECRET,
     redirectUri: `http://localhost:3000`,
 });
 

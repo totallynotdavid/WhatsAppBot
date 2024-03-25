@@ -2,7 +2,7 @@ const { Page } = require(`facebook-nodejs-business-sdk`);
 const path = require(`path`);
 require(`dotenv`).config({ path: path.resolve(__dirname, `../.env`) });
 
-const access_token = process.env.facebook_access_token;
+const access_token = process.env.FACEBOOK_ACCESS_TOKEN;
 
 const api = require(`facebook-nodejs-business-sdk`).FacebookAdsApi.init(
     access_token

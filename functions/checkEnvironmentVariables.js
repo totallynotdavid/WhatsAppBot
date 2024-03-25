@@ -11,15 +11,15 @@ function checkEnvironmentVariables() {
 
     // Define the required environment variables
     const requiredVariables = [
-        `spotify_client_id`,
-        `spotify_client_secret`,
+        `SPOTIFY_CLIENT_ID`,
+        `SPOTIFY_CLIENT_SECRET`,
         `YOUTUBE_API_KEY_1`,
-        `supabase_api_key`,
-        `supabase_base_url`,
-        `folder_id`,
-        `facebook_access_token`,
-        `facebookId`,
-        `adminNumber`,
+        `SUPABASE_API_KEY`,
+        `SUPABASE_BASE_URL`,
+        `DRIVE_FOLDER_ID`,
+        `FACEBOOK_ACCESS_TOKEN`,
+        `FACEBOOK_PAGE_ID`,
+        `ADMIN_NUMBER`,
         `OPENAI_API_KEY`,
     ];
 

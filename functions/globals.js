@@ -1,4 +1,4 @@
-const ownerNumber = process.env.adminNumber;
+const ownerNumber = process.env.ADMIN_NUMBER;
 
 // Load config file based on environment
 const env = process.env.NODE_ENV || `dev`;
