@@ -52,8 +52,6 @@ let {
 
 // Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
-// Set subreddit for the "fromis" command
-const subreddit = utilities.capitalizeText(fromisCommand);
 
 // Set function to update premium groups and users
 const setFetchedData = (
@@ -248,7 +246,7 @@ client.on(`message`, async message => {
                 case commands.fromis:
                     reddit.getRedditImage(
                         message,
-                        subreddit,
+                        fromisCommand,
                         client,
                         MessageMedia
                     );
@@ -461,15 +459,15 @@ client.on(`message`, async message => {
             const quotedMessage = await message.getQuotedMessage();
 
             switch (command) {
-                case adminCommands.help:
-                    help.getAdminHelpMessage(
+                case adminCommands.help: {
+                    const adminHelpMessageText = help.getAdminHelpMessage(
                         prefix_admin,
                         stringifyMessage,
-                        helpCommand,
-                        message,
-                        /*client, List,*/ robotEmoji
+                        helpCommand
                     );
+                    message.reply(`${robotEmoji} ${adminHelpMessageText}`);
                     break;
+                }
                 case adminCommands.todos:
                     mentions.mentionEveryone(
                         chatInfo,

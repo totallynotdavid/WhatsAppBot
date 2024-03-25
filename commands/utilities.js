@@ -17,35 +17,27 @@ function convertArrayToDict(commandArray) {
     }, {});
 }
 
-function commandGenerator(
-    fixedDataCommandDict,
-    message,
-    stringifyMessage,
-    prefix,
-    robotEmoji
-) {
+function commandGenerator(fixedDataCommandDict, stringifyMessage, prefix) {
     try {
-        const commandObj = fixedDataCommandDict[stringifyMessage[1]];
+        const command = stringifyMessage[1];
+        const commandObj = fixedDataCommandDict[command];
 
-        if (commandObj) {
-            const builtMessage = commandObj.usage
-                ? `${robotEmoji} ${
-                      commandObj.message
-                  }.\n\n*Ejemplo de uso*:\n\n${codeWrapper(
-                      `${prefix}${commandObj.usage}`
-                  )}`
-                : `${robotEmoji} ${commandObj.message}.`;
-
-            message.reply(builtMessage);
-        } else {
-            message.reply(
-                `${robotEmoji} Parece que ${codeWrapper(
-                    stringifyMessage[1]
-                )} no existe.`
-            );
+        if (!commandObj) {
+            return `Parece que ${codeWrapper(command)} no existe.`;
         }
+
+        const { message, usage } = commandObj;
+
+        if (usage) {
+            return `${message}.\n\n*Ejemplo de uso*:\n\n${codeWrapper(
+                `${prefix}${usage}`
+            )}`;
+        }
+
+        return message;
     } catch (err) {
         console.error(err);
+        return `Ha ocurrido un error al generar la información del comando.`;
     }
 }
 
