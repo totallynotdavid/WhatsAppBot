@@ -1,7 +1,7 @@
 const { Client, LocalAuth, MessageMedia } = require(`whatsapp-web.js`);
 const qrcode = require(`qrcode-terminal`);
 const supabaseCommunicationModule = require(
-  `../lib/api/supabaseCommunicationModule.js`
+    `../lib/api/supabaseCommunicationModule.js`
 );
 
 // Import commands and utility functions
@@ -41,6 +41,7 @@ const {
 let {
     prefix,
     prefix_admin,
+    ownerNumber,
     robotEmoji,
     paidUsers,
     physicsUsers,
@@ -48,7 +49,6 @@ let {
     commands,
     adminCommands,
 } = require(`./globals`);
-const ownerNumber = process.env.adminNumber;
 
 // Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
