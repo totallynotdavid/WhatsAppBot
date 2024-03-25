@@ -49,6 +49,7 @@ let {
     commands,
     adminCommands,
 } = require(`./globals`);
+const ownerNumber = process.env.adminNumber;
 
 // Import specific commands
 const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
@@ -112,7 +113,6 @@ client.on(`message`, async message => {
         message.getChat(),
     ]);
 
-    const ownerNumber = process.env.adminNumber;
     const senderNumber = message.id.participant || message.id.remote;
     const isPaidUser = paidUsers.some(
         user => user.phone_number === senderNumber
