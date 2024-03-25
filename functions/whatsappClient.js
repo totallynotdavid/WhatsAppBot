@@ -115,538 +115,579 @@ client.on(`message`, async message => {
         return;
     }
 
-    let [contactInfo, chat] = await Promise.all([
-        message.getContact(),
-        message.getChat(),
-    ]);
+    let contactInfo,
+        chatInfo,
+        senderPhoneNumber,
+        isSenderPaidUser,
+        senderName,
+        groupId,
+        commandParts,
+        commandQuery;
 
-    const senderNumber = message.id.participant || message.id.remote;
-    const isPaidUser = paidUsers.some(
-        user => user.phone_number === senderNumber
-    );
+    try {
+        [contactInfo, chatInfo] = await Promise.all([
+            message.getContact(),
+            message.getChat(),
+        ]);
+        senderPhoneNumber = message.id.participant || message.id.remote;
+        isSenderPaidUser = paidUsers.some(
+            user => user.phone_number === senderPhoneNumber
+        );
 
-    if (!chat.isGroup && !isPaidUser) {
-        await handleContactRequest(client, message, robotEmoji, ownerNumber);
-        return;
-    }
-
-    const senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
-    const groupNumber = chat.id._serialized;
-
-    /* Get all the text after the command (yt & wiki & chat) */
-    const parts = message.body.split(` `).slice(1);
-    const query = parts.join(` `);
-
-    /*
-      The checks are done in order of importance
-      1. Check if the message is in a group
-      Here there is a divergence between the admin and the regular commands
-      1.a Regular: The message is in a premium group
-      1.b Admin: The message is from a user who is a paid user
-    */
-
-    if (message.body.startsWith(prefix)) {
-        if (
-            !premiumGroups.some(
-                group => group.group_id === groupNumber && group.isActive
-            )
-        )
+        if (!chatInfo.isGroup && !isSenderPaidUser) {
+            await handleContactRequest(
+                client,
+                message,
+                robotEmoji,
+                ownerNumber
+            );
             return;
+        }
+
+        senderName = contactInfo.pushname || message._data.notifyName; // The bot name is not defined, so we use the notifyName
+        groupId = chatInfo.id._serialized;
 
         /* Creates an array with each word. Example: from "!spot dkdk" it will get "["!spot", "dkdk"]" */
         let stringifyMessage = message.body.trim().split(/\s+/);
 
-        const command = stringifyMessage[0].split(prefix)[1];
+        /* Get all the text after the command (yt & wiki & chat) */
+        commandParts = message.body.trim().split(/\s+/);
+        commandQuery = commandParts.slice(1).join(` `);
+        /*
+          The checks are done in order of importance
+          1. Check if the message is in a group
+          Here there is a divergence between the admin and the regular commands
+          1.a Regular: The message is in a premium group
+          1.b Admin: The message is from a user who is a paid user
+        */
 
-        if (!(command in commands)) return;
+        if (message.body.startsWith(prefix)) {
+            if (
+                !premiumGroups.some(
+                    group => group.group_id === groupId && group.isActive
+                )
+            )
+                return;
 
-        /* Logging all commands received to Supabase */
-        supabaseCommunicationModule.insertMessage(
-            senderNumber,
-            message.body,
-            message.to,
-            `users`
-        );
+            const command = stringifyMessage[0].split(prefix)[1];
 
-        switch (command) {
-            case commands.help:
-                help.getHelpMessage(
-                    prefix,
-                    stringifyMessage,
-                    helpCommand,
-                    message,
-                    robotEmoji
-                );
-                break;
-            case commands.sticker:
-                stickers.transformMediaToSticker(
-                    chat,
-                    message,
-                    senderName,
-                    senderNumber,
-                    robotEmoji
-                );
-                break;
-            case commands.toimage:
-                stickers.processQuotedStickerMessage(
-                    stringifyMessage,
-                    message,
-                    chat,
-                    robotEmoji,
-                    senderName
-                );
-                break;
-            case commands.url:
-                stickers.handleStickerURL(
-                    stringifyMessage,
-                    message,
-                    robotEmoji,
-                    reddit,
-                    chat,
-                    MessageMedia,
-                    senderName,
-                    senderNumber
-                );
-                break;
-            case commands.spot:
-                spotify.handleSpotifySongRequest(
-                    client,
-                    message,
-                    MessageMedia,
-                    query,
-                    stringifyMessage,
-                    robotEmoji
-                );
-                break;
-            case commands.letra:
-                lyrics.handleSongLyricsRequest(
-                    stringifyMessage,
-                    message,
-                    robotEmoji
-                );
-                break;
-            case commands.cae:
-                cae.getCAEMessage(
-                    prefix,
-                    stringifyMessage,
-                    caeCommand,
-                    message,
-                    robotEmoji
-                );
-                break;
-            case commands.fromis:
-                reddit.getRedditImage(message, subreddit, client, MessageMedia);
-                break;
-            case commands.w:
-                wikipedia.handleWikipediaRequest(
-                    stringifyMessage,
-                    message,
-                    robotEmoji,
-                    query,
-                    senderName,
-                    client,
-                    MessageMedia
-                );
-                break;
-            case commands.yt: {
-                const searchResult = await youtube.searchOnYoutube(
-                    query,
-                    `fullData`
-                );
+            if (!(command in commands)) return;
 
-                if (searchResult.error) {
-                    message.reply(searchResult.message);
-                } else {
-                    if (searchResult.thumbnailUrl) {
-                        const media = await MessageMedia.fromUrl(
-                            searchResult.thumbnailUrl,
-                            { unsafeMime: true }
+            /* Logging all commands received to Supabase */
+            supabaseCommunicationModule.insertMessage(
+                senderPhoneNumber,
+                message.body,
+                message.to,
+                `users`
+            );
+
+            switch (command) {
+                case commands.help:
+                    help.getHelpMessage(
+                        prefix,
+                        stringifyMessage,
+                        helpCommand,
+                        message,
+                        robotEmoji
+                    );
+                    break;
+                case commands.sticker:
+                    stickers.transformMediaToSticker(
+                        chatInfo,
+                        message,
+                        senderName,
+                        senderPhoneNumber,
+                        robotEmoji
+                    );
+                    break;
+                case commands.toimage:
+                    stickers.processQuotedStickerMessage(
+                        stringifyMessage,
+                        message,
+                        chatInfo,
+                        robotEmoji,
+                        senderName
+                    );
+                    break;
+                case commands.url:
+                    stickers.handleStickerURL(
+                        stringifyMessage,
+                        message,
+                        robotEmoji,
+                        reddit,
+                        chatInfo,
+                        MessageMedia,
+                        senderName,
+                        senderPhoneNumber
+                    );
+                    break;
+                case commands.spot:
+                    spotify.handleSpotifySongRequest(
+                        client,
+                        message,
+                        MessageMedia,
+                        commandQuery,
+                        stringifyMessage,
+                        robotEmoji
+                    );
+                    break;
+                case commands.letra:
+                    lyrics.handleSongLyricsRequest(
+                        stringifyMessage,
+                        message,
+                        robotEmoji
+                    );
+                    break;
+                case commands.cae:
+                    cae.getCAEMessage(
+                        prefix,
+                        stringifyMessage,
+                        caeCommand,
+                        message,
+                        robotEmoji
+                    );
+                    break;
+                case commands.fromis:
+                    reddit.getRedditImage(
+                        message,
+                        subreddit,
+                        client,
+                        MessageMedia
+                    );
+                    break;
+                case commands.w:
+                    wikipedia.handleWikipediaRequest(
+                        stringifyMessage,
+                        message,
+                        robotEmoji,
+                        commandQuery,
+                        senderName,
+                        client,
+                        MessageMedia
+                    );
+                    break;
+                case commands.yt: {
+                    const searchResult = await youtube.searchOnYoutube(
+                        commandQuery,
+                        `fullData`
+                    );
+
+                    if (searchResult.error) {
+                        message.reply(searchResult.message);
+                    } else {
+                        if (searchResult.thumbnailUrl) {
+                            const media = await MessageMedia.fromUrl(
+                                searchResult.thumbnailUrl,
+                                { unsafeMime: true }
+                            );
+                            client.sendMessage(message.id.remote, media, {
+                                caption: searchResult.caption,
+                            });
+                        } else {
+                            message.reply(searchResult.caption);
+                        }
+                    }
+                    break;
+                }
+                case commands.play: {
+                    const audioResponse =
+                        await youtube.sendYoutubeAudio(commandQuery);
+
+                    if (audioResponse.error) {
+                        message.reply(`${robotEmoji} ${audioResponse.message}`);
+                    } else {
+                        const media = MessageMedia.fromFilePath(
+                            audioResponse.filePath
                         );
                         client.sendMessage(message.id.remote, media, {
-                            caption: searchResult.caption,
+                            sendAudioAsVoice: true,
                         });
-                    } else {
-                        message.reply(searchResult.caption);
                     }
+                    utilities.deleteFile(audioResponse.filePath);
+                    break;
                 }
-                break;
-            }
-            case commands.play: {
-                const audioResponse = await youtube.sendYoutubeAudio(query);
+                case commands.watch: {
+                    const videoResponse =
+                        await youtube.sendYoutubeVideo(commandQuery);
 
-                if (audioResponse.error) {
-                    message.reply(`${robotEmoji} ${audioResponse.message}`);
-                } else {
-                    const media = MessageMedia.fromFilePath(
-                        audioResponse.filePath
-                    );
-                    client.sendMessage(message.id.remote, media, {
-                        sendAudioAsVoice: true,
-                    });
+                    if (videoResponse.error) {
+                        message.reply(`${robotEmoji} ${videoResponse.message}`);
+                    } else {
+                        const isWithinLimit =
+                            await utilities.isFileSizeWithinLimit(
+                                videoResponse.filePath,
+                                16
+                            );
+
+                        if (!isWithinLimit) {
+                            message.reply(
+                                `${robotEmoji} El video supera el límite de 16 MB. Prueba con otro video.`
+                            );
+                        } else {
+                            const media = await MessageMedia.fromFilePath(
+                                videoResponse.filePath
+                            );
+                            client.sendMessage(message.id.remote, media);
+                        }
+                    }
+                    utilities.deleteFile(videoResponse.filePath);
+                    break;
                 }
-                utilities.deleteFile(audioResponse.filePath);
-                break;
-            }
-            case commands.watch: {
-                const videoResponse = await youtube.sendYoutubeVideo(query);
-
-                if (videoResponse.error) {
-                    message.reply(`${robotEmoji} ${videoResponse.message}`);
-                } else {
-                    const isWithinLimit = await utilities.isFileSizeWithinLimit(
-                        videoResponse.filePath,
-                        16
+                case commands.say:
+                    amazon.handleTextToAudio(
+                        stringifyMessage,
+                        message,
+                        MessageMedia,
+                        client,
+                        robotEmoji
                     );
-
-                    if (!isWithinLimit) {
+                    break;
+                case commands.doi:
+                    sciHub.handleDoiRequest(
+                        message,
+                        client,
+                        MessageMedia,
+                        stringifyMessage,
+                        robotEmoji
+                    );
+                    break;
+                case commands.tex:
+                    boTeX.handleLatexToImage(
+                        stringifyMessage,
+                        message,
+                        client,
+                        MessageMedia,
+                        robotEmoji
+                    );
+                    break;
+                case commands.paper:
+                    sciHub.handleSearchPapersByKeywords(
+                        stringifyMessage,
+                        message,
+                        commandQuery,
+                        robotEmoji
+                    );
+                    break;
+                case commands.author:
+                    sciHub.handleSearchAuthor(
+                        stringifyMessage,
+                        message,
+                        commandQuery,
+                        robotEmoji
+                    );
+                    break;
+                case commands.doc:
+                    docsearch.searchDocuments(
+                        stringifyMessage,
+                        message,
+                        commandQuery,
+                        robotEmoji
+                    );
+                    break;
+                case commands.drive:
+                    docdown.handleGoogleDriveDownloads(
+                        stringifyMessage,
+                        message,
+                        commandQuery,
+                        client,
+                        MessageMedia,
+                        robotEmoji
+                    );
+                    break;
+                case commands.chat:
+                    if (commandQuery.length <= 1) {
                         message.reply(
-                            `${robotEmoji} El video supera el límite de 16 MB. Prueba con otro video.`
+                            `${robotEmoji} ¿De qué quieres hablar hoy?`
                         );
-                    } else {
-                        const media = await MessageMedia.fromFilePath(
-                            videoResponse.filePath
-                        );
-                        client.sendMessage(message.id.remote, media);
+                        return;
                     }
-                }
-                utilities.deleteFile(videoResponse.filePath);
-                break;
-            }
-            case commands.say:
-                amazon.handleTextToAudio(
-                    stringifyMessage,
-                    message,
-                    MessageMedia,
-                    client,
-                    robotEmoji
-                );
-                break;
-            case commands.doi:
-                sciHub.handleDoiRequest(
-                    message,
-                    client,
-                    MessageMedia,
-                    stringifyMessage,
-                    robotEmoji
-                );
-                break;
-            case commands.tex:
-                boTeX.handleLatexToImage(
-                    stringifyMessage,
-                    message,
-                    client,
-                    MessageMedia,
-                    robotEmoji
-                );
-                break;
-            case commands.paper:
-                sciHub.handleSearchPapersByKeywords(
-                    stringifyMessage,
-                    message,
-                    query,
-                    robotEmoji
-                );
-                break;
-            case commands.author:
-                sciHub.handleSearchAuthor(
-                    stringifyMessage,
-                    message,
-                    query,
-                    robotEmoji
-                );
-                break;
-            case commands.doc:
-                docsearch.searchDocuments(
-                    stringifyMessage,
-                    message,
-                    query,
-                    robotEmoji
-                );
-                break;
-            case commands.drive:
-                docdown.handleGoogleDriveDownloads(
-                    stringifyMessage,
-                    message,
-                    query,
-                    client,
-                    MessageMedia,
-                    robotEmoji
-                );
-                break;
-            case commands.chat:
-                if (query.length <= 1) {
-                    message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
-                    return;
-                }
 
-                if (!(await groups.hasValidSpecialDay(groupNumber))) {
-                    message.reply(
-                        `${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`
-                    );
-                    return;
-                }
-                /* eslint-disable no-case-declarations */
-                const chatResponse = await openai.handleChatWithGPT(
-                    senderNumber,
-                    groupNumber,
-                    query
-                );
-                message.reply(`${robotEmoji} ${chatResponse}`);
-                break;
-            case commands.edit:
-                editImage.handleEditImage(
-                    stringifyMessage,
-                    message,
-                    client,
-                    MessageMedia,
-                    robotEmoji
-                );
-                break;
-            case commands.t:
-                const translatedMessage = await translate.translateText(query);
-                message.reply(`${robotEmoji} ${translatedMessage}`);
-                break;
-            default:
-                break;
-        }
-
-        message.react(`✅`);
-    }
-
-    /*
-        The logic here is the following:
-        1. Check if string[1] is an actual command, this must be done because the user could send a message starting with the prefix but not being a command
-        2. Check if the user is a paid user
-    */
-    if (message.body.startsWith(prefix_admin)) {
-        let stringifyMessage = message.body.trim().split(/\s+/);
-        const command = stringifyMessage[0].split(prefix_admin)[1];
-        if (!(command in adminCommands)) return;
-
-        if (!paidUsers.some(user => user.phone_number === senderNumber)) {
-            return message.reply(
-                `${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`
-            );
-        }
-
-        /* Check if the sender is an admin of the group */
-        const participantsArray = Object.values(chat.participants);
-        const admins = participantsArray.filter(
-            participant => participant.isAdmin
-        );
-
-        const quotedMessage = await message.getQuotedMessage();
-
-        switch (command) {
-            case adminCommands.help:
-                help.getAdminHelpMessage(
-                    prefix_admin,
-                    stringifyMessage,
-                    helpCommand,
-                    message,
-                    /*client, List,*/ robotEmoji
-                );
-                break;
-            case adminCommands.todos:
-                mentions.mentionEveryone(chat, client, message, senderName);
-                break;
-            case adminCommands.ban:
-                const banAll =
-                    stringifyMessage.length === 2 &&
-                    stringifyMessage[1] === `${prefix_admin}todos`;
-                groups.handleBanUserFromGroup(
-                    admins,
-                    stringifyMessage,
-                    client,
-                    chat,
-                    quotedMessage,
-                    message,
-                    robotEmoji,
-                    banAll
-                );
-                break;
-            case adminCommands.bot:
-                groups.handleToggleBotActivation(
-                    stringifyMessage,
-                    message,
-                    chat,
-                    robotEmoji,
-                    refreshDataCallback
-                );
-                break;
-            case adminCommands.del:
-                groups.handleDeleteMessage(
-                    admins,
-                    stringifyMessage,
-                    message,
-                    quotedMessage,
-                    client,
-                    robotEmoji
-                );
-                break;
-            case adminCommands.join:
-                groups.handleJoinGroupRequest(
-                    stringifyMessage,
-                    message,
-                    client,
-                    robotEmoji,
-                    prefix_admin,
-                    adminCommands.join
-                );
-                break;
-            case adminCommands.addgroup:
-                db.handleUpgradeGroupToPremium(
-                    stringifyMessage,
-                    chat,
-                    message,
-                    refreshDataCallback,
-                    robotEmoji,
-                    senderNumber
-                );
-                break;
-            case adminCommands.add:
-                groups.handleAddUserToGroup(
-                    admins,
-                    message,
-                    client,
-                    robotEmoji
-                );
-                break;
-            case adminCommands.addpremium:
-                db.handleUpgradeUserToPremium(
-                    senderNumber,
-                    ownerNumber,
-                    quotedMessage,
-                    stringifyMessage,
-                    message,
-                    robotEmoji,
-                    prefix_admin
-                );
-                break;
-            case adminCommands.refresh:
-                db.handleRefreshLocalDataFromDatabase(
-                    senderNumber,
-                    ownerNumber,
-                    stringifyMessage,
-                    message,
-                    robotEmoji,
-                    refreshDataCallback
-                );
-                break;
-            case adminCommands.promote:
-                groups.handlePromoteUsersToAdmins(
-                    admins,
-                    message,
-                    stringifyMessage,
-                    quotedMessage,
-                    chat,
-                    client,
-                    robotEmoji
-                );
-                break;
-            case adminCommands.demote:
-                groups.handleDemoteUsersToParticipants(
-                    admins,
-                    message,
-                    stringifyMessage,
-                    quotedMessage,
-                    chat,
-                    client,
-                    robotEmoji
-                );
-                break;
-            case adminCommands.close:
-                const closeResponse = await chat.setMessagesAdminsOnly(true);
-                if (closeResponse) {
-                    message.reply(
-                        `${robotEmoji} Mensajes permitidos solo para administradores`
-                    );
-                } else {
-                    message.reply(
-                        `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
-                    );
-                }
-                break;
-            case adminCommands.open:
-                const openResponse = await chat.setMessagesAdminsOnly(false);
-                if (openResponse) {
-                    message.reply(
-                        `${robotEmoji} Mensajes permitidos para todos los miembros`
-                    );
-                } else {
-                    message.reply(
-                        `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
-                    );
-                }
-                break;
-            case adminCommands.chat:
-                if (query.length > 1) {
+                    if (!(await groups.hasValidSpecialDay(groupId))) {
+                        message.reply(
+                            `${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`
+                        );
+                        return;
+                    }
+                    /* eslint-disable no-case-declarations */
                     const chatResponse = await openai.handleChatWithGPT(
-                        senderNumber,
-                        groupNumber,
-                        query
+                        senderPhoneNumber,
+                        groupId,
+                        commandQuery
                     );
                     message.reply(`${robotEmoji} ${chatResponse}`);
-                } else {
-                    message.reply(`${robotEmoji} ¿De qué quieres hablar hoy?`);
-                }
-                break;
-            case adminCommands.imagine:
-                if (query.length > 4) {
-                    message.reply(
-                        `${robotEmoji} Trabajando en ello... dame unos segundos.`
+                    break;
+                case commands.edit:
+                    editImage.handleEditImage(
+                        stringifyMessage,
+                        message,
+                        client,
+                        MessageMedia,
+                        robotEmoji
                     );
-                    const translatedQuery =
-                        await translate.translateText(query);
-                    const pathsToImages =
-                        await imagine.handleImagine(translatedQuery);
-                    if (pathsToImages.length === 0)
-                        return message.reply(
-                            `${robotEmoji} No logré generar una imagen. Contacta al desarrollador (David).`
-                        );
+                    break;
+                case commands.t:
+                    const translatedMessage =
+                        await translate.translateText(commandQuery);
+                    message.reply(`${robotEmoji} ${translatedMessage}`);
+                    break;
+                default:
+                    break;
+            }
 
-                    pathsToImages.forEach(pathToImage => {
-                        const media = MessageMedia.fromFilePath(pathToImage);
-                        client.sendMessage(message.id.remote, media);
-                    });
-                    message.reply(
-                        `${robotEmoji} ¡Terminamos, ya vienen las imágenes!`
-                    );
-                } else {
-                    message.reply(
-                        `${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`
-                    );
-                }
-                break;
-            case adminCommands.subscription:
-                const subscriptionInfo = await getUserInfo(
-                    client,
-                    senderNumber,
-                    robotEmoji,
-                    paidUsers,
-                    premiumGroups
-                );
-                await client.sendMessage(senderNumber, subscriptionInfo);
-                await message.reply(
-                    `${robotEmoji} Hey, te acabo de enviar un mensaje privado con más información sobre tu suscripción.`
-                );
-                break;
-            case adminCommands.global:
-                await handleGlobalMessage(
-                    client,
-                    paidUsers,
-                    senderNumber,
-                    ownerNumber,
-                    message,
-                    robotEmoji,
-                    stringifyMessage
-                );
-                break;
-            default:
-                break;
+            message.react(`✅`);
         }
 
-        message.react(`✅`);
+        /*
+            The logic here is the following:
+            1. Check if string[1] is an actual command, this must be done because the user could send a message starting with the prefix but not being a command
+            2. Check if the user is a paid user
+        */
+        if (message.body.startsWith(prefix_admin)) {
+            const command = stringifyMessage[0].split(prefix_admin)[1];
+            if (!(command in adminCommands)) return;
+
+            if (
+                !paidUsers.some(user => user.phone_number === senderPhoneNumber)
+            ) {
+                return message.reply(
+                    `${robotEmoji} Esta función está únicamente disponible para usuarios de pago.`
+                );
+            }
+
+            /* Check if the sender is an admin of the group */
+            const participantsArray = Object.values(chatInfo.participants);
+            const admins = participantsArray.filter(
+                participant => participant.isAdmin
+            );
+
+            const quotedMessage = await message.getQuotedMessage();
+
+            switch (command) {
+                case adminCommands.help:
+                    help.getAdminHelpMessage(
+                        prefix_admin,
+                        stringifyMessage,
+                        helpCommand,
+                        message,
+                        /*client, List,*/ robotEmoji
+                    );
+                    break;
+                case adminCommands.todos:
+                    mentions.mentionEveryone(
+                        chatInfo,
+                        client,
+                        message,
+                        senderName
+                    );
+                    break;
+                case adminCommands.ban:
+                    const banAll =
+                        stringifyMessage.length === 2 &&
+                        stringifyMessage[1] === `${prefix_admin}todos`;
+                    groups.handleBanUserFromGroup(
+                        admins,
+                        stringifyMessage,
+                        client,
+                        chatInfo,
+                        quotedMessage,
+                        message,
+                        robotEmoji,
+                        banAll
+                    );
+                    break;
+                case adminCommands.bot:
+                    groups.handleToggleBotActivation(
+                        stringifyMessage,
+                        message,
+                        chatInfo,
+                        robotEmoji,
+                        refreshDataCallback
+                    );
+                    break;
+                case adminCommands.del:
+                    groups.handleDeleteMessage(
+                        admins,
+                        stringifyMessage,
+                        message,
+                        quotedMessage,
+                        client,
+                        robotEmoji
+                    );
+                    break;
+                case adminCommands.join:
+                    groups.handleJoinGroupRequest(
+                        stringifyMessage,
+                        message,
+                        client,
+                        robotEmoji,
+                        prefix_admin,
+                        adminCommands.join
+                    );
+                    break;
+                case adminCommands.addgroup:
+                    db.handleUpgradeGroupToPremium(
+                        stringifyMessage,
+                        chatInfo,
+                        message,
+                        refreshDataCallback,
+                        robotEmoji,
+                        senderPhoneNumber
+                    );
+                    break;
+                case adminCommands.add:
+                    groups.handleAddUserToGroup(
+                        admins,
+                        message,
+                        client,
+                        robotEmoji
+                    );
+                    break;
+                case adminCommands.addpremium:
+                    db.handleUpgradeUserToPremium(
+                        senderPhoneNumber,
+                        ownerNumber,
+                        quotedMessage,
+                        stringifyMessage,
+                        message,
+                        robotEmoji,
+                        prefix_admin
+                    );
+                    break;
+                case adminCommands.refresh:
+                    db.handleRefreshLocalDataFromDatabase(
+                        senderPhoneNumber,
+                        ownerNumber,
+                        stringifyMessage,
+                        message,
+                        robotEmoji,
+                        refreshDataCallback
+                    );
+                    break;
+                case adminCommands.promote:
+                    groups.handlePromoteUsersToAdmins(
+                        admins,
+                        message,
+                        stringifyMessage,
+                        quotedMessage,
+                        chatInfo,
+                        client,
+                        robotEmoji
+                    );
+                    break;
+                case adminCommands.demote:
+                    groups.handleDemoteUsersToParticipants(
+                        admins,
+                        message,
+                        stringifyMessage,
+                        quotedMessage,
+                        chatInfo,
+                        client,
+                        robotEmoji
+                    );
+                    break;
+                case adminCommands.close:
+                    const closeResponse =
+                        await chatInfo.setMessagesAdminsOnly(true);
+                    if (closeResponse) {
+                        message.reply(
+                            `${robotEmoji} Mensajes permitidos solo para administradores.`
+                        );
+                    } else {
+                        message.reply(
+                            `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
+                        );
+                    }
+                    break;
+                case adminCommands.open:
+                    const openResponse =
+                        await chatInfo.setMessagesAdminsOnly(false);
+                    if (openResponse) {
+                        message.reply(
+                            `${robotEmoji} Mensajes permitidos para todos los miembros.`
+                        );
+                    } else {
+                        message.reply(
+                            `${robotEmoji} Error al cambiar la configuración. Asegúrate de tener los permisos necesarios.`
+                        );
+                    }
+                    break;
+                case adminCommands.chat:
+                    if (commandQuery.length > 1) {
+                        const chatResponse = await openai.handleChatWithGPT(
+                            senderPhoneNumber,
+                            groupId,
+                            commandQuery
+                        );
+                        message.reply(`${robotEmoji} ${chatResponse}`);
+                    } else {
+                        message.reply(
+                            `${robotEmoji} ¿De qué quieres hablar hoy?\n\n _Recuerda utilizado el ${prefix_admin}chat si quieres seguir conversando._`
+                        );
+                    }
+                    break;
+                case adminCommands.imagine:
+                    if (commandQuery.length > 4) {
+                        message.reply(
+                            `${robotEmoji} Trabajando en ello... dame unos segundos.`
+                        );
+                        const translatedQuery =
+                            await translate.translateText(commandQuery);
+                        const pathsToImages =
+                            await imagine.handleImagine(translatedQuery);
+                        if (pathsToImages.length === 0)
+                            return message.reply(
+                                `${robotEmoji} No logré generar una imagen. Contacta al desarrollador.`
+                            );
+
+                        pathsToImages.forEach(pathToImage => {
+                            const media =
+                                MessageMedia.fromFilePath(pathToImage);
+                            client.sendMessage(message.id.remote, media);
+                        });
+                        message.reply(
+                            `${robotEmoji} ¡Terminamos, ya vienen las imágenes!`
+                        );
+                    } else {
+                        message.reply(
+                            `${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`
+                        );
+                    }
+                    break;
+                case adminCommands.subscription:
+                    const subscriptionInfo = await getUserInfo(
+                        client,
+                        senderPhoneNumber,
+                        robotEmoji,
+                        paidUsers,
+                        premiumGroups
+                    );
+                    await client.sendMessage(
+                        senderPhoneNumber,
+                        subscriptionInfo
+                    );
+                    await message.reply(
+                        `${robotEmoji} Hey, te acabo de enviar un mensaje privado con más información sobre tu suscripción.`
+                    );
+                    break;
+                case adminCommands.global:
+                    await handleGlobalMessage(
+                        client,
+                        paidUsers,
+                        senderPhoneNumber,
+                        ownerNumber,
+                        message,
+                        robotEmoji,
+                        stringifyMessage
+                    );
+                    break;
+                default:
+                    break;
+            }
+
+            message.react(`✅`);
+        }
+    } catch (error) {
+        console.error(`Error procesando mensaje:`, error);
     }
 });
 
