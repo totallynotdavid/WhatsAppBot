@@ -108,10 +108,10 @@ client.on(`ready`, () => {
   * message is the one we want to use on production (it doesn't include the bot's messages
 */
 client.on(`message`, async message => {
-    if (
-        !message.body.startsWith(prefix) &&
-        !message.body.startsWith(prefix_admin)
-    ) {
+    const isCommand =
+        message.body.startsWith(prefix) ||
+        message.body.startsWith(prefix_admin);
+    if (!isCommand) {
         return;
     }
 
