@@ -1,5 +1,5 @@
 const { commandGenerator, convertArrayToDict, codeWrapper } = require(
-    `./utilities.js`
+    `./utilities`
 );
 
 const helpListCommands = require(`../data/helpListCommands.json`);
@@ -10,133 +10,77 @@ const helpAdminListCommandsDict = convertArrayToDict(helpAdminListCommands);
 
 // User commands
 
-function getHelpMessage(
-    prefix,
-    stringifyMessage,
-    helpCommand,
-    message,
-    /*client, List,*/ robotEmoji
-) {
+function getHelpMessage(prefix, stringifyMessage, helpCommand) {
     try {
         switch (stringifyMessage.length) {
             case 1:
-                sendHelpList(
-                    prefix,
-                    helpCommand,
-                    message,
-                    /*client, List,*/ robotEmoji
-                );
-                break;
+                return sendHelpList(prefix, helpCommand);
             case 2:
-                commandGenerator(
+                return commandGenerator(
                     helpListCommandsDict,
-                    message,
                     stringifyMessage,
-                    prefix,
-                    robotEmoji
+                    prefix
                 );
-                break;
             default:
-                message.reply(
-                    `🤖 Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`
-                );
+                return `Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`;
         }
     } catch (err) {
         console.error(err);
+        return `Ha ocurrido un error al procesar el comando de ayuda.`;
     }
 }
 
-function sendHelpList(
-    prefix,
-    helpCommand,
-    message,
-    /*client, List,*/ robotEmoji
-) {
+function sendHelpList(prefix, helpCommand) {
     try {
         const commands = helpListCommands.map(
             command => `${prefix}${command.command}`
         );
-        /*
-    const helpList = new List(
-      `${robotEmoji} Buh, soy un bot sin habilidades telepáticas... nah. ¿O quizá sí?`,
-      'Cómo usar los comandos',
-      [
-        {
-          title: `Usa "${prefix}${helpCommand} <comando>" para más detalles sobre un comando`,
-          rows: examples.map(example => ({title: example})),
-        },
-    ]);
-    client.sendMessage(message.id.remote, helpList);
-    */
-        message.reply(
-            `${robotEmoji} Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(
-                commands.join(`\n`)
-            )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
-                `${prefix}${helpCommand} <comando>`
-            )} (sin los símbolos <>).`
-        );
+        return `Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(
+            commands.join(`\n`)
+        )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
+            `${prefix}${helpCommand} <comando>`
+        )} (sin los símbolos <>).`;
     } catch (err) {
         console.error(err);
+        return `Ha ocurrido un error al generar la lista de comandos.`;
     }
 }
 
 // Admin commands
 
-function getAdminHelpMessage(
-    prefix,
-    stringifyMessage,
-    helpCommand,
-    message,
-    /*client, List,*/ robotEmoji
-) {
+function getAdminHelpMessage(prefix, stringifyMessage, helpCommand) {
     try {
         switch (stringifyMessage.length) {
             case 1:
-                sendAdminHelpList(
-                    prefix,
-                    helpCommand,
-                    message,
-                    /*client, List,*/ robotEmoji
-                );
-                break;
+                return sendAdminHelpList(prefix, helpCommand);
             case 2:
-                commandGenerator(
+                return commandGenerator(
                     helpAdminListCommandsDict,
-                    message,
                     stringifyMessage,
-                    prefix,
-                    robotEmoji
+                    prefix
                 );
-                break;
             default:
-                message.reply(
-                    `🤖 Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`
-                );
+                return `Este comando no es válido. Usa ${prefix}${helpCommand} para ver los comandos disponibles.`;
         }
     } catch (err) {
         console.error(err);
+        return `Ha ocurrido un error al procesar el comando de ayuda de administración.`;
     }
 }
 
-function sendAdminHelpList(
-    prefix,
-    helpCommand,
-    message,
-    /*client, List,*/ robotEmoji
-) {
+function sendAdminHelpList(prefix, helpCommand) {
     try {
         const commands = helpAdminListCommands.map(
             command => `${prefix}${command.command}`
         );
-        message.reply(
-            `${robotEmoji} Aquí tienes la lista de comandos de administración disponibles:\n\n${codeWrapper(
-                commands.join(`\n`)
-            )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
-                `${prefix}${helpCommand} <comando>`
-            )} (sin los símbolos <>).`
-        );
+        return `Aquí tienes la lista de comandos de administración disponibles:\n\n${codeWrapper(
+            commands.join(`\n`)
+        )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
+            `${prefix}${helpCommand} <comando>`
+        )} (sin los símbolos <>).`;
     } catch (err) {
         console.error(err);
+        return `Ha ocurrido un error al generar la lista de comandos de administración.`;
     }
 }
 

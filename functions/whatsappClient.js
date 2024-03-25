@@ -180,15 +180,15 @@ client.on(`message`, async message => {
             if (!(command in commands)) return;
 
             switch (command) {
-                case commands.help:
-                    help.getHelpMessage(
+                case commands.help: {
+                    const helpMessageText = help.getHelpMessage(
                         prefix,
                         stringifyMessage,
-                        helpCommand,
-                        message,
-                        robotEmoji
+                        helpCommand
                     );
+                    message.reply(`${robotEmoji} ${helpMessageText}`);
                     break;
+                }
                 case commands.sticker:
                     stickers.transformMediaToSticker(
                         chatInfo,
