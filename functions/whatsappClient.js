@@ -96,9 +96,8 @@ client.on(`auth_failure`, authFailureMessage => {
 });
 
 client.on(`ready`, () => {
-    console.log(`Estamos listos, ¡el bot está en linea!`);
     console.log(
-        `Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`
+        `Estamos listos, ¡el bot está en linea! Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`
     );
 });
 
