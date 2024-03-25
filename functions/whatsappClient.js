@@ -153,6 +153,15 @@ client.on(`message`, async message => {
         /* Get all the text after the command (yt & wiki & chat) */
         commandParts = message.body.trim().split(/\s+/);
         commandQuery = commandParts.slice(1).join(` `);
+
+        /* Logging all commands received to Supabase */
+        supabaseCommunicationModule.insertMessage(
+            senderPhoneNumber,
+            message.body,
+            message.to,
+            `users`
+        );
+
         /*
           The checks are done in order of importance
           1. Check if the message is in a group
@@ -160,7 +169,6 @@ client.on(`message`, async message => {
           1.a Regular: The message is in a premium group
           1.b Admin: The message is from a user who is a paid user
         */
-
         if (message.body.startsWith(prefix)) {
             if (
                 !premiumGroups.some(
@@ -172,14 +180,6 @@ client.on(`message`, async message => {
             const command = stringifyMessage[0].split(prefix)[1];
 
             if (!(command in commands)) return;
-
-            /* Logging all commands received to Supabase */
-            supabaseCommunicationModule.insertMessage(
-                senderPhoneNumber,
-                message.body,
-                message.to,
-                `users`
-            );
 
             switch (command) {
                 case commands.help:
