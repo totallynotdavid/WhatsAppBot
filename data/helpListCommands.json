@@ -51,8 +51,12 @@
     },
     {
         "command": "t",
-        "message": "Traduce tu texto a del inglés al español",
-        "usage": "t -en Hola, soy un bot"
+        "message": "Traduce tu texto de un idioma a otro. Uso:\n- ```t <texto>```: Traduce el texto.\n- ```t <código de idioma de destino> <texto>```: Traduce el texto detectando el idioma de origen automáticamente al idioma de destino especificado.\n- ```t <código de idioma de origen> <código de idioma de destino> <texto>```: Traduce el texto del idioma de origen especificado al idioma de destino especificado.",
+        "usage": [
+            "t Hola, soy un bot",
+            "t en Hola, soy un bot",
+            "t es en Hola, soy un bot"
+        ]
     },
     {
         "command": "w",
