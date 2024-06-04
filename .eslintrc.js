@@ -23,7 +23,6 @@ module.exports = {
     },
     rules: {
         "linebreak-style": [`error`, `unix`],
-        "quotes": [`error`, `backtick`],
         "semi": [`error`, `always`],
         "multiline-ternary": [`error`, `always-multiline`],
         "no-multi-spaces": [`error`],
