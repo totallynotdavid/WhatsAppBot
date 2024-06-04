@@ -1,11 +1,13 @@
-const { commandGenerator, convertArrayToDict, codeWrapper } = require(
-    `./utilities`
-);
+const {
+    commandGenerator,
+    convertArrayToDict,
+    codeWrapper,
+} = require("./utilities");
 
-const helpListCommands = require(`../data/helpListCommands.json`);
+const helpListCommands = require("../data/helpListCommands.json");
 const helpListCommandsDict = convertArrayToDict(helpListCommands);
 
-const helpAdminListCommands = require(`../data/helpAdminListCommands.json`);
+const helpAdminListCommands = require("../data/helpAdminListCommands.json");
 const helpAdminListCommandsDict = convertArrayToDict(helpAdminListCommands);
 
 // User commands
@@ -36,7 +38,7 @@ function sendHelpList(prefix, helpCommand) {
             command => `${prefix}${command.command}`
         );
         return `Aquí tienes la lista de comandos disponibles:\n\n${codeWrapper(
-            commands.join(`\n`)
+            commands.join("\n")
         )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
             `${prefix}${helpCommand} <comando>`
         )} (sin los símbolos <>).`;
@@ -74,7 +76,7 @@ function sendAdminHelpList(prefix, helpCommand) {
             command => `${prefix}${command.command}`
         );
         return `Aquí tienes la lista de comandos de administración disponibles:\n\n${codeWrapper(
-            commands.join(`\n`)
+            commands.join("\n")
         )}\n\nSi necesitas más información sobre un comando en particular, escribe: ${codeWrapper(
             `${prefix}${helpCommand} <comando>`
         )} (sin los símbolos <>).`;
