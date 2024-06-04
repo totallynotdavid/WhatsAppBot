@@ -29,8 +29,14 @@ function commandGenerator(fixedDataCommandDict, stringifyMessage, prefix) {
         const { message, usage } = commandObj;
 
         if (usage) {
+            let usageText;
+            if (Array.isArray(usage)) {
+                usageText = usage.map(item => `${prefix}${item}`).join("\n");
+            } else {
+                usageText = `${prefix}${usage}`;
+            }
             return `${message}.\n\n*Ejemplo de uso*:\n\n${codeWrapper(
-                `${prefix}${usage}`
+                usageText
             )}`;
         }
 
