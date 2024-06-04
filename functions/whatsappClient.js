@@ -78,7 +78,7 @@ const client = new Client({
     puppeteer: launchPuppeteer(),
     webVersionCache: {
         type: `remote`,
-        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2407.3.html`,
+        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html`,
     },
 });
 
@@ -422,9 +422,15 @@ client.on(`message`, async message => {
                     );
                     break;
                 case commands.t:
-                    const translatedMessage =
-                        await translate.translateText(commandQuery);
-                    message.reply(`${robotEmoji} ${translatedMessage}`);
+                    try {
+                        const translatedMessage =
+                            await translate.translateText(commandQuery);
+                        message.reply(`${robotEmoji} ${translatedMessage}`);
+                    } catch (error) {
+                        message.reply(
+                            `${robotEmoji} Sorry, I couldn't translate that message.`
+                        );
+                    }
                     break;
                 default:
                     break;
