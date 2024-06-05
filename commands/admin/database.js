@@ -17,7 +17,9 @@ async function handleUpgradeGroupToPremium(
     message,
     refreshDataCallback,
     robotEmoji,
-    senderNumber
+    senderNumber,
+    prefix,
+    prefix_admin
 ) {
     if (!chat.id || !chat.name) {
         await message.reply(`${robotEmoji} Una de las variables es undefined.`);
@@ -32,7 +34,9 @@ async function handleUpgradeGroupToPremium(
                 senderNumber
             );
             await refreshDataCallback();
-            await message.reply(`${robotEmoji} Chat registrado.`);
+            await message.reply(
+                `${robotEmoji} Chat registrado. Ya puedes usar los comandos en este chat 🎉.\n\nUsa ${prefix}help o ${prefix_admin}help para ver la lista de comandos.`
+            );
         } catch (error) {
             await message.reply(
                 `${robotEmoji} Error registrando el chat: ${error.message}`

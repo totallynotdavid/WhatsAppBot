@@ -555,7 +555,9 @@ client.on(`message`, async message => {
                         message,
                         refreshDataCallback,
                         robotEmoji,
-                        senderPhoneNumber
+                        senderPhoneNumber,
+                        prefix,
+                        prefix_admin
                     );
                     break;
                 case adminCommands.add:
