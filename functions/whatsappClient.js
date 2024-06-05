@@ -344,7 +344,7 @@ client.on(`message`, async message => {
                                 videoResponse.filePath
                             );
 
-                            client.sendMessage(message.id.remote, media);
+                            await client.sendMessage(message.id.remote, media);
 
                             utilities.deleteFile(videoResponse.filePath);
                         }
