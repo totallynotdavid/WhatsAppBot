@@ -78,7 +78,10 @@ async function sendYoutubeAudio(youtubeURL) {
             };
         }
 
-        const media_metadata = await fetchYoutubeMetadata(youtubeURL, `idOnly`);
+        const media_metadata = await fetchYoutubeMetadata(
+            youtubeURL,
+            `fullData`
+        );
 
         if (!media_metadata || !media_metadata.mediaId) {
             return { error: true, message: `La URL no es válida.` };
@@ -106,7 +109,14 @@ async function sendYoutubeAudio(youtubeURL) {
 
         const downloadedFilename = downloadedMedia[0].path;
 
-        return { error: false, filePath: downloadedFilename };
+        return {
+            error: false,
+            filePath: downloadedFilename,
+            videoMetadata: {
+                title: media_metadata.title,
+                channelTitle: media_metadata.channelTitle,
+            },
+        };
     } catch (error) {
         console.error(`Error in sendYoutubeAudio: ${error.message}`);
         return { error: true, message: error.message };

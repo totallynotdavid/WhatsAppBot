@@ -111,7 +111,6 @@ client.on(`ready`, () => {
             console.error("Error clearing messages:", error);
         }
     }
-    clearAllChats();
     setInterval(clearAllChats, 1800000); // Clear messages every 30 minutes
 });
 
@@ -305,10 +304,12 @@ client.on(`message`, async message => {
                 case commands.play: {
                     const audioResponse =
                         await youtube.sendYoutubeAudio(commandQuery);
-
                     if (audioResponse.error) {
                         message.reply(`${robotEmoji} ${audioResponse.message}`);
                     } else {
+                        const metadata = `${robotEmoji} El audio que encontré es: *${audioResponse.videoMetadata.title}* - *${audioResponse.videoMetadata.channelTitle}*`;
+                        message.reply(metadata);
+
                         const media = MessageMedia.fromFilePath(
                             audioResponse.filePath
                         );
