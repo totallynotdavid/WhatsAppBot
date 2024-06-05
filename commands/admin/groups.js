@@ -313,8 +313,12 @@ async function handleJoinGroupRequest(
     const inviteCode = inviteLink.split(`https://chat.whatsapp.com/`)[1];
 
     try {
-        await client.acceptInvite(inviteCode);
+        const joinedGroupId = await client.acceptInvite(inviteCode);
         message.reply(`${robotEmoji} ¡Listo! Me acabo de unir al grupo.`);
+        const joinedGroup = await client.getChatById(joinedGroupId);
+        joinedGroup.sendMessage(
+            `¡Hey! Soy un bot 🤖 y me acabo de unir a este grupo. Para terminar de configurar todo, usa el comando ${prefix_admin}addgroup para activarme.`
+        );
     } catch (error) {
         message.reply(
             `${robotEmoji} No me he podido unir al grupo. Asegúrate de que el enlace de invitación sea correcto y de que aún esté activo.`
