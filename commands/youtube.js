@@ -115,6 +115,13 @@ async function sendYoutubeAudio(youtubeURL) {
 
 async function sendYoutubeVideo(youtubeURL) {
     try {
+        if (!youtubeURL) {
+            return {
+                error: true,
+                message: `Oe, pero incluye lo que deseas ver.`,
+            };
+        }
+
         const media_metadata = await fetchYoutubeMetadata(youtubeURL, `idOnly`);
 
         if (!media_metadata || !media_metadata.mediaId) {

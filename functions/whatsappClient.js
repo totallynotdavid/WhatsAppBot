@@ -326,10 +326,12 @@ client.on(`message`, async message => {
                             const media = await MessageMedia.fromFilePath(
                                 videoResponse.filePath
                             );
+
                             client.sendMessage(message.id.remote, media);
+
+                            utilities.deleteFile(videoResponse.filePath);
                         }
                     }
-                    utilities.deleteFile(videoResponse.filePath);
                     break;
                 }
                 case commands.say:
