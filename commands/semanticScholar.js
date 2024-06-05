@@ -96,9 +96,21 @@ async function searchAuthorRecentPapers(authorQuery, maxResults = 5) {
     }
 }
 
-async function handleSearchPapersByKeywords(message, query, robotEmoji) {
-    if (query.trim().length < 2) {
+async function handleSearchPapersByKeywords(
+    stringifyMessage,
+    message,
+    query,
+    robotEmoji
+) {
+    if (stringifyMessage.length < 2) {
         message.reply(`${robotEmoji} ¿De qué tema quieres buscar?`);
+        return;
+    }
+
+    if (stringifyMessage.length > 2) {
+        message.reply(
+            `${robotEmoji} Por favor, introduce una sola palabra clave.`
+        );
         return;
     }
 
