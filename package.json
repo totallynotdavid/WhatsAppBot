@@ -12,7 +12,7 @@
         "lint": "eslint **/*.js",
         "prettier": "prettier --write .",
         "start": "node index.js",
-        "start:prod": "pm2 start index.js --cron-restart=\"*/90 * * * *\" && pnpm run logs",
+        "start:prod": "pm2 start index.js --cron-restart=\"0 */2 * * *\" && pnpm run logs",
         "test": "pnpm run -s lint",
         "clean": "pnpm run clean:logs && pnpm run clean:mundane && pnpm run clean:packages && pnpm run clean:session && pnpm i",
         "clean:logs": "shx rm -rf ~/.pm2/logs",
