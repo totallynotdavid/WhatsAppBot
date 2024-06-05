@@ -1,5 +1,6 @@
 const admin = require(`./admin`);
 const sciHub = require(`./sciHub`);
+const semanticScholar = require(`./semanticScholar`);
 const boTeX = require(`./boTeX`);
 const lyrics = require(`./lyrics`);
 const amazon = require(`./amazon`);
@@ -19,6 +20,7 @@ const translate = require(`./translate`);
 module.exports = {
     admin,
     sciHub,
+    semanticScholar,
     boTeX,
     lyrics,
     amazon,
