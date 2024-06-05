@@ -18,11 +18,7 @@ function extractTitle(htmlContent) {
     let previous;
     do {
         previous = decodedContent;
-        decodedContent = decodedContent.replace(
-            /<\/?(i|b|em|strong)[^>]*>/gi,
-            ""
-        );
-        decodedContent = decodedContent.replace(/<\/?[^>]+(>|$)/g, "");
+        decodedContent = decodedContent.replace(/<\/?[^>]+>/g, "");
     } while (decodedContent !== previous);
 
     decodedContent = decodedContent.replace(/\s\s+/g, " ");
@@ -149,7 +145,6 @@ async function handleDoiRequest(
             );
         }
     } else {
-        // Handle regular URL
         const response = await fetch(`${sciHub_baseURL}${input}`);
         const html = await response.text();
 
