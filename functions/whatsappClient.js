@@ -97,6 +97,22 @@ client.on(`ready`, () => {
     console.log(
         `Estamos listos, ¡el bot está en linea! Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`
     );
+
+    async function clearAllChats() {
+        try {
+            const chats = await client.getChats();
+            for (let chat of chats) {
+                const result = await chat.clearMessages();
+                console.log(
+                    `Cleared messages for chat ${chat.id._serialized}: ${result}`
+                );
+            }
+        } catch (error) {
+            console.error("Error clearing messages:", error);
+        }
+    }
+    clearAllChats();
+    setInterval(clearAllChats, 1800000); // Clear messages every 30 minutes
 });
 
 /*
