@@ -296,11 +296,13 @@ client.on(`message`, async message => {
                         const media = MessageMedia.fromFilePath(
                             audioResponse.filePath
                         );
+
                         client.sendMessage(message.id.remote, media, {
                             sendAudioAsVoice: true,
                         });
+
+                        utilities.deleteFile(audioResponse.filePath);
                     }
-                    utilities.deleteFile(audioResponse.filePath);
                     break;
                 }
                 case commands.watch: {
