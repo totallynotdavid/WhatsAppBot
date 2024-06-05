@@ -8,19 +8,24 @@ const BASE_DOMAIN = "https://api.semanticscholar.org";
 
 function extractTitle(htmlContent) {
     let decodedContent = htmlContent
-        .replace(/&amp;/g, "&")
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
-        .replace(/&nbsp;/g, " ");
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&");
 
-    decodedContent = decodedContent
-        .replace(/<\/?(i|b|em|strong)[^>]*>/gi, "")
-        .replace(/<\/?[^>]+(>|$)/g, "");
+    let previous;
+    do {
+        previous = decodedContent;
+        decodedContent = decodedContent.replace(
+            /<\/?(i|b|em|strong)[^>]*>/gi,
+            ""
+        );
+        decodedContent = decodedContent.replace(/<\/?[^>]+(>|$)/g, "");
+    } while (decodedContent !== previous);
 
     decodedContent = decodedContent.replace(/\s\s+/g, " ");
-
     return decodedContent.trim();
 }
 
