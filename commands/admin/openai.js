@@ -2,6 +2,7 @@ const path = require(`path`);
 const { get } = require(`lodash`);
 require(`dotenv`).config({ path: path.resolve(__dirname, `../../.env`) });
 const { Configuration, OpenAIApi } = require(`openai`);
+
 const supabaseCommunicationModule = require(
     `../../lib/api/supabaseCommunicationModule.js`
 );
@@ -190,6 +191,48 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
     }
 };
 
+async function summarizeMessages(messages) {
+    try {
+        const messagesText = await Promise.all(
+            messages.map(async msg => {
+                const contact = await msg.getContact();
+                const name =
+                    contact.pushname ||
+                    msg._data.notifyName ||
+                    msg.author ||
+                    msg.from;
+                return `${name}: ${msg.body}`;
+            })
+        );
+
+        const prompt = `Summarize the conversation. Mention who said what using first names. Be straightforward. Keep it concise. 🗣️:\n${messagesText.join(
+            "\n"
+        )}`;
+
+        const messagesForAPI = [
+            {
+                role: "system",
+                content: "You are a meeting recorder. Use Spanish.",
+            },
+            { role: "user", content: prompt },
+        ];
+
+        console.log("messagesForAPI", messagesForAPI);
+        const response = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: messagesForAPI,
+            max_tokens: 800,
+        });
+
+        const summary = response.data.choices[0].message.content.trim();
+        return summary;
+    } catch (error) {
+        console.error("Error summarizing messages:", error);
+        return "Sorry, I could not summarize the messages.";
+    }
+}
+
 module.exports = {
     handleChatWithGPT,
+    summarizeMessages,
 };

@@ -111,7 +111,7 @@ client.on(`ready`, () => {
             console.error("Error clearing messages:", error);
         }
     }
-    setInterval(clearAllChats, 1800000); // Clear messages every 30 minutes
+    clearAllChats();
 });
 
 /*
@@ -650,6 +650,21 @@ client.on(`message`, async message => {
                             `${robotEmoji} ¿De qué quieres hablar hoy?\n\n _Recuerda utilizado el ${prefix_admin}chat si quieres seguir conversando._`
                         );
                     }
+                    break;
+                case adminCommands.resumen:
+                    const allMessages = await chatInfo.fetchMessages({
+                        limit: Infinity,
+                    });
+
+                    const latest50TextMessages = allMessages
+                        .filter(msg => msg.body)
+                        .slice(-50);
+
+                    const summary =
+                        await openai.summarizeMessages(latest50TextMessages);
+                    message.reply(
+                        `${robotEmoji} ${summary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`
+                    );
                     break;
                 case adminCommands.imagine:
                     if (commandQuery.length > 4) {

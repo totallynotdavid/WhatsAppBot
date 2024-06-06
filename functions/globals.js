@@ -54,6 +54,7 @@ const adminCommands = {
     close: `close`,
     open: `open`,
     chat: `chat`,
+    resumen: `resumen`,
     imagine: `imagine`,
     subscription: `subscription`,
     global: `global`,

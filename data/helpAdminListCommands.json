@@ -65,6 +65,11 @@
         "usage": "chat <tu mensaje>"
     },
     {
+        "command": "resumen",
+        "message": "Obtén un resumen de los últimos 50 mensajes en el grupo",
+        "usage": "resumen"
+    },
+    {
         "command": "imagine",
         "message": "Libera tu creatividad y pide al bot que imagine y genere una imagen por ti",
         "usage": "imagine <tu mensaje>"
