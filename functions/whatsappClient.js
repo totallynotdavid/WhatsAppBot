@@ -111,7 +111,7 @@ client.on(`ready`, () => {
             console.error("Error clearing messages:", error);
         }
     }
-    clearAllChats();
+    // clearAllChats();
 });
 
 /*
@@ -412,28 +412,16 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.chat:
-                    if (commandQuery.length <= 1) {
-                        message.reply(
-                            `${robotEmoji} ¿De qué quieres hablar hoy?`
-                        );
-                        return;
-                    }
-
-                    if (!(await groups.hasValidSpecialDay(groupId))) {
-                        message.reply(
-                            `${robotEmoji} Deshabilitado. Este comando solo está disponible en días especiales.`
-                        );
-                        return;
-                    }
-                    /* eslint-disable no-case-declarations */
-                    const chatResponse = await openai.handleChatWithGPT(
+                case commands.chat: {
+                    const response = await openai.handleFreeChatWithGPT(
                         senderPhoneNumber,
                         groupId,
-                        commandQuery
+                        commandQuery,
+                        robotEmoji
                     );
-                    message.reply(`${robotEmoji} ${chatResponse}`);
+                    message.reply(`${robotEmoji} ${response}`);
                     break;
+                }
                 case commands.edit:
                     editImage.handleEditImage(
                         stringifyMessage,
@@ -504,7 +492,7 @@ client.on(`message`, async message => {
                         senderName
                     );
                     break;
-                case adminCommands.ban:
+                case adminCommands.ban: {
                     const banAll =
                         stringifyMessage.length === 2 &&
                         stringifyMessage[1] === `${prefix_admin}todos`;
@@ -519,13 +507,16 @@ client.on(`message`, async message => {
                         banAll
                     );
                     break;
+                }
                 case adminCommands.bot:
                     groups.handleToggleBotActivation(
                         stringifyMessage,
                         message,
                         chatInfo,
                         robotEmoji,
-                        refreshDataCallback
+                        refreshDataCallback,
+                        senderPhoneNumber,
+                        groupId
                     );
                     break;
                 case adminCommands.del:
@@ -611,7 +602,7 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case adminCommands.close:
+                case adminCommands.close: {
                     const closeResponse =
                         await chatInfo.setMessagesAdminsOnly(true);
                     if (closeResponse) {
@@ -624,7 +615,8 @@ client.on(`message`, async message => {
                         );
                     }
                     break;
-                case adminCommands.open:
+                }
+                case adminCommands.open: {
                     const openResponse =
                         await chatInfo.setMessagesAdminsOnly(false);
                     if (openResponse) {
@@ -637,6 +629,7 @@ client.on(`message`, async message => {
                         );
                     }
                     break;
+                }
                 case adminCommands.chat:
                     if (commandQuery.length > 1) {
                         const chatResponse = await openai.handleChatWithGPT(
@@ -647,11 +640,11 @@ client.on(`message`, async message => {
                         message.reply(`${robotEmoji} ${chatResponse}`);
                     } else {
                         message.reply(
-                            `${robotEmoji} ¿De qué quieres hablar hoy?\n\n _Recuerda utilizado el ${prefix_admin}chat si quieres seguir conversando._`
+                            `${robotEmoji} ¿De qué quieres hablar hoy?\n\n_Recuerda utilizar ${prefix_admin}chat si quieres seguir conversando._`
                         );
                     }
                     break;
-                case adminCommands.resumen:
+                case adminCommands.resumen: {
                     const allMessages = await chatInfo.fetchMessages({
                         limit: Infinity,
                     });
@@ -666,6 +659,7 @@ client.on(`message`, async message => {
                         `${robotEmoji} ${summary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`
                     );
                     break;
+                }
                 case adminCommands.imagine:
                     if (commandQuery.length > 4) {
                         message.reply(
@@ -694,7 +688,7 @@ client.on(`message`, async message => {
                         );
                     }
                     break;
-                case adminCommands.subscription:
+                case adminCommands.subscription: {
                     const subscriptionInfo = await getUserInfo(
                         client,
                         senderPhoneNumber,
@@ -710,6 +704,7 @@ client.on(`message`, async message => {
                         `${robotEmoji} Hey, te acabo de enviar un mensaje privado con más información sobre tu suscripción.`
                     );
                     break;
+                }
                 case adminCommands.global:
                     await handleGlobalMessage(
                         client,

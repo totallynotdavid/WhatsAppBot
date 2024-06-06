@@ -1,6 +1,7 @@
 const supabaseCommunicationModule = require(
     `../../lib/api/supabaseCommunicationModule.js`
 );
+const specialDay = require(`./specialDay.js`);
 
 /* https://github.com/pedroslopez/whatsapp-web.js/issues/2067 */
 async function banUser(chat, participantId) {
@@ -362,7 +363,9 @@ async function handleToggleBotActivation(
     message,
     chat,
     robotEmoji,
-    refreshDataCallback
+    refreshDataCallback,
+    senderPhoneNumber,
+    groupId
 ) {
     if (stringifyMessage.length === 2) {
         const botCommand = stringifyMessage[1];
@@ -375,6 +378,21 @@ async function handleToggleBotActivation(
             case `off`:
                 await disableBot(message, chat.id._serialized, robotEmoji);
                 await refreshDataCallback();
+                break;
+            case `special`:
+                try {
+                    const activationMessage =
+                        await specialDay.activateSpecialDay(
+                            senderPhoneNumber,
+                            groupId
+                        );
+                    message.reply(`${robotEmoji} ${activationMessage}`);
+                } catch (error) {
+                    message.reply(
+                        `${robotEmoji} Houston, tenemos un problema.`
+                    );
+                    console.error(error);
+                }
                 break;
             default:
                 message.reply(
@@ -432,18 +450,7 @@ async function hasValidSpecialDay(groupId) {
     if (groupData && groupData.special_day_expiry) {
         const now = new Date();
         const specialDayExpiry = new Date(groupData.special_day_expiry);
-        const nowUtc = Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate()
-        );
-        const expiryUtc = Date.UTC(
-            specialDayExpiry.getUTCFullYear(),
-            specialDayExpiry.getUTCMonth(),
-            specialDayExpiry.getUTCDate()
-        );
-
-        return nowUtc <= expiryUtc;
+        return now <= specialDayExpiry;
     }
     return false;
 }
