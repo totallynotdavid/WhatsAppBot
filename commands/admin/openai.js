@@ -6,6 +6,7 @@ const { Configuration, OpenAIApi } = require(`openai`);
 const supabaseCommunicationModule = require(
     `../../lib/api/supabaseCommunicationModule.js`
 );
+const groups = require(`./groups.js`);
 
 const config =
     process.env.NODE_ENV === `production`
@@ -78,7 +79,7 @@ async function callOpenAI(apiMethod, options) {
  * @param {string} query - The user's query.
  * @returns {Promise<string|null>} The GPT's response or null if an error occurred.
  */
-const handleChatWithGPT = async (senderNumber, group, query) => {
+async function handleChatWithGPT(senderNumber, group, query) {
     try {
         let previousMessages =
             await supabaseCommunicationModule.fetchLastNMessages(
@@ -189,8 +190,27 @@ const handleChatWithGPT = async (senderNumber, group, query) => {
         console.error(`Error in handleChatWithGPT: ${error.message}`);
         return null;
     }
-};
+}
 
+async function handleFreeChatWithGPT(senderPhoneNumber, groupId, commandQuery) {
+    const hasValidSpecialDay = await groups.hasValidSpecialDay(groupId);
+    if (!hasValidSpecialDay) {
+        return `Este comando solo está disponible en días especiales. Los usuarios de paga pueden activar este día especial 🎉`;
+    }
+
+    if (commandQuery.length <= 1) {
+        return `¿De qué quieres hablar hoy?`;
+    }
+
+    const chatResponse = await handleChatWithGPT(
+        senderPhoneNumber,
+        groupId,
+        commandQuery
+    );
+    return chatResponse || `No tengo respuesta.`;
+}
+
+// used on command: resumen
 async function summarizeMessages(messages) {
     try {
         const messagesText = await Promise.all(
@@ -234,5 +254,6 @@ async function summarizeMessages(messages) {
 
 module.exports = {
     handleChatWithGPT,
+    handleFreeChatWithGPT,
     summarizeMessages,
 };

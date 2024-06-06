@@ -6,8 +6,8 @@
     },
     {
         "command": "bot",
-        "message": "Con este comando, puedes activar o desactivar la presencia y funcionalidad del bot dentro de tu grupo. Este comando te permite controlar cuando el bot interactúa con los miembros del grupo",
-        "usage": "bot <on/off>"
+        "message": "Con este comando, puedes activar o desactivar la presencia y funcionalidad del bot dentro de tu grupo. Este comando te permite controlar cuando el bot interactúa con los miembros del grupo. Puedes usar este comando para activar el día especial del bot, donde todos podrán disfrutar del comando chat.",
+        "usage": ["bot on", "bot off", "bot special"]
     },
     {
         "command": "todos",
