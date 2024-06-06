@@ -391,6 +391,7 @@ async function handleToggleBotActivation(
                     message.reply(
                         `${robotEmoji} Houston, tenemos un problema.`
                     );
+                    console.error(error);
                 }
                 break;
             default:
@@ -449,18 +450,7 @@ async function hasValidSpecialDay(groupId) {
     if (groupData && groupData.special_day_expiry) {
         const now = new Date();
         const specialDayExpiry = new Date(groupData.special_day_expiry);
-        const nowUtc = Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate()
-        );
-        const expiryUtc = Date.UTC(
-            specialDayExpiry.getUTCFullYear(),
-            specialDayExpiry.getUTCMonth(),
-            specialDayExpiry.getUTCDate()
-        );
-
-        return nowUtc <= expiryUtc;
+        return now <= specialDayExpiry;
     }
     return false;
 }
