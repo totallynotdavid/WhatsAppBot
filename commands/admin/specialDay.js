@@ -30,7 +30,7 @@ async function getGroupSpecialDay(groupId) {
 }
 
 async function getUserGroupsWithActivatedDay(contactNumber) {
-    let groups = await supabase.searchTableV2(
+    let groups = await supabase.searchTable(
         "premium_groups",
         "contact_number",
         contactNumber
