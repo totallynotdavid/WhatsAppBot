@@ -43,7 +43,7 @@
         "spotify-web-api-node": "^5.0.2",
         "sqlite3": "^5.1.6",
         "uuid": "^9.0.1",
-        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#9847ebadb976d6ba6c8f0a708e6cf04d7d030a6a",
+        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#24b11b7d3ff5c13c1610db0892e196b31ffac484",
         "yt_duration": "^0.0.2",
         "yt_metadata": "^0.0.5",
         "ytdlp_video_processor": "^0.0.6"
