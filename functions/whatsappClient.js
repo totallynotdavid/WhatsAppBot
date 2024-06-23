@@ -117,7 +117,7 @@ client.on(`ready`, () => {
 /*
   Event can be triggered by: message or message_create
   * message_create includes the messages by the bot itself (good for testing)
-  * message is the one we want to use on production (it doesn't include the bot's messages
+  * message is the one we want to use on production (it doesn't include the bot's messages)
 */
 client.on(`message`, async message => {
     const isCommand =
