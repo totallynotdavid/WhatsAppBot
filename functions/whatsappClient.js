@@ -16,7 +16,8 @@ const {
     wikipedia,
     reddit,
     utilities,
-    stickers,
+    stickerHandler,
+    mediaConverter,
     docsearch,
     docdown,
     youtube,
@@ -97,21 +98,6 @@ client.on(`ready`, () => {
     console.log(
         `Estamos listos, ¡el bot está en linea! Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`
     );
-
-    async function clearAllChats() {
-        try {
-            const chats = await client.getChats();
-            for (let chat of chats) {
-                const result = await chat.clearMessages();
-                console.log(
-                    `Cleared messages for chat ${chat.id._serialized}: ${result}`
-                );
-            }
-        } catch (error) {
-            console.error("Error clearing messages:", error);
-        }
-    }
-    // clearAllChats();
 });
 
 /*
@@ -119,7 +105,7 @@ client.on(`ready`, () => {
   * message_create includes the messages by the bot itself (good for testing)
   * message is the one we want to use on production (it doesn't include the bot's messages)
 */
-client.on(`message`, async message => {
+client.on(`message_create`, async message => {
     const isCommand =
         message.body.startsWith(prefix) ||
         message.body.startsWith(prefix_admin);
@@ -203,8 +189,8 @@ client.on(`message`, async message => {
                     message.reply(`${robotEmoji} ${helpMessageText}`);
                     break;
                 }
-                case commands.sticker:
-                    stickers.transformMediaToSticker(
+                case commands.sticker: {
+                    mediaConverter.transformMediaToSticker(
                         chatInfo,
                         message,
                         senderName,
@@ -212,17 +198,20 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.toimage:
-                    stickers.processQuotedStickerMessage(
+                }
+                case commands.toimage: {
+                    mediaConverter.convertQuotedStickerToMedia(
                         stringifyMessage,
                         message,
+                        MessageMedia,
                         chatInfo,
                         robotEmoji,
                         senderName
                     );
                     break;
+                }
                 case commands.url:
-                    stickers.handleStickerURL(
+                    stickerHandler.handleStickerURL(
                         stringifyMessage,
                         message,
                         robotEmoji,
