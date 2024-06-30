@@ -36,8 +36,8 @@ importers:
         specifier: ^1.0.15
         version: 1.0.15
       fluent-ffmpeg:
-        specifier: ^2.1.2
-        version: 2.1.2
+        specifier: ^2.1.3
+        version: 2.1.3
       googleapis:
         specifier: ^105.0.0
         version: 105.0.0(encoding@0.1.13)
@@ -66,8 +66,8 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       whatsapp-web.js:
-        specifier: github:pedroslopez/whatsapp-web.js#24b11b7d3ff5c13c1610db0892e196b31ffac484
-        version: https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/24b11b7d3ff5c13c1610db0892e196b31ffac484(encoding@0.1.13)
+        specifier: github:pedroslopez/whatsapp-web.js#webpack-exodus
+        version: https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/cd566f28b9957d58dbd470470f6e2fe018808db3(encoding@0.1.13)
       yt_duration:
         specifier: ^0.0.2
         version: 0.0.2
@@ -785,6 +785,9 @@ packages:
     resolution: {integrity: sha512-NfJ4UzBCcQGLDlQq7nHxH+tv3kyZ0hHQqF5BO6J7tNJeP5do1llPr8dZ8zHonfhAu0PHAdMkSo+8o0wxg9lZWw==}
     engines: {node: '>=0.8'}
 
+  async@0.2.10:
+    resolution: {integrity: sha512-eAkdoKxU6/LkKDBzLpT+t6Ff5EtfSF4wx1WfJiPEEV7WNLnDaRXk0oVysiEPm262roaachGexwUv94WhSgN5TQ==}
+
   async@3.2.5:
     resolution: {integrity: sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==}
 
@@ -1260,6 +1263,10 @@ packages:
   fluent-ffmpeg@2.1.2:
     resolution: {integrity: sha512-IZTB4kq5GK0DPp7sGQ0q/BWurGHffRtQQwVkiqDgeO6wYJLLV5ZhgNOQ65loZxxuPMKZKZcICCUnaGtlxBiR0Q==}
     engines: {node: '>=0.8.0'}
+
+  fluent-ffmpeg@2.1.3:
+    resolution: {integrity: sha512-Be3narBNt2s6bsaqP6Jzq91heDgOEaDCJAXcE3qcma/EJBSy5FB4cvO31XBInuAuKBx8Kptf8dkhjK0IOru39Q==}
+    engines: {node: '>=18'}
 
   follow-redirects@1.15.6:
     resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
@@ -2416,9 +2423,9 @@ packages:
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
 
-  whatsapp-web.js@https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/24b11b7d3ff5c13c1610db0892e196b31ffac484:
-    resolution: {tarball: https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/24b11b7d3ff5c13c1610db0892e196b31ffac484}
-    version: 1.24.0
+  whatsapp-web.js@https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/cd566f28b9957d58dbd470470f6e2fe018808db3:
+    resolution: {tarball: https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/cd566f28b9957d58dbd470470f6e2fe018808db3}
+    version: 1.23.1-alpha.5
     engines: {node: '>=18.0.0'}
 
   whatwg-url@5.0.0:
@@ -3715,6 +3722,8 @@ snapshots:
 
   assert-plus@1.0.0: {}
 
+  async@0.2.10: {}
+
   async@3.2.5: {}
 
   asynckit@0.4.0: {}
@@ -4316,6 +4325,11 @@ snapshots:
   fluent-ffmpeg@2.1.2:
     dependencies:
       async: 3.2.5
+      which: 1.3.1
+
+  fluent-ffmpeg@2.1.3:
+    dependencies:
+      async: 0.2.10
       which: 1.3.1
 
   follow-redirects@1.15.6: {}
@@ -5602,7 +5616,7 @@ snapshots:
 
   webidl-conversions@3.0.1: {}
 
-  whatsapp-web.js@https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/24b11b7d3ff5c13c1610db0892e196b31ffac484(encoding@0.1.13):
+  whatsapp-web.js@https://codeload.github.com/pedroslopez/whatsapp-web.js/tar.gz/cd566f28b9957d58dbd470470f6e2fe018808db3(encoding@0.1.13):
     dependencies:
       '@pedroslopez/moduleraid': 5.0.2
       fluent-ffmpeg: 2.1.2
