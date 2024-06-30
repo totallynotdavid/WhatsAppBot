@@ -35,24 +35,9 @@ async function transformMediaToSticker(
             }
 
             mediaSticker = await originalQuotedMessage.downloadMedia();
-            console.log("Downloading media 1 from quoted message");
-            await chat.sendMessage(mediaSticker, {
-                sendMediaAsSticker: true,
-                stickerName: `${senderName}`,
-                stickerAuthor: `davidbot 2`,
-            });
-            console.log("Downloading media from quoted message");
         } else {
-            console.log("Downloading media");
             mediaSticker = await message.downloadMedia();
-            console.log("Media downloaded");
-            await chat.sendMessage(mediaSticker, {
-                sendMediaAsSticker: true,
-                stickerName: `${senderName}`,
-                stickerAuthor: `david`,
-            });
         }
-        console.log("Sending media to convertImageToSticker");
         await convertImageToSticker(
             chat,
             message,
