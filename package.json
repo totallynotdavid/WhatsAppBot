@@ -28,6 +28,7 @@
         "@google-cloud/local-auth": "^2.1.0",
         "@supabase/supabase-js": "^2.7.1",
         "@vitalets/google-translate-api": "^9.2.0",
+        "axios": "^1.7.2",
         "bimg": "^0.1.5",
         "discord-image-generation": "^1.4.25",
         "dotenv": "^16.0.3",

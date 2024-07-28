@@ -1,67 +1,47 @@
-const mediaConverter = require(`./mediaConverter`);
+const fetch = require("node-fetch");
+const { URL } = require("url");
 
-async function validateAndConvertMedia(
-    chat,
-    mediaURL,
-    message,
-    MessageMedia,
-    senderName,
-    senderNumber,
-    robotEmoji,
-    localFilePath = null
-) {
-    try {
-        if (mediaURL.endsWith(`.gifv`)) {
-            mediaURL = mediaURL.replace(/\.gifv$/i, `.mp4`);
+const env = process.env.NODE_ENV || "dev";
+const config = require(`../config.${env}.js`);
+const { ALLOWED_REDDIT_HOSTS } = config;
+
+class UrlHandler {
+    static async getDirectMediaUrl(url) {
+        if (this.isImgurUrl(url)) {
+            return this.getImgurDirectUrl(url);
+        } else if (this.isRedditUrl(url)) {
+            return this.getRedditDirectUrl(url);
         }
+        return url; // Return as-is if not a special case
+    }
 
-        const response = await fetch(mediaURL);
-        const [contentType, contentLength] = (
-            response.headers.get(`content-type`) || ``
-        ).split(`;`);
+    static isImgurUrl(url) {
+        return url.includes("imgur.com");
+    }
 
-        if (
-            response.ok &&
-            contentType &&
-            (contentType.startsWith(`image/`) ||
-                contentType.startsWith(`video/`))
-        ) {
-            if (
-                contentType.startsWith(`video/mp4`) &&
-                contentLength &&
-                parseInt(contentLength.split(`=`)[1]) > 20 * 1000
-            ) {
-                message.reply(
-                    `${robotEmoji} Necesitas ser un usuario de pago para enviar videos de más de 20 segundos.`
-                );
-            } else {
-                let sticker;
-                if (localFilePath) {
-                    sticker = await MessageMedia.fromFilePath(localFilePath);
-                } else {
-                    sticker = await MessageMedia.fromUrl(mediaURL);
-                }
-                mediaConverter.convertImageToSticker(
-                    chat,
-                    message,
-                    sticker,
-                    senderName,
-                    senderNumber
-                );
-            }
-        } else {
-            message.reply(
-                `${robotEmoji} Esa URL no es hacia el corazón de ella, ni siquiera es una imagen o video. Intenta de nuevo.`
-            );
+    static isRedditUrl(url) {
+        const { hostname } = new URL(url);
+        return ALLOWED_REDDIT_HOSTS.includes(hostname);
+    }
+
+    static async getImgurDirectUrl(url) {
+        // Implement Imgur-specific logic
+        return url; //.replace(/\.(gifv|mp4)$/, ".gif");
+    }
+
+    static async getRedditDirectUrl(url) {
+        // Implement Reddit-specific logic
+        // This is a placeholder and should be replaced with actual Reddit API calls
+        return url;
+    }
+
+    static async downloadMedia(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch URL: ${response.statusText}`);
         }
-    } catch (error) {
-        console.error(error);
-        message.reply(
-            `${robotEmoji} Parece que algo salió mal, intenta de nuevo.`
-        );
+        return await response.buffer();
     }
 }
 
-module.exports = {
-    validateAndConvertMedia,
-};
+module.exports = UrlHandler;

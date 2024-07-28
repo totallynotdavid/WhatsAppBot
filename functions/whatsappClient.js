@@ -16,8 +16,7 @@ const {
     wikipedia,
     reddit,
     utilities,
-    stickerHandler,
-    mediaConverter,
+    StickerHandler,
     docsearch,
     docdown,
     youtube,
@@ -185,37 +184,27 @@ client.on(`message_create`, async message => {
                     message.reply(`${robotEmoji} ${helpMessageText}`);
                     break;
                 }
-                case commands.sticker: {
-                    mediaConverter.transformMediaToSticker(
+                case commands.sticker:
+                case commands.url:
+                    await StickerHandler.handleMediaToSticker(
                         chatInfo,
                         message,
                         senderName,
                         senderPhoneNumber,
-                        robotEmoji
+                        robotEmoji,
+                        stringifyMessage,
+                        MessageMedia,
+                        command === commands.url ? stringifyMessage[1] : null
                     );
                     break;
-                }
-                case commands.toimage: {
-                    mediaConverter.convertQuotedStickerToMedia(
-                        stringifyMessage,
-                        message,
-                        MessageMedia,
+                case commands.toimage:
+                    await StickerHandler.handleStickerToMedia(
                         chatInfo,
-                        robotEmoji,
-                        senderName
-                    );
-                    break;
-                }
-                case commands.url:
-                    stickerHandler.handleStickerURL(
-                        stringifyMessage,
                         message,
-                        robotEmoji,
-                        reddit,
-                        chatInfo,
-                        MessageMedia,
                         senderName,
-                        senderPhoneNumber
+                        robotEmoji,
+                        stringifyMessage,
+                        MessageMedia
                     );
                     break;
                 case commands.spot:

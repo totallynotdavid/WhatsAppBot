@@ -9,8 +9,8 @@ const cae = require(`./cae`);
 const wikipedia = require(`./wikipedia`);
 const reddit = require(`./reddit`);
 const utilities = require(`./utilities`);
-const stickerHandler = require(`./stickerHandler`);
-const mediaConverter = require(`./mediaConverter`);
+const StickerHandler = require(`./stickerHandler`);
+const MediaConverter = require(`./mediaConverter`);
 const docsearch = require(`./docsearch`);
 const docdown = require(`./docdown`);
 const youtube = require(`./youtube`);
@@ -30,8 +30,8 @@ module.exports = {
     wikipedia,
     reddit,
     utilities,
-    stickerHandler,
-    mediaConverter,
+    StickerHandler,
+    MediaConverter,
     docsearch,
     docdown,
     youtube,
