@@ -1,5 +1,5 @@
 const fs = require("fs");
-const path = require("path");
+const path = require("node:path");
 const fetch = require("node-fetch");
 const { pipeline } = require("stream");
 
