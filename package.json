@@ -44,7 +44,7 @@
         "spotify-web-api-node": "^5.0.2",
         "sqlite3": "^5.1.6",
         "uuid": "^9.0.1",
-        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus",
+        "whatsapp-web.js": "^1.25.0",
         "yt_duration": "^0.0.2",
         "yt_metadata": "^0.0.5",
         "ytdlp_video_processor": "^0.0.6"

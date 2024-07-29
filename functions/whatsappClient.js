@@ -276,6 +276,7 @@ client.on(`message_create`, async message => {
                     break;
                 }
                 case commands.play: {
+                    /*
                     const audioResponse =
                         await youtube.sendYoutubeAudio(commandQuery);
                     if (audioResponse.error) {
@@ -294,6 +295,8 @@ client.on(`message_create`, async message => {
 
                         utilities.deleteFile(audioResponse.filePath);
                     }
+                    */
+                    message.reply('Esta función está deshabilitada temporalmente.');
                     break;
                 }
                 case commands.watch: {
