@@ -322,7 +322,9 @@ client.on(`message`, async message => {
                         utilities.deleteFile(audioResponse.filePath);
                     }
                     */
-                    message.reply('Esta función está deshabilitada temporalmente.');
+                    message.reply(
+                        "Esta función está deshabilitada temporalmente."
+                    );
                     break;
                 }
                 case commands.watch: {
