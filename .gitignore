@@ -5,6 +5,7 @@
 **/audio/
 **/pdf/
 **/video/
+**/fixedData/
 *.mp4
 *.txt
 *.sqlite
