@@ -42,7 +42,6 @@ function cleanLyrics(lyrics) {
         if (char === "\n") {
             newlineCount++;
         } else {
-            // If we have more than one newline store, write down that many new line (\n) characters
             if (newlineCount > 0) {
                 if (newlineCount === 2) {
                     result += "\n";
@@ -69,7 +68,6 @@ async function getLyrics(songName) {
             firstSong.artist.name,
             firstSong.title
         );
-        console.log("original lyrics:", lyricsData.lyrics);
         return {
             title: firstSong.title,
             artist: firstSong.artist.name,
@@ -87,7 +85,6 @@ async function handleSongLyricsRequest(songName) {
     }
     try {
         const songLyrics = await getLyrics(songName);
-        console.log("songLyrics:", songLyrics);
         if (songLyrics && songLyrics.lyrics) {
             return {
                 success: true,
