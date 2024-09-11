@@ -1,30 +1,106 @@
-const { getLyrics } = require(`fetch-lyrics`);
-const withProxy = require(`@totallynodavid/proxy-wrapper`);
+const fetch = require("node-fetch");
+const API_URL = "https://api.lyrics.ovh";
 
-async function handleSongLyricsRequest(stringifyMessage, message, robotEmoji) {
-    if (stringifyMessage.length === 1) {
-        message.reply(
-            `${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`
+async function searchSongs(term) {
+    try {
+        const response = await fetch(
+            `${API_URL}/suggest/${encodeURIComponent(term)}`
         );
-    } else {
-        const songName = stringifyMessage.slice(1).join(` `);
-        try {
-            const getLyricsWithProxy = withProxy(getLyrics);
-            const songLyrics = await getLyricsWithProxy(songName);
-            if (songLyrics && songLyrics.lyrics) {
-                const replyMessage = `${robotEmoji} Aquí tienes la letra de la canción:\n\n*Título:* ${songLyrics.title}\n\n*Letra:*\n${songLyrics.lyrics}`;
-                message.reply(replyMessage);
-            } else {
-                message.reply(
-                    `${robotEmoji} No encontré la letra de esa canción.`
-                );
-            }
-        } catch (error) {
-            console.error(error);
-            message.reply(
-                `${robotEmoji} Hubo un error al buscar la letra de la canción.`
-            );
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return await response.json();
+    } catch (error) {
+        console.error("Error searching songs:", error);
+        throw error;
+    }
+}
+
+async function fetchLyrics(artist, song) {
+    try {
+        const url = `${API_URL}/v1/${encodeURIComponent(
+            artist
+        )}/${encodeURIComponent(song)}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching lyrics:", error);
+        throw error;
+    }
+}
+
+function cleanLyrics(lyrics) {
+    let result = "";
+    let newlineCount = 0;
+
+    for (let i = 0; i < lyrics.length; i++) {
+        let char = lyrics[i];
+
+        if (char === "\n") {
+            newlineCount++;
+        } else {
+            // If we have more than one newline store, write down that many new line (\n) characters
+            if (newlineCount > 0) {
+                if (newlineCount === 2) {
+                    result += "\n";
+                } else if (newlineCount >= 3) {
+                    result += "\n\n";
+                }
+                newlineCount = 0;
+            }
+            result += char;
+        }
+    }
+
+    return result;
+}
+
+async function getLyrics(songName) {
+    try {
+        const songs = await searchSongs(songName);
+        if (!songs.data || songs.data.length === 0) {
+            throw new Error("No songs found");
+        }
+        const firstSong = songs.data[0];
+        const lyricsData = await fetchLyrics(
+            firstSong.artist.name,
+            firstSong.title
+        );
+        console.log("original lyrics:", lyricsData.lyrics);
+        return {
+            title: firstSong.title,
+            artist: firstSong.artist.name,
+            lyrics: cleanLyrics(lyricsData.lyrics),
+        };
+    } catch (error) {
+        console.error("Error in getLyrics:", error);
+        return null;
+    }
+}
+
+async function handleSongLyricsRequest(songName) {
+    if (!songName) {
+        return { error: "No song name provided" };
+    }
+    try {
+        const songLyrics = await getLyrics(songName);
+        console.log("songLyrics:", songLyrics);
+        if (songLyrics && songLyrics.lyrics) {
+            return {
+                success: true,
+                title: songLyrics.title,
+                artist: songLyrics.artist,
+                lyrics: songLyrics.lyrics,
+            };
+        } else {
+            return { error: "Lyrics not found" };
+        }
+    } catch (error) {
+        console.error(error);
+        return { error: "Error fetching lyrics" };
     }
 }
 
