@@ -234,16 +234,9 @@ client.on(`message`, async message => {
                     );
                     break;
                 case commands.spot:
-                    spotify.handleSpotifySongRequest(
-                        client,
-                        message,
-                        MessageMedia,
-                        commandQuery,
-                        stringifyMessage,
-                        robotEmoji
-                    );
+                    spotify(client, message, commandQuery);
                     break;
-                case commands.letra:
+                case commands.letra: {
                     const songName = stringifyMessage.slice(1).join(" ");
                     if (!songName) {
                         message.reply(
@@ -266,6 +259,7 @@ client.on(`message`, async message => {
                         }
                     }
                     break;
+                }
                 case commands.cae:
                     cae.getCAEMessage(
                         prefix,
