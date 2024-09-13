@@ -20,12 +20,10 @@ async function refreshAccessToken() {
 async function searchSpotify(query) {
     if (!accessToken) await refreshAccessToken();
     const result = await spotifyApi.searchTracks(query, { limit: 1 });
-    console.log("result", result);
     return result.body.tracks.items[0];
 }
 
 async function searchFallback(query) {
-    console.log("Searching fallback for query:", query);
     const response = await fetch(
         `https://api.lyrics.ovh/suggest/${encodeURIComponent(query)}`
     );
@@ -35,25 +33,19 @@ async function searchFallback(query) {
 
 async function searchAndDownloadSong(query) {
     let song = await searchSpotify(query);
-    console.log("result from searchSpotify", song);
-    if (!song) {
-        console.log("Song not found on Spotify for query:", query);
+
+    if (!song || !song.preview_url) {
+        song = await searchFallback(query);
+        console.log('Fallback was used');
     }
-    if (!song) song = await searchFallback(query);
 
     if (!song) return null;
 
     const previewUrl = song.preview_url || song.preview;
-    console.log("previewUrl", previewUrl);
-
     if (!previewUrl) return null;
 
-    const filePath = path.join(
-        __dirname,
-        "..",
-        "audio",
-        `${song.id || song.title}.mp3`
-    );
+    const fileName = `${song.id || song.title.replace(/\s+/g, "_")}.mp3`;
+    const filePath = path.join(__dirname, "..", "audio", fileName);
     await audioService.downloadAudio(previewUrl, filePath);
 
     return {
