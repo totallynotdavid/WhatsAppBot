@@ -36,7 +36,7 @@ async function searchAndDownloadSong(query) {
 
     if (!song || !song.preview_url) {
         song = await searchFallback(query);
-        console.log('Fallback was used');
+        console.log("Fallback was used");
     }
 
     if (!song) return null;
