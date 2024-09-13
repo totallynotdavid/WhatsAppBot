@@ -7,7 +7,8 @@ const supabaseCommunicationModule = require(
 // Import commands and utility functions
 const {
     sciHub,
-    semanticScholar,
+    author,
+    paper,
     boTeX,
     lyrics,
     amazon,
@@ -394,20 +395,13 @@ client.on(`message`, async message => {
                     );
                     break;
                 case commands.paper:
-                    semanticScholar.handleSearchPapersByKeywords(
-                        stringifyMessage,
-                        message,
-                        commandQuery,
-                        robotEmoji
-                    );
+                    const paperResponse = await paper.handlePaperSearch(query);
+                    await message.reply(`${robotEmoji} ${paperResponse}`);
                     break;
                 case commands.author:
-                    semanticScholar.handleSearchAuthor(
-                        stringifyMessage,
-                        message,
-                        commandQuery,
-                        robotEmoji
-                    );
+                    const authorResponse =
+                        await author.handleAuthorSearch(query);
+                    await message.reply(`${robotEmoji} ${authorResponse}`);
                     break;
                 case commands.doc:
                     docsearch.searchDocuments(
