@@ -6,7 +6,7 @@ const supabaseCommunicationModule = require(
 
 // Import commands and utility functions
 const {
-    sciHub,
+    doi,
     author,
     paper,
     boTeX,
@@ -78,10 +78,6 @@ const setRefreshDataCallback = callback => {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: launchPuppeteer(),
-    webVersionCache: {
-        type: `remote`,
-        remotePath: `https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html`,
-    },
 });
 
 client.on(`qr`, qr => {
@@ -98,21 +94,6 @@ client.on(`ready`, () => {
     console.log(
         `Estamos listos, ¡el bot está en linea! Tenemos ${premiumGroups.length} grupos premium y ${paidUsers.length} usuarios premium. Los usuarios de física son ${physicsUsers.length}.`
     );
-
-    async function clearAllChats() {
-        try {
-            const chats = await client.getChats();
-            for (let chat of chats) {
-                const result = await chat.clearMessages();
-                console.log(
-                    `Cleared messages for chat ${chat.id._serialized}: ${result}`
-                );
-            }
-        } catch (error) {
-            console.error("Error clearing messages:", error);
-        }
-    }
-    // clearAllChats();
 });
 
 /*
@@ -376,15 +357,36 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.doi:
-                    sciHub.handleDoiRequest(
-                        message,
-                        client,
-                        MessageMedia,
-                        stringifyMessage,
-                        robotEmoji
-                    );
+                case commands.doi: {
+                    const result = await doi.handleDoiRequest(commandQuery);
+
+                    if (result.success) {
+                        let caption = result.title
+                            ? `📄 *Título*: ${result.title}\n\n`
+                            : "";
+
+                        if (result.paperDetails) {
+                            const { authors, year, abstract } =
+                                result.paperDetails;
+                            if (authors && authors.length > 0)
+                                caption += `*Autor(es)*: ${authors.join(
+                                    ", "
+                                )}\n`;
+                            if (year) caption += `*Año*: ${year}\n`;
+                            if (abstract)
+                                caption += `\n*Resumen*:\n${abstract}`;
+                        }
+
+                        const media = MessageMedia.fromFilePath(result.pdfPath);
+                        await client.sendMessage(message.from, media, {
+                            caption,
+                        });
+                        utilities.deleteFile(result.pdfPath);
+                    } else {
+                        await message.reply(result.message);
+                    }
                     break;
+                }
                 case commands.tex:
                     boTeX.handleLatexToImage(
                         stringifyMessage,
@@ -394,15 +396,18 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.paper:
-                    const paperResponse = await paper.handlePaperSearch(query);
+                case commands.paper: {
+                    const paperResponse =
+                        await paper.handlePaperSearch(commandQuery);
                     await message.reply(`${robotEmoji} ${paperResponse}`);
                     break;
-                case commands.author:
+                }
+                case commands.author: {
                     const authorResponse =
-                        await author.handleAuthorSearch(query);
+                        await author.handleAuthorSearch(commandQuery);
                     await message.reply(`${robotEmoji} ${authorResponse}`);
                     break;
+                }
                 case commands.doc:
                     docsearch.searchDocuments(
                         stringifyMessage,
