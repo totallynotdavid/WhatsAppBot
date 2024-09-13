@@ -32,7 +32,6 @@
         "discord-image-generation": "^1.4.25",
         "dotenv": "^16.0.3",
         "facebook-nodejs-business-sdk": "^18.0.4",
-        "fetch-lyrics": "^1.0.15",
         "fluent-ffmpeg": "^2.1.2",
         "googleapis": "^105.0.0",
         "imgur": "^2.3.0",

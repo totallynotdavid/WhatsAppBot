@@ -12,7 +12,7 @@
     {
         "command": "letra",
         "message": "Obtén la letra de tu canción favorita",
-        "usage": "letra fromis_9 Airplane Mode"
+        "usage": "letra weezer island in the sun"
     },
     {
         "command": "sticker",
