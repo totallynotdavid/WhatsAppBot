@@ -208,22 +208,32 @@ client.on(`message_create`, async message => {
                     );
                     break;
                 case commands.spot:
-                    spotify.handleSpotifySongRequest(
-                        client,
-                        message,
-                        MessageMedia,
-                        commandQuery,
-                        stringifyMessage,
-                        robotEmoji
-                    );
+                    spotify(client, message, commandQuery);
                     break;
-                case commands.letra:
-                    lyrics.handleSongLyricsRequest(
-                        stringifyMessage,
-                        message,
-                        robotEmoji
-                    );
+                case commands.letra: {
+                    const songName = stringifyMessage.slice(1).join(" ");
+                    if (!songName) {
+                        message.reply(
+                            `${robotEmoji} Cómo te atreves a pedirme la letra de una canción sin decirme el nombre.`
+                        );
+                    } else {
+                        const result =
+                            await lyrics.handleSongLyricsRequest(songName);
+                        if (result.success) {
+                            const replyMessage = `${robotEmoji} *Título:* ${result.title}\n*Artista:* ${result.artist}\n\n*Letra:*\n${result.lyrics}`;
+                            message.reply(replyMessage);
+                        } else {
+                            message.reply(
+                                `${robotEmoji} ${
+                                    result.error === "Lyrics not found"
+                                        ? "Mmm... No encontré la letra de esta canción."
+                                        : "Hubo un error al buscar la letra de la canción."
+                                }`
+                            );
+                        }
+                    }
                     break;
+                }
                 case commands.cae:
                     cae.getCAEMessage(
                         prefix,
@@ -296,7 +306,9 @@ client.on(`message_create`, async message => {
                         utilities.deleteFile(audioResponse.filePath);
                     }
                     */
-                    message.reply('Esta función está deshabilitada temporalmente.');
+                    message.reply(
+                        "Esta función está deshabilitada temporalmente."
+                    );
                     break;
                 }
                 case commands.watch: {
