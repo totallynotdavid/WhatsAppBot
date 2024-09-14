@@ -20,4 +20,19 @@ async function sendAudio(client, message, filePath) {
     }
 }
 
-module.exports = { downloadAudio, sendAudio };
+async function sendAudioBuffer(client, message, audioBuffer) {
+    try {
+        const media = new MessageMedia(
+            "audio/mpeg",
+            audioBuffer.toString("base64")
+        );
+        await client.sendMessage(message.from, media, {
+            sendAudioAsVoice: true,
+        });
+    } catch (error) {
+        console.error("Error sending audio buffer:", error);
+        throw error;
+    }
+}
+
+module.exports = { downloadAudio, sendAudio, sendAudioBuffer };
