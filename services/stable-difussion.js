@@ -30,7 +30,6 @@ const stylePresets = [
     `tile-texture`,
 ];
 
-// Function to fetch image from Stability API and write to file
 async function fetchImageAndWriteToFile(prompt) {
     const stylePreset =
         stylePresets[Math.floor(Math.random() * stylePresets.length)];

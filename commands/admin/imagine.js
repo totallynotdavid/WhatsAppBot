@@ -1,5 +1,5 @@
-const { saveImageFilesLocally } = require(`../../lib/api/bing`);
-const { fetchImageAndWriteToFile } = require(`../../lib/api/stableDiffusion`);
+const { saveImageFilesLocally } = require(`../../services/bing-image-creator`);
+const { fetchImageAndWriteToFile } = require(`../../services/stable-difussion`);
 const { improvePrompt } = require(`../../functions/promptImprover`);
 
 // 9 out of 10 calls are made to Bing Image API
