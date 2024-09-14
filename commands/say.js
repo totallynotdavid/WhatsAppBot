@@ -4,7 +4,7 @@ const {
     synthesizeSpeech,
 } = require("../services/amazon-polly");
 const { sendMessage } = require("../services/message");
-const { sendAudioBuffer } = require("../services/audio");
+const { saveAndSendAudioBuffer } = require("../services/audio");
 
 async function handleTextToSpeechCommand(client, message, args) {
     let text = "";
@@ -22,11 +22,11 @@ async function handleTextToSpeechCommand(client, message, args) {
             return;
         }
     } else {
-        if (args[0].startsWith("-")) {
-            const possibleVoiceId = args[0].slice(1);
+        if (args[1].startsWith("-")) {
+            const possibleVoiceId = args[1].slice(1);
             if (isValidVoice(possibleVoiceId)) {
                 voiceId = possibleVoiceId;
-                text = args.slice(1).join(" ");
+                text = args.slice(2).join(" ");
             } else {
                 await sendMessage(
                     client,
@@ -51,12 +51,8 @@ async function handleTextToSpeechCommand(client, message, args) {
 
     try {
         const audioBuffer = await synthesizeSpeech(text, voiceId);
-        await sendAudioBuffer(client, message, audioBuffer);
-        await sendMessage(
-            client,
-            message,
-            `Voz utilizada: ${voiceId}`
-        );
+        await saveAndSendAudioBuffer(client, message, audioBuffer);
+        await sendMessage(client, message, `Voz utilizada: ${voiceId}`);
     } catch (error) {
         console.error("Error in text-to-speech command:", error);
         await sendMessage(
