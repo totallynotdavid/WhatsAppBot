@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 
-const SCIHUB_BASE_URL = "https://pismin.com/";
+const SCIHUB_BASE_URL = "https://sci-hub.scrongyao.com/"; // https://pismin.com/
 
 function extractTitle(htmlContent) {
     let decodedContent = htmlContent
