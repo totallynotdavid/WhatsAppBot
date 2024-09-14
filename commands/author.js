@@ -1,4 +1,4 @@
-const semanticScholar = require("../services/semanticscholar");
+const { searchAuthorRecentPapers } = require("../services/semantic-scholar");
 
 function formatPaperList(papers) {
     return papers
@@ -17,7 +17,7 @@ async function handleAuthorSearch(query) {
         return "¿De qué autor quieres buscar?";
     }
 
-    const result = await semanticScholar.searchAuthorRecentPapers(query);
+    const result = await searchAuthorRecentPapers(query);
     if (result.success) {
         const paperList = formatPaperList(result.papers);
         return `Últimos artículos de ${query}:\n\n${paperList}`;

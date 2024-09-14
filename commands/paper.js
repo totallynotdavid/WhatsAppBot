@@ -1,4 +1,4 @@
-const semanticScholar = require("../services/semanticscholar");
+const { searchPapersByKeywords } = require("../services/semantic-scholar");
 
 function formatPaperList(papers) {
     return papers
@@ -22,7 +22,7 @@ async function handlePaperSearch(query) {
         return "¿De qué tema quieres buscar?";
     }
 
-    const result = await semanticScholar.searchPapersByKeywords(query);
+    const result = await searchPapersByKeywords(query);
     if (result.success) {
         const paperList = formatPaperList(result.papers);
         return `Resultados:\n\n${paperList}`;

@@ -1,5 +1,5 @@
 const { fetchArticle } = require("../services/scihub");
-const { getPaperDetails } = require("../services/semanticscholar");
+const { getPaperDetails } = require("../services/semantic-scholar");
 const { downloadPdf } = require("../services/pdf");
 
 async function handleDoiRequest(input) {
