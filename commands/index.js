@@ -1,5 +1,5 @@
 const admin = require(`./admin`);
-const sciHub = require(`./sciHub`);
+const doi = require(`./doi`);
 const author = require(`./author`);
 const paper = require(`./paper`);
 const boTeX = require(`./boTeX`);
@@ -20,7 +20,7 @@ const translate = require(`./translate`);
 
 module.exports = {
     admin,
-    sciHub,
+    doi,
     author,
     paper,
     boTeX,

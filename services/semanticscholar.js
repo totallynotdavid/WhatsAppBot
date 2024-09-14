@@ -45,7 +45,7 @@ async function searchPapersByKeywords(keywords, maxResults = 5) {
         }
 
         const formattedPapers = await Promise.all(
-            response.data.slice(0, maxResults).map(async (paper, index) => {
+            response.data.slice(0, maxResults).map(async paper => {
                 const authors = paper.authors
                     .slice(0, 2)
                     .map(author => author.name);
@@ -69,6 +69,23 @@ async function searchPapersByKeywords(keywords, maxResults = 5) {
     } catch (error) {
         console.error(`Error searching papers by keywords:`, error);
         return { success: false, message: "Error al buscar artículos." };
+    }
+}
+
+async function getPaperDetails(doi, fields = "title,authors,year,abstract") {
+    const paperId = `DOI:${doi}`;
+    const endpoint = `/graph/v1/paper/${paperId}`;
+    try {
+        const response = await fetchFromApi(endpoint, { fields });
+        return {
+            ...response,
+            authors: response.authors
+                ? response.authors.map(({ name }) => name)
+                : [],
+        };
+    } catch (error) {
+        console.error("Error fetching paper details:", error);
+        return null;
     }
 }
 
@@ -109,4 +126,5 @@ async function searchAuthorRecentPapers(authorQuery, maxResults = 5) {
 module.exports = {
     searchPapersByKeywords,
     searchAuthorRecentPapers,
+    getPaperDetails,
 };
