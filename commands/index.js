@@ -4,7 +4,7 @@ const author = require(`./author`);
 const paper = require(`./paper`);
 const boTeX = require(`./boTeX`);
 const lyrics = require(`./lyrics`);
-const amazon = require(`./amazon`);
+const say = require(`./say`);
 const help = require(`./help`);
 const cae = require(`./cae`);
 const wikipedia = require(`./wikipedia`);
@@ -25,7 +25,7 @@ module.exports = {
     paper,
     boTeX,
     lyrics,
-    amazon,
+    say,
     help,
     cae,
     wikipedia,

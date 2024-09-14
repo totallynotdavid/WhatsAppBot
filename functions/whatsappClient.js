@@ -11,7 +11,7 @@ const {
     paper,
     boTeX,
     lyrics,
-    amazon,
+    say,
     help,
     cae,
     wikipedia,
@@ -349,12 +349,10 @@ client.on(`message`, async message => {
                     break;
                 }
                 case commands.say:
-                    amazon.handleTextToAudio(
-                        stringifyMessage,
-                        message,
-                        MessageMedia,
+                    await say.handleTextToSpeechCommand(
                         client,
-                        robotEmoji
+                        message,
+                        stringifyMessage
                     );
                     break;
                 case commands.doi: {
