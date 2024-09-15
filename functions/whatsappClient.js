@@ -53,7 +53,7 @@ let {
 } = require(`./globals`);
 
 // Import specific commands
-const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
+const { help: helpCommand, cae: caeCommand } = commands;
 
 // Set function to update premium groups and users
 const setFetchedData = (
@@ -251,14 +251,69 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.fromis:
-                    reddit.getRedditImage(
-                        message,
-                        fromisCommand,
-                        client,
-                        MessageMedia
-                    );
+                case commands.reddit: {
+                    if (stringifyMessage.length === 1) {
+                        await message.reply(
+                            "Incluye el nombre del subreddit o el enlace a un post de Reddit."
+                        );
+                        return;
+                    }
+
+                    try {
+                        const result =
+                            await reddit.handleRedditCommand(stringifyMessage);
+
+                        if (result.media.urls.length > 0) {
+                            for (let i = 0; i < result.media.urls.length; i++) {
+                                const mediaUrl = result.media.urls[i];
+                                let media;
+
+                                if (
+                                    mediaUrl.startsWith(
+                                        "data:video/mp4;base64,"
+                                    )
+                                ) {
+                                    media = new MessageMedia(
+                                        "video/mp4",
+                                        mediaUrl.split(",")[1],
+                                        "video.mp4"
+                                    );
+                                } else {
+                                    media =
+                                        await MessageMedia.fromUrl(mediaUrl);
+                                }
+
+                                const options =
+                                    i === 0
+                                        ? {
+                                              caption: `${robotEmoji} ${result.caption}`,
+                                          }
+                                        : {};
+
+                                if (media.mimetype === "video/mp4") {
+                                    options.sendVideoAsGif = true;
+                                }
+
+                                await client.sendMessage(
+                                    message.from,
+                                    media,
+                                    options
+                                );
+                            }
+                        } else {
+                            await client.sendMessage(
+                                message.from,
+                                `${robotEmoji} ${result.caption}`
+                            );
+                        }
+                    } catch (error) {
+                        await message.reply(
+                            `Ha ocurrido un error. Inténtalo de nuevo ahora o más tarde.`
+                        );
+                        console.error("Error in Reddit command:", error);
+                    }
                     break;
+                }
                 case commands.w:
                     wikipedia.handleWikipediaRequest(
                         stringifyMessage,

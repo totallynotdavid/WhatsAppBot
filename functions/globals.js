@@ -21,7 +21,7 @@ const commands = {
     letra: `letra`,
     say: `say`,
     cae: `cae`,
-    fromis: `fromis`,
+    reddit: `reddit`,
     w: `w`,
     yt: `yt`,
     play: `play`,
