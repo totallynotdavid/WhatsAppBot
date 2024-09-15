@@ -24,6 +24,9 @@ const {
     spotify,
     editImage,
     translate,
+    chat,
+    freeChat,
+    summarize,
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
@@ -36,7 +39,6 @@ const {
     groups,
     db,
     mentions,
-    openai,
     imagine,
     getUserInfo,
     handleGlobalMessage,
@@ -497,7 +499,7 @@ client.on(`message`, async message => {
                     );
                     break;
                 case commands.chat: {
-                    const response = await openai.handleFreeChatWithGPT(
+                    const response = await freeChat.handleFreeChatCommand(
                         senderPhoneNumber,
                         groupId,
                         commandQuery,
@@ -714,20 +716,15 @@ client.on(`message`, async message => {
                     }
                     break;
                 }
-                case adminCommands.chat:
-                    if (commandQuery.length > 1) {
-                        const chatResponse = await openai.handleChatWithGPT(
-                            senderPhoneNumber,
-                            groupId,
-                            commandQuery
-                        );
-                        message.reply(`${robotEmoji} ${chatResponse}`);
-                    } else {
-                        message.reply(
-                            `${robotEmoji} ¿De qué quieres hablar hoy?\n\n_Recuerda utilizar ${prefix_admin}chat si quieres seguir conversando._`
-                        );
-                    }
+                case adminCommands.chat: {
+                    const response = await chat.handleChatCommand(
+                        message.from,
+                        message.id.remote,
+                        commandQuery
+                    );
+                    await message.reply(`🤖 ${response}`);
                     break;
+                }
                 case adminCommands.resumen: {
                     const allMessages = await chatInfo.fetchMessages({
                         limit: Infinity,
@@ -736,9 +733,11 @@ client.on(`message`, async message => {
                     const latest50TextMessages = allMessages
                         .filter(msg => msg.body)
                         .slice(-50);
-
+                    console.log("latest50TextMessages", latest50TextMessages);
                     const summary =
-                        await openai.summarizeMessages(latest50TextMessages);
+                        await summarize.handleSummarizeCommand(
+                            latest50TextMessages
+                        );
                     message.reply(
                         `${robotEmoji} ${summary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`
                     );
