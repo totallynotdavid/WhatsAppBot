@@ -254,7 +254,7 @@ client.on(`message`, async message => {
                 case commands.reddit: {
                     if (stringifyMessage.length === 1) {
                         await message.reply(
-                            "Please provide a subreddit name or a Reddit URL."
+                            "Incluye el nombre del subreddit o el enlace a un post de Reddit."
                         );
                         return;
                     }
@@ -266,23 +266,39 @@ client.on(`message`, async message => {
                         if (result.media.urls.length > 0) {
                             for (let i = 0; i < result.media.urls.length; i++) {
                                 const mediaUrl = result.media.urls[i];
-                                const media =
-                                    await MessageMedia.fromUrl(mediaUrl);
+                                let media;
 
-                                if (i === 0) {
-                                    await client.sendMessage(
-                                        message.from,
-                                        media,
-                                        {
-                                            caption: `${robotEmoji} ${result.caption}`,
-                                        }
+                                if (
+                                    mediaUrl.startsWith(
+                                        "data:video/mp4;base64,"
+                                    )
+                                ) {
+                                    media = new MessageMedia(
+                                        "video/mp4",
+                                        mediaUrl.split(",")[1],
+                                        "video.mp4"
                                     );
                                 } else {
-                                    await client.sendMessage(
-                                        message.from,
-                                        media
-                                    );
+                                    media =
+                                        await MessageMedia.fromUrl(mediaUrl);
                                 }
+
+                                const options =
+                                    i === 0
+                                        ? {
+                                              caption: `${robotEmoji} ${result.caption}`,
+                                          }
+                                        : {};
+
+                                if (media.mimetype === "video/mp4") {
+                                    options.sendVideoAsGif = true;
+                                }
+
+                                await client.sendMessage(
+                                    message.from,
+                                    media,
+                                    options
+                                );
                             }
                         } else {
                             await client.sendMessage(
