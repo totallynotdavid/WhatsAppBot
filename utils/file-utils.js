@@ -1,7 +1,12 @@
 const fs = require("fs").promises;
 const path = require("path");
 const fetch = require("node-fetch");
-const { TEMP_DIR } = require("../config");
+
+const config =
+    process.env.NODE_ENV === `production`
+        ? require(`../config.prod`)
+        : require(`../config.dev`);
+const { TEMP_DIR } = config;
 
 async function fetchAndSaveFile(url, extension) {
     await fs.mkdir(TEMP_DIR, { recursive: true });

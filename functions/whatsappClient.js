@@ -259,58 +259,54 @@ client.on(`message`, async message => {
                         return;
                     }
 
-                    try {
-                        const result =
-                            await reddit.handleRedditCommand(stringifyMessage);
+                    const result =
+                        await reddit.handleRedditCommand(stringifyMessage);
+                    if (!result.success) {
+                        await message.reply(`${robotEmoji} ${result.error}`);
+                        return;
+                    }
 
-                        if (result.media.urls.length > 0) {
-                            for (let i = 0; i < result.media.urls.length; i++) {
-                                const mediaUrl = result.media.urls[i];
-                                let media;
+                    if (result.data.media.urls.length > 0) {
+                        for (
+                            let i = 0;
+                            i < result.data.media.urls.length;
+                            i++
+                        ) {
+                            const mediaUrl = result.data.media.urls[i];
+                            let media;
 
-                                if (
-                                    mediaUrl.startsWith(
-                                        "data:video/mp4;base64,"
-                                    )
-                                ) {
-                                    media = new MessageMedia(
-                                        "video/mp4",
-                                        mediaUrl.split(",")[1],
-                                        "video.mp4"
-                                    );
-                                } else {
-                                    media =
-                                        await MessageMedia.fromUrl(mediaUrl);
-                                }
-
-                                const options =
-                                    i === 0
-                                        ? {
-                                              caption: `${robotEmoji} ${result.caption}`,
-                                          }
-                                        : {};
-
-                                if (media.mimetype === "video/mp4") {
-                                    options.sendVideoAsGif = true;
-                                }
-
-                                await client.sendMessage(
-                                    message.from,
-                                    media,
-                                    options
+                            if (mediaUrl.startsWith("data:video/mp4;base64,")) {
+                                media = new MessageMedia(
+                                    "video/mp4",
+                                    mediaUrl.split(",")[1],
+                                    "video.mp4"
                                 );
+                            } else {
+                                media = await MessageMedia.fromUrl(mediaUrl);
                             }
-                        } else {
+
+                            const options =
+                                i === 0
+                                    ? {
+                                          caption: `${robotEmoji} ${result.data.caption}`,
+                                      }
+                                    : {};
+
+                            if (media.mimetype === "video/mp4") {
+                                options.sendVideoAsGif = true;
+                            }
+
                             await client.sendMessage(
                                 message.from,
-                                `${robotEmoji} ${result.caption}`
+                                media,
+                                options
                             );
                         }
-                    } catch (error) {
-                        await message.reply(
-                            `Ha ocurrido un error. Inténtalo de nuevo ahora o más tarde.`
+                    } else {
+                        await client.sendMessage(
+                            message.from,
+                            `${robotEmoji} ${result.data.caption}`
                         );
-                        console.error("Error in Reddit command:", error);
                     }
                     break;
                 }

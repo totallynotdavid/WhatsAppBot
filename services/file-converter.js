@@ -7,8 +7,8 @@ const {
 
 const config =
     process.env.NODE_ENV === `production`
-        ? require(`../../config.prod`)
-        : require(`../../config.dev`);
+        ? require(`../config.prod`)
+        : require(`../config.dev`);
 const { TEMP_DIR } = config;
 
 async function convertGifToMp4(gifUrl) {

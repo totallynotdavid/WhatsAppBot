@@ -1,9 +1,9 @@
 const {
     getRandomPost,
     getPostMetadata,
-    getMedia,
     generateCaption,
 } = require("../services/reddit");
+const { getMedia } = require("../services/media-downloader");
 
 async function handleRedditCommand(args) {
     try {
@@ -16,24 +16,37 @@ async function handleRedditCommand(args) {
             const validTimeframes = ["day", "week", "month", "year", "all"];
 
             if (!validTimeframes.includes(timeframe)) {
-                throw new Error(
-                    "Período de tiempo inválido. Usa day, week, month, year o all."
-                );
+                return {
+                    success: false,
+                    error: "Período de tiempo inválido. Usa day, week, month, year o all.",
+                };
             }
 
             post = await getRandomPost(subreddit, timeframe);
         }
 
+        if (!post) {
+            return {
+                success: false,
+                error: "No se pudo encontrar el subreddit o el post especificado.",
+            };
+        }
         const media = await getMedia(post.permalink);
         const caption = generateCaption(post);
 
         return {
-            caption,
-            media,
+            success: true,
+            data: {
+                caption,
+                media,
+            },
         };
     } catch (error) {
         console.error("Error in Reddit command:", error);
-        throw error;
+        return {
+            success: false,
+            error: "Ha ocurrido un error. Inténtalo de nuevo ahora o más tarde.",
+        };
     }
 }
 
