@@ -3,7 +3,7 @@ const util = require("util");
 const os = require("os");
 const {
     createTempDirectory,
-    fetchAndSaveFile,
+    saveContentToFile,
     cleanupDirectory,
 } = require("../utils/file-utils");
 
@@ -30,7 +30,7 @@ async function processLatex(latexCode) {
 
     try {
         const latexDocument = latexTemplate.replace("%s", latexCode);
-        await fetchAndSaveFile(inputPath, latexDocument);
+        await saveContentToFile(latexDocument, inputPath);
 
         await execFilePromise("pdflatex", [
             `-output-directory=${tempDir}`,

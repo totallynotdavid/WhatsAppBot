@@ -19,6 +19,11 @@ async function fetchAndSaveFile(url, extension) {
     return filePath;
 }
 
+async function saveContentToFile(content, filePath) {
+    await fs.writeFile(filePath, content, "utf8");
+    return filePath;
+}
+
 async function readFileAsBase64(filePath) {
     const buffer = await fs.readFile(filePath);
     return buffer.toString("base64");
@@ -53,6 +58,7 @@ function getFileDirectory(filePath) {
 
 module.exports = {
     fetchAndSaveFile,
+    saveContentToFile,
     readFileAsBase64,
     cleanupTempFiles,
     createTempDirectory,
