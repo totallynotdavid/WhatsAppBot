@@ -2,7 +2,7 @@ const admin = require(`./admin`);
 const doi = require(`./doi`);
 const author = require(`./author`);
 const paper = require(`./paper`);
-const boTeX = require(`./boTeX`);
+const tex = require(`./tex`);
 const lyrics = require(`./lyrics`);
 const say = require(`./say`);
 const help = require(`./help`);
@@ -23,7 +23,7 @@ module.exports = {
     doi,
     author,
     paper,
-    boTeX,
+    tex,
     lyrics,
     say,
     help,

@@ -9,7 +9,7 @@ const {
     doi,
     author,
     paper,
-    boTeX,
+    tex,
     lyrics,
     say,
     help,
@@ -27,6 +27,9 @@ const {
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
+const { cleanupDirectory, getFileDirectory } = require(
+    `../utils/file-utils.js`
+);
 
 // Import admin commands
 const {
@@ -436,15 +439,33 @@ client.on(`message`, async message => {
                     }
                     break;
                 }
-                case commands.tex:
-                    boTeX.handleLatexToImage(
-                        stringifyMessage,
-                        message,
-                        client,
-                        MessageMedia,
-                        robotEmoji
-                    );
+                case commands.tex: {
+                    const result = await tex.handleLatexToImage(commandQuery);
+
+                    if (result.success) {
+                        try {
+                            const media = MessageMedia.fromFilePath(
+                                result.imagePath
+                            );
+                            await client.sendMessage(message.from, media, {
+                                caption: `${robotEmoji} Solicitado por ${senderName}`,
+                            });
+                        } catch (error) {
+                            console.error("Error sending image:", error);
+                            await message.reply(
+                                `${robotEmoji} Ha ocurrido un error al enviar la imagen. Inténtalo de nuevo ahora o más tarde.`
+                            );
+                        } finally {
+                            const directory = getFileDirectory(
+                                result.imagePath
+                            );
+                            await cleanupDirectory(directory);
+                        }
+                    } else {
+                        await message.reply(`${robotEmoji} ${result.message}`);
+                    }
                     break;
+                }
                 case commands.paper: {
                     const paperResponse =
                         await paper.handlePaperSearch(commandQuery);
