@@ -1,4 +1,4 @@
-const { processLatex } = require("../services/latex");
+const { processLatex } = require("../services/pdflatex");
 
 async function handleLatexToImage(query) {
     if (!query) {
