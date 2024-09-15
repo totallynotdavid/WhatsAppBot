@@ -53,7 +53,7 @@ let {
 } = require(`./globals`);
 
 // Import specific commands
-const { help: helpCommand, cae: caeCommand, fromis: fromisCommand } = commands;
+const { help: helpCommand, cae: caeCommand } = commands;
 
 // Set function to update premium groups and users
 const setFetchedData = (
@@ -251,14 +251,53 @@ client.on(`message`, async message => {
                         robotEmoji
                     );
                     break;
-                case commands.fromis:
-                    reddit.getRedditImage(
-                        message,
-                        fromisCommand,
-                        client,
-                        MessageMedia
-                    );
+                case commands.reddit: {
+                    if (stringifyMessage.length === 1) {
+                        await message.reply(
+                            "Please provide a subreddit name or a Reddit URL."
+                        );
+                        return;
+                    }
+
+                    try {
+                        const result =
+                            await reddit.handleRedditCommand(stringifyMessage);
+
+                        if (result.media.urls.length > 0) {
+                            for (let i = 0; i < result.media.urls.length; i++) {
+                                const mediaUrl = result.media.urls[i];
+                                const media =
+                                    await MessageMedia.fromUrl(mediaUrl);
+
+                                if (i === 0) {
+                                    await client.sendMessage(
+                                        message.from,
+                                        media,
+                                        {
+                                            caption: `${robotEmoji} ${result.caption}`,
+                                        }
+                                    );
+                                } else {
+                                    await client.sendMessage(
+                                        message.from,
+                                        media
+                                    );
+                                }
+                            }
+                        } else {
+                            await client.sendMessage(
+                                message.from,
+                                `${robotEmoji} ${result.caption}`
+                            );
+                        }
+                    } catch (error) {
+                        await message.reply(
+                            `Ha ocurrido un error. Inténtalo de nuevo ahora o más tarde.`
+                        );
+                        console.error("Error in Reddit command:", error);
+                    }
                     break;
+                }
                 case commands.w:
                     wikipedia.handleWikipediaRequest(
                         stringifyMessage,
