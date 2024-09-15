@@ -1,9 +1,4 @@
 const fetch = require("node-fetch");
-const MediaDownloader = require("@totallynodavid/downloader");
-const ffmpeg = require("fluent-ffmpeg");
-const fs = require("fs").promises;
-const path = require("path");
-
 const API_BASE = "https://www.reddit.com/r";
 
 async function getRandomPost(subreddit, timeframe = "week") {
@@ -67,70 +62,6 @@ async function getPostMetadata(url) {
     }
 }
 
-async function getMedia(url) {
-    try {
-        const media = await MediaDownloader(url);
-
-        if (media.urls.length > 0) {
-            const processedUrls = await Promise.all(
-                media.urls.map(processMediaUrl)
-            );
-            return {
-                urls: processedUrls.filter(url => url !== null),
-                count: processedUrls.filter(url => url !== null).length,
-            };
-        }
-
-        return media;
-    } catch (error) {
-        console.error("Error downloading or processing media:", error);
-        throw error;
-    }
-}
-
-async function processMediaUrl(url) {
-    if (url.endsWith(".gif")) {
-        return await convertGifToMp4(url);
-    }
-    return url;
-}
-
-async function convertGifToMp4(gifUrl) {
-    const tempDir = path.join(__dirname, "../media");
-    await fs.mkdir(tempDir, { recursive: true });
-
-    const gifPath = path.join(tempDir, `${Date.now()}_temp.gif`);
-    const mp4Path = path.join(tempDir, `${Date.now()}_temp.mp4`);
-
-    try {
-        const response = await fetch(gifUrl);
-        const buffer = await response.buffer();
-        await fs.writeFile(gifPath, buffer);
-
-        await new Promise((resolve, reject) => {
-            ffmpeg(gifPath)
-                .outputOptions("-movflags faststart")
-                .outputOptions("-pix_fmt yuv420p")
-                .outputOptions("-vf scale=trunc(iw/2)*2:trunc(ih/2)*2")
-                .toFormat("mp4")
-                .on("end", () => resolve())
-                .on("error", err => reject(err))
-                .save(mp4Path);
-        });
-
-        const mp4Buffer = await fs.readFile(mp4Path);
-        const base64Mp4 = mp4Buffer.toString("base64");
-
-        await fs.unlink(gifPath);
-        await fs.unlink(mp4Path);
-
-        return `data:video/mp4;base64,${base64Mp4}`;
-    } catch (error) {
-        console.error("Error converting GIF to MP4:", error);
-        return null;
-    }
-}
-
 function generateCaption(post) {
     const {
         title,
@@ -161,4 +92,4 @@ function generateCaption(post) {
     return caption;
 }
 
-module.exports = { getRandomPost, getPostMetadata, getMedia, generateCaption };
+module.exports = { getRandomPost, getPostMetadata, generateCaption };
