@@ -1,5 +1,5 @@
 const { callOpenAI } = require("../services/openai");
-const { fetchLastNMessages, addMessage } = require("../services/database");
+const { fetchLastNMessages, addMessage } = require("../services/supabase");
 const { formatMessagesForChat } = require("../utils/promptManager");
 const groups = require("./admin/groups");
 

@@ -1,5 +1,5 @@
 const { callOpenAI } = require("../services/openai");
-const { fetchLastNMessages, addMessage } = require("../services/database");
+const { fetchLastNMessages, addMessage } = require("../services/supabase");
 const {
     formatMessagesForChat,
     getSummaryPrompt,
@@ -13,8 +13,8 @@ async function handleChatCommand(senderId, groupId, query) {
     }
 
     try {
-        let rawMessages = await fetchLastNMessages(senderId, groupId, 5);
-        let processedMessages = processMessages(rawMessages);
+        const rawMessages = await fetchLastNMessages(senderId, groupId, 5);
+        const processedMessages = processMessages(rawMessages);
 
         let messages;
         if (
@@ -48,12 +48,16 @@ async function handleChatCommand(senderId, groupId, query) {
         const chatResponse = await callOpenAI(messages);
 
         if (chatResponse) {
-            await addMessage(senderId, groupId, "user", query);
-            await addMessage(senderId, groupId, "assistant", chatResponse);
+            await Promise.all([
+                addMessage(senderId, groupId, "user", query),
+                addMessage(senderId, groupId, "assistant", chatResponse),
+            ]);
             return chatResponse;
         } else {
-            await addMessage(senderId, groupId, "user", query);
-            await addMessage(senderId, groupId, "assistant", "No response");
+            await Promise.all([
+                addMessage(senderId, groupId, "user", query),
+                addMessage(senderId, groupId, "assistant", "No response"),
+            ]);
             return "Lo siento, no pude generar una respuesta.";
         }
     } catch (error) {
