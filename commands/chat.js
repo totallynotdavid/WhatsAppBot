@@ -3,6 +3,7 @@ const { fetchLastNMessages, addMessage } = require("../services/database");
 const {
     formatMessagesForChat,
     getSummaryPrompt,
+    processMessages,
 } = require("../utils/promptManager");
 const config = require("../config");
 
@@ -12,29 +13,35 @@ async function handleChatCommand(senderId, groupId, query) {
     }
 
     try {
-        let previousMessages = await fetchLastNMessages(senderId, groupId, 5);
+        let rawMessages = await fetchLastNMessages(senderId, groupId, 5);
+        let processedMessages = processMessages(rawMessages);
 
         let messages;
-        if (previousMessages.length === 0) {
+        if (
+            processedMessages.length === 0 ||
+            processedMessages[0].length === 0
+        ) {
             messages = formatMessagesForChat([], query);
         } else {
-            const totalLength = previousMessages.reduce(
+            const lastConversation =
+                processedMessages[processedMessages.length - 1];
+            const totalLength = lastConversation.reduce(
                 (total, msg) => total + msg.content.length,
                 0
             );
 
             if (totalLength > config.MAX_CONVERSATION_LENGTH) {
-                const conversationText = previousMessages
+                const conversationText = lastConversation
                     .map(msg => `${msg.role}: ${msg.content}`)
                     .join("\n");
                 const summaryPrompt = getSummaryPrompt(conversationText);
                 const summary = await callOpenAI(summaryPrompt);
                 messages = formatMessagesForChat(
-                    [{ role: "system", content: summary }],
+                    [{ role: "system", content: `Summary: ${summary}` }],
                     query
                 );
             } else {
-                messages = formatMessagesForChat(previousMessages, query);
+                messages = formatMessagesForChat(lastConversation, query);
             }
         }
 
