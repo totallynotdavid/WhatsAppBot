@@ -1,6 +1,4 @@
-const { callOpenAI } = require("../services/openai");
-const { fetchLastNMessages, addMessage } = require("../services/supabase");
-const { formatMessagesForChat } = require("../utils/promptManager");
+const { handleChatLogic } = require("../utils/chat-with-llm");
 const groups = require("./admin/groups");
 
 async function handleFreeChatCommand(senderId, groupId, query) {
@@ -14,20 +12,7 @@ async function handleFreeChatCommand(senderId, groupId, query) {
     }
 
     try {
-        let previousMessages = await fetchLastNMessages(senderId, groupId, 5);
-        let messages = formatMessagesForChat(previousMessages, query);
-
-        const chatResponse = await callOpenAI(messages);
-
-        if (chatResponse) {
-            await addMessage(senderId, groupId, "user", query);
-            await addMessage(senderId, groupId, "assistant", chatResponse);
-            return chatResponse;
-        } else {
-            await addMessage(senderId, groupId, "user", query);
-            await addMessage(senderId, groupId, "assistant", "No response");
-            return "Lo siento, no pude generar una respuesta.";
-        }
+        return await handleChatLogic(senderId, groupId, query);
     } catch (error) {
         console.error("Error in handleFreeChatCommand:", error);
         return "Ocurrió un error al procesar tu solicitud.";
