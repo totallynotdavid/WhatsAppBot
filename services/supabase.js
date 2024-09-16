@@ -30,11 +30,21 @@ async function fetchLastNMessages(phoneNumber, group, n) {
     }
 }
 
-async function addMessage(phoneNumber, group, sender, message) {
+async function addMessage(
+    phoneNumber,
+    group,
+    sender,
+    message,
+    conversation_id
+) {
     try {
-        const { error } = await supabase
-            .from("gpt_messages")
-            .insert({ user: phoneNumber, group, sender, message });
+        const { error } = await supabase.from("gpt_messages").insert({
+            user: phoneNumber,
+            group,
+            sender,
+            message,
+            conversation_id,
+        });
 
         if (error) throw error;
     } catch (error) {

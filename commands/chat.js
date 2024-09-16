@@ -12,6 +12,8 @@ async function handleChatCommand(senderId, groupId, query) {
         return "¿De qué quieres hablar hoy?";
     }
 
+    const conversation_id = `${groupId}_${senderId}`;
+
     try {
         const rawMessages = await fetchLastNMessages(senderId, groupId, 5);
         const processedMessages = processMessages(rawMessages);
@@ -49,14 +51,26 @@ async function handleChatCommand(senderId, groupId, query) {
 
         if (chatResponse) {
             await Promise.all([
-                addMessage(senderId, groupId, "user", query),
-                addMessage(senderId, groupId, "assistant", chatResponse),
+                addMessage(senderId, groupId, "user", query, conversation_id),
+                addMessage(
+                    senderId,
+                    groupId,
+                    "assistant",
+                    chatResponse,
+                    conversation_id
+                ),
             ]);
             return chatResponse;
         } else {
             await Promise.all([
-                addMessage(senderId, groupId, "user", query),
-                addMessage(senderId, groupId, "assistant", "No response"),
+                addMessage(senderId, groupId, "user", query, conversation_id),
+                addMessage(
+                    senderId,
+                    groupId,
+                    "assistant",
+                    "No response",
+                    conversation_id
+                ),
             ]);
             return "Lo siento, no pude generar una respuesta.";
         }
