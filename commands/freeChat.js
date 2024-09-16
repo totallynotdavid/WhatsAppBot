@@ -3,12 +3,12 @@ const groups = require("./admin/groups");
 
 async function handleFreeChatCommand(senderId, groupId, query) {
     if (!query) {
-        return "¿De qué quieres hablar hoy?";
+        return "¿Sobre qué quieres conversar?";
     }
 
     const hasValidSpecialDay = await groups.hasValidSpecialDay(groupId);
     if (!hasValidSpecialDay) {
-        return "Este comando solo está disponible en días especiales. Los usuarios de paga pueden activar este día especial 🎉";
+        return "Este comando está disponible solo en días especiales. Usuarios de pago pueden activarlo";
     }
 
     try {

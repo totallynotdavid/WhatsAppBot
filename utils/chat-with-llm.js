@@ -64,7 +64,7 @@ async function handleChatLogic(senderId, groupId, query) {
                 conversation_id
             ),
         ]);
-        return "Lo siento, no pude generar una respuesta.";
+        return "Disculpa, no pude generar una respuesta. ¿Podrías intentar de nuevo?";
     }
 }
 

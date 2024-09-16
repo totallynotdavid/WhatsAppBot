@@ -2,7 +2,7 @@ const { handleChatLogic } = require("../utils/chat-with-llm");
 
 async function handleChatCommand(senderId, groupId, query) {
     if (!query) {
-        return "¿De qué quieres hablar hoy?";
+        return "¿Sobre qué quieres conversar?";
     }
 
     try {
