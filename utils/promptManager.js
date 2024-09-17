@@ -58,7 +58,7 @@ function getSummaryPrompt(text) {
         {
             role: "system",
             content:
-                "You are a meeting recorder. Summarize the conversation in Spanish. Mention who said what using first names. Be straightforward and concise.",
+                "You are a meeting recorder. Summarize in Spanish. Format: {ID}: {message}. Concise. Attribute to speakers.",
         },
         { role: "user", content: text },
     ];

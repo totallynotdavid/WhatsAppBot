@@ -33,6 +33,8 @@ const { launchPuppeteer } = require(`../lib/functions/index.js`);
 const { cleanupDirectory, getFileDirectory } = require(
     `../utils/file-utils.js`
 );
+const { extractMessageData } = require(`../utils/extract-messages.js`);
+const { processMentionsInSummary } = require(`../utils/mentions.js`);
 
 // Import admin commands
 const {
@@ -730,17 +732,32 @@ client.on(`message`, async message => {
                         limit: Infinity,
                     });
 
-                    const latest50TextMessages = allMessages
-                        .filter(msg => msg.body)
-                        .slice(-50);
-                    console.log("latest50TextMessages", latest50TextMessages);
+                    const extractedMessages = extractMessageData(allMessages, {
+                        limit: 60,
+                        textOnly: false,
+                    });
+
                     const summary =
                         await summarize.handleSummarizeCommand(
-                            latest50TextMessages
+                            extractedMessages
                         );
-                    message.reply(
-                        `${robotEmoji} ${summary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`
+
+                    // Process mentions in the summary
+                    const { processedSummary, mentions } =
+                        await processMentionsInSummary(
+                            summary,
+                            chatInfo,
+                            client
+                        );
+
+                    // Send the message with mentions
+                    await chatInfo.sendMessage(
+                        `${robotEmoji} ${processedSummary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`,
+                        {
+                            mentions: mentions,
+                        }
                     );
+
                     break;
                 }
                 case adminCommands.imagine:
