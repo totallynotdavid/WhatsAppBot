@@ -742,7 +742,6 @@ client.on(`message`, async message => {
                             extractedMessages
                         );
 
-                    // Process mentions in the summary
                     const { processedSummary, mentions } =
                         await processMentionsInSummary(
                             summary,
@@ -750,7 +749,6 @@ client.on(`message`, async message => {
                             client
                         );
 
-                    // Send the message with mentions
                     await chatInfo.sendMessage(
                         `${robotEmoji} ${processedSummary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`,
                         {
