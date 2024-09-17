@@ -5,10 +5,7 @@ const {
     cleanupTempFiles,
 } = require("../utils/file-utils");
 
-const config =
-    process.env.NODE_ENV === `production`
-        ? require(`../config.prod`)
-        : require(`../config.dev`);
+const config = require("../config");
 const { TEMP_DIR } = config;
 
 async function convertGifToMp4(gifUrl) {

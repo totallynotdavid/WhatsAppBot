@@ -17,6 +17,9 @@ const youtube = require(`./youtube`);
 const spotify = require(`./spotify`);
 const editImage = require(`./editImage`);
 const translate = require(`./translate`);
+const chat = require(`./chat`);
+const freeChat = require(`./freeChat`);
+const resumen = require(`./resumen`);
 
 module.exports = {
     admin,
@@ -38,4 +41,7 @@ module.exports = {
     spotify,
     editImage,
     translate,
+    chat,
+    freeChat,
+    resumen,
 };

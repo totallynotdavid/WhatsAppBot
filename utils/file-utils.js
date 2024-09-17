@@ -4,10 +4,7 @@ const fetch = require("node-fetch");
 const os = require("os");
 const crypto = require("crypto");
 
-const config =
-    process.env.NODE_ENV === `production`
-        ? require(`../config.prod`)
-        : require(`../config.dev`);
+const config = require("../config");
 const { TEMP_DIR } = config;
 
 async function fetchAndSaveFile(url, extension) {

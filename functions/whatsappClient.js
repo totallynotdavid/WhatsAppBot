@@ -24,19 +24,23 @@ const {
     spotify,
     editImage,
     translate,
+    chat,
+    freeChat,
+    resumen,
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
 const { cleanupDirectory, getFileDirectory } = require(
     `../utils/file-utils.js`
 );
+const { extractMessageData } = require(`../utils/extract-messages.js`);
+const { processMentions } = require(`../utils/mentions.js`);
 
 // Import admin commands
 const {
     groups,
     db,
     mentions,
-    openai,
     imagine,
     getUserInfo,
     handleGlobalMessage,
@@ -497,7 +501,7 @@ client.on(`message`, async message => {
                     );
                     break;
                 case commands.chat: {
-                    const response = await openai.handleFreeChatWithGPT(
+                    const response = await freeChat.handleFreeChatCommand(
                         senderPhoneNumber,
                         groupId,
                         commandQuery,
@@ -714,34 +718,47 @@ client.on(`message`, async message => {
                     }
                     break;
                 }
-                case adminCommands.chat:
-                    if (commandQuery.length > 1) {
-                        const chatResponse = await openai.handleChatWithGPT(
-                            senderPhoneNumber,
-                            groupId,
-                            commandQuery
+                case adminCommands.chat: {
+                    const response = await chat.handleChatCommand(
+                        message.from,
+                        message.id.remote,
+                        commandQuery
+                    );
+                    await message.reply(`🤖 ${response}`);
+                    break;
+                }
+                case adminCommands.resumen: {
+                    try {
+                        const allMessages = await chatInfo.fetchMessages({
+                            limit: Infinity,
+                        });
+
+                        const extractedMessages = extractMessageData(
+                            allMessages,
+                            {
+                                limit: 60,
+                                textOnly: false,
+                            }
                         );
-                        message.reply(`${robotEmoji} ${chatResponse}`);
-                    } else {
-                        message.reply(
-                            `${robotEmoji} ¿De qué quieres hablar hoy?\n\n_Recuerda utilizar ${prefix_admin}chat si quieres seguir conversando._`
+
+                        const summary =
+                            await resumen.summarizeMessages(extractedMessages);
+
+                        const { processedSummary, mentions } =
+                            await processMentions(summary, chatInfo, client);
+
+                        await chatInfo.sendMessage(
+                            `${robotEmoji} ${processedSummary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`,
+                            {
+                                mentions: mentions,
+                            }
+                        );
+                    } catch (error) {
+                        console.error("Error in resumen command:", error);
+                        await message.reply(
+                            "Ocurrió un error. Inténtalo de nuevo."
                         );
                     }
-                    break;
-                case adminCommands.resumen: {
-                    const allMessages = await chatInfo.fetchMessages({
-                        limit: Infinity,
-                    });
-
-                    const latest50TextMessages = allMessages
-                        .filter(msg => msg.body)
-                        .slice(-50);
-
-                    const summary =
-                        await openai.summarizeMessages(latest50TextMessages);
-                    message.reply(
-                        `${robotEmoji} ${summary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`
-                    );
                     break;
                 }
                 case adminCommands.imagine:
