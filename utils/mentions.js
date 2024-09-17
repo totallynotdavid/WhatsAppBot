@@ -1,4 +1,4 @@
-async function processMentionsInSummary(summary, chat, client) {
+async function processMentions(summary, chat, client) {
     const phoneNumberRegex = /(\d{10,})/g;
     const mentionedNumbers = summary.match(phoneNumberRegex) || [];
     let processedSummary = summary;
@@ -14,13 +14,11 @@ async function processMentionsInSummary(summary, chat, client) {
             const contact = await client.getContactById(participantId);
             const mentionName = contact.pushname || contact.name || phoneNumber;
 
-            // Replace the phone number with the mention format
             processedSummary = processedSummary.replace(
                 new RegExp(phoneNumber, "g"),
-                `@${phoneNumber}`
+                `@${mentionName}`
             );
 
-            // Add the contact to the mentions array
             mentions.push(contact);
         }
     }
@@ -29,5 +27,5 @@ async function processMentionsInSummary(summary, chat, client) {
 }
 
 module.exports = {
-    processMentionsInSummary,
+    processMentions,
 };

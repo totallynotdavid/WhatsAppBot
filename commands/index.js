@@ -19,7 +19,7 @@ const editImage = require(`./editImage`);
 const translate = require(`./translate`);
 const chat = require(`./chat`);
 const freeChat = require(`./freeChat`);
-const summarize = require(`./summarize`);
+const resumen = require(`./resumen`);
 
 module.exports = {
     admin,
@@ -43,5 +43,5 @@ module.exports = {
     translate,
     chat,
     freeChat,
-    summarize,
+    resumen,
 };

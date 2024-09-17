@@ -26,7 +26,7 @@ const {
     translate,
     chat,
     freeChat,
-    summarize,
+    resumen,
 } = require(`../commands/index.js`);
 const { handleContactRequest } = require(`../lib/handlers/contactHandler.js`);
 const { launchPuppeteer } = require(`../lib/functions/index.js`);
@@ -34,7 +34,7 @@ const { cleanupDirectory, getFileDirectory } = require(
     `../utils/file-utils.js`
 );
 const { extractMessageData } = require(`../utils/extract-messages.js`);
-const { processMentionsInSummary } = require(`../utils/mentions.js`);
+const { processMentions } = require(`../utils/mentions.js`);
 
 // Import admin commands
 const {
@@ -728,34 +728,37 @@ client.on(`message`, async message => {
                     break;
                 }
                 case adminCommands.resumen: {
-                    const allMessages = await chatInfo.fetchMessages({
-                        limit: Infinity,
-                    });
+                    try {
+                        const allMessages = await chatInfo.fetchMessages({
+                            limit: Infinity,
+                        });
 
-                    const extractedMessages = extractMessageData(allMessages, {
-                        limit: 60,
-                        textOnly: false,
-                    });
-
-                    const summary =
-                        await summarize.handleSummarizeCommand(
-                            extractedMessages
+                        const extractedMessages = extractMessageData(
+                            allMessages,
+                            {
+                                limit: 60,
+                                textOnly: false,
+                            }
                         );
 
-                    const { processedSummary, mentions } =
-                        await processMentionsInSummary(
-                            summary,
-                            chatInfo,
-                            client
+                        const summary =
+                            await resumen.summarizeMessages(extractedMessages);
+
+                        const { processedSummary, mentions } =
+                            await processMentions(summary, chatInfo, client);
+
+                        await chatInfo.sendMessage(
+                            `${robotEmoji} ${processedSummary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`,
+                            {
+                                mentions: mentions,
+                            }
                         );
-
-                    await chatInfo.sendMessage(
-                        `${robotEmoji} ${processedSummary}\n\n_Esta función está en desarrollo, así que puede generar resultados inesperados._`,
-                        {
-                            mentions: mentions,
-                        }
-                    );
-
+                    } catch (error) {
+                        console.error("Error in resumen command:", error);
+                        await message.reply(
+                            "Ocurrió un error. Inténtalo de nuevo."
+                        );
+                    }
                     break;
                 }
                 case adminCommands.imagine:
