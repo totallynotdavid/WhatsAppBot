@@ -555,7 +555,7 @@ client.on(`message`, async message => {
             }
 
             /* Check if the sender is an admin of the group */
-            const participantsArray = Object.values(chatInfo.participants);
+            const participantsArray = chatInfo.participants || []; // This is not working. chatInfo is returning a PrivateChat object instead of a GroupChat object
             const admins = participantsArray.filter(
                 participant => participant.isAdmin
             );
