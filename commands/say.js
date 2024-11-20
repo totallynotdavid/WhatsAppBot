@@ -33,10 +33,10 @@ async function handleTextToSpeechCommand(client, message, args) {
                     message,
                     `Voz inválida. Usando voz aleatoria.`
                 );
-                text = args.join(" ");
+                text = args.slice(1).join(" ");
             }
         } else {
-            text = args.join(" ");
+            text = args.slice(1).join(" ");
         }
     }
 
