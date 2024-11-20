@@ -765,23 +765,32 @@ client.on(`message`, async message => {
                         message.reply(
                             `${robotEmoji} Trabajando en ello... dame unos segundos.`
                         );
-                        const translatedQuery =
-                            await translate.translateText(commandQuery);
-                        const pathsToImages =
-                            await imagine.handleImagine(translatedQuery);
-                        if (pathsToImages.length === 0)
-                            return message.reply(
-                                `${robotEmoji} No logré generar una imagen. Contacta al desarrollador.`
-                            );
 
-                        pathsToImages.forEach(pathToImage => {
-                            const media =
-                                MessageMedia.fromFilePath(pathToImage);
-                            client.sendMessage(message.id.remote, media);
-                        });
-                        message.reply(
-                            `${robotEmoji} ¡Terminamos, ya vienen las imágenes!`
-                        );
+                        try {
+                            const pathsToImages =
+                                await imagine.handleImagine(commandQuery);
+
+                            if (pathsToImages.length === 0) {
+                                return message.reply(
+                                    `${robotEmoji} No logré generar una imagen. Contacta al desarrollador.`
+                                );
+                            }
+
+                            pathsToImages.forEach(pathToImage => {
+                                const media =
+                                    MessageMedia.fromFilePath(pathToImage);
+                                client.sendMessage(message.id.remote, media);
+                            });
+
+                            message.reply(
+                                `${robotEmoji} ¡Terminamos, ya vienen las imágenes!`
+                            );
+                        } catch (error) {
+                            console.error("Error in imagine command:", error);
+                            message.reply(
+                                `${robotEmoji} Hubo un error al generar la imagen. Por favor intenta de nuevo.`
+                            );
+                        }
                     } else {
                         message.reply(
                             `${robotEmoji} ¿Qué quieres ver? Escribe una descripción de la imagen que quieres ver.`
